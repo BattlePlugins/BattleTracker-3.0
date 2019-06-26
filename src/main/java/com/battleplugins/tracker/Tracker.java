@@ -1,4 +1,4 @@
-package com.battlepluging.tracker;
+package com.battleplugins.tracker;
 
 import mc.alk.v1r7.core.MCPlugin;
 
@@ -13,6 +13,6 @@ public class Tracker extends MCPlugin {
 
     @Override
     public void onDisable() {
-        
+
     }
 }
