@@ -1,4 +1,4 @@
-package com.battleplugins.tracker;
+package org.battleplugins.tracker;
 
 import mc.alk.v1r7.core.MCPlugin;
 import org.bukkit.plugin.ServicePriority;

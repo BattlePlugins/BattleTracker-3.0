@@ -1,4 +1,4 @@
-package com.battleplugins.tracker;
+package org.battleplugins.tracker;
 
 /**
  * Interface used for tracking across all of
