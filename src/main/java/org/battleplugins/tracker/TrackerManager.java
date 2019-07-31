@@ -37,7 +37,7 @@ public class TrackerManager {
      * @return the PvP tracker interface
      */
     public TrackerInterface getPvPInterface() {
-        return interfaces.get(Tracker.PVP_INTERFACE);
+        return interfaces.get(BattleTracker.PVP_INTERFACE);
     }
 
     /**
@@ -46,7 +46,7 @@ public class TrackerManager {
      * @return the PvE tracker interface
      */
     public TrackerInterface getPvEInterface() {
-        return interfaces.get(Tracker.PVE_INTERFACE);
+        return interfaces.get(BattleTracker.PVE_INTERFACE);
     }
 
     /**

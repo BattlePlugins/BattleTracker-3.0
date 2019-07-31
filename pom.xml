@@ -9,6 +9,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <source>https://github.com/BattlePlugins/BattleTracker</source>
         <download>http://dev.bukkit.org/bukkit-plugins/battletracker2/</download>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <repositories>
