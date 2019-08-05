@@ -1,0 +1,8 @@
+# plugin.yml for Bukkit, nukkit.yml overrides this if Nukkit is installed
+main: org.battleplugins.tracker.bukkit.BukkitTrackerPlugin
+name: ${project.name}
+api-version: 1.13
+version: ${project.version}
+description: ${project.description}
+author: BattlePlugins
+website: ${project.url}

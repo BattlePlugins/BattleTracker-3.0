@@ -1,9 +1,9 @@
 package org.battleplugins.tracker.impl;
 
+import mc.alk.mc.MCOfflinePlayer;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.record.Record;
-import org.bukkit.OfflinePlayer;
 
 import java.util.Map;
 
@@ -36,72 +36,72 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public void incrementValue(StatType statType, OfflinePlayer player) {
+    public void incrementValue(StatType statType, MCOfflinePlayer player) {
         incrementValue(statType.getInternalName(), player);
     }
 
     @Override
-    public void incrementValue(String statType, OfflinePlayer player) {
+    public void incrementValue(String statType, MCOfflinePlayer player) {
         Record record = records.get(player.getName());
         record.setValue(statType, record.getStat(statType) + 1);
     }
 
     @Override
-    public void decrementValue(StatType statType, OfflinePlayer player) {
+    public void decrementValue(StatType statType, MCOfflinePlayer player) {
         decrementValue(statType.getInternalName(), player);
     }
 
     @Override
-    public void decrementValue(String statType, OfflinePlayer player) {
+    public void decrementValue(String statType, MCOfflinePlayer player) {
         Record record = records.get(player.getName());
         record.setValue(statType, record.getStat(statType) - 1);
     }
 
     @Override
-    public void setValue(StatType statType, int value, OfflinePlayer player) {
+    public void setValue(StatType statType, int value, MCOfflinePlayer player) {
         setValue(statType.getInternalName(), value, player);
     }
 
     @Override
-    public void setValue(String statType, int value, OfflinePlayer player) {
+    public void setValue(String statType, int value, MCOfflinePlayer player) {
         Record record = records.get(player.getName());
         record.setValue(statType, value);
     }
 
     @Override
-    public void updateRating(OfflinePlayer killer, OfflinePlayer loser) {
+    public void updateRating(MCOfflinePlayer killer, MCOfflinePlayer loser) {
 
     }
 
     @Override
-    public void enableTracking(OfflinePlayer player) {
+    public void enableTracking(MCOfflinePlayer player) {
         Record record = records.get(player.getName());
         record.setTracking(true);
     }
 
     @Override
-    public void disableTracking(OfflinePlayer player) {
+    public void disableTracking(MCOfflinePlayer player) {
         Record record = records.get(player.getName());
         record.setTracking(false);
     }
 
     @Override
-    public void enableMessages(OfflinePlayer player) {
+    public void enableMessages(MCOfflinePlayer player) {
 
     }
 
     @Override
-    public void disableMessages(OfflinePlayer player) {
+    public void disableMessages(MCOfflinePlayer player) {
 
     }
 
     @Override
-    public void createNewRecord(OfflinePlayer player, Record record) {
+    public void createNewRecord(MCOfflinePlayer player, Record record) {
         records.put(player.getName(), record);
     }
 
     @Override
-    public void removeRecord(OfflinePlayer player) {
+    public void removeRecord(MCOfflinePlayer player) {
         records.remove(player.getName());
     }
 
@@ -111,7 +111,7 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public void save(OfflinePlayer player) {
+    public void save(MCOfflinePlayer player) {
 
     }
 
