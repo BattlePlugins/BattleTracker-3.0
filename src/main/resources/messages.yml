@@ -1,0 +1,39 @@
+# -----------------
+# Main message config for BattleTracker
+#
+# Documentation: https://docs.battleplugins.org/docs/bt/messages
+# Support: https://discord.gg/tMVPVJf
+# GitHub: https://github.com/BattlePlugins/BattleTracker
+# -----------------
+
+## Options
+# %k : the killer (can be a player, mob, or environment)
+# %d : the dead player
+# %i : item used to kill the player (if one exists)
+# %n : number (used for streaks, rampages)
+
+## Messages
+# If a BattleTracker message is defaulting to 'unknown', that most
+# likely means it has not been added yet. Upon an unknown death, a
+# message is sent to the console with the unformatted death reason (or entity).
+# If you want to add it yourself, take a look at this page:
+
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+
+special:
+  rampage:
+    default: "&6%k&f has slain &6%d&f on a rampage of &c%n&f kills!"
+    "2": "&6%k&f has started a rampage on &6%d&f!"
+    "3": "&6%k&f is on a rampage!!"
+  streak:
+    default: "&6%k&f has slain &6%d&f in a streak of &c%n&f kills!"
+    "10": "&6%k&f is on a killing spree! slaying &6%d&f in a streak of &c%n&f kills!"
+    "20": "&6%k&f is unstoppable killing &6%d&f in a streak of &c%n&f kills!"
+
+messages:
+  prefix: "&5[Tracker]&f "
+  xBetween: "&cx must be between 1 and %s"
+  recordNotFound: "&cA record for player &6%s&4 couldn't be found"
+  playerNotFound: "&cThe player %s was not found"
+  noRecordsInTable: "&cThere are no records in the &6%s&c table"

@@ -1,7 +1,7 @@
 package org.battleplugins.tracker.nukkit;
 
 import cn.nukkit.plugin.service.ServicePriority;
-import mc.alk.nukkit.plugin.NukkitPlugin;
+import mc.alk.battlecore.nukkit.NukkitBattlePlugin;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerManager;
 
@@ -10,10 +10,12 @@ import org.battleplugins.tracker.TrackerManager;
  *
  * @author Redned
  */
-public class NukkitTrackerPlugin extends NukkitPlugin {
+public class NukkitTrackerPlugin extends NukkitBattlePlugin {
 
     @Override
     public void onEnable() {
+        super.onEnable();
+
         BattleTracker.setInstance(new BattleTracker(this));
         // Register the tracker manager into the service provider API
         getServer().getServiceManager().register(TrackerManager.class, BattleTracker.getInstance().getTrackerManager(), this, ServicePriority.NORMAL);
@@ -21,6 +23,6 @@ public class NukkitTrackerPlugin extends NukkitPlugin {
 
     @Override
     public void onDisable() {
-
+        super.onDisable();
     }
 }

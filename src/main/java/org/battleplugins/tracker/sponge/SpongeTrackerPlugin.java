@@ -1,6 +1,6 @@
 package org.battleplugins.tracker.sponge;
 
-import mc.alk.sponge.plugin.SpongePlugin;
+import mc.alk.battlecore.sponge.SpongeBattlePlugin;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInfo;
 import org.spongepowered.api.plugin.Plugin;
@@ -11,7 +11,7 @@ import org.spongepowered.api.plugin.Plugin;
  * @author Redned
  */
 @Plugin(id = "bt", authors = "BattlePlugins", name = TrackerInfo.NAME, version = TrackerInfo.VERSION, description = TrackerInfo.DESCRIPTION, url = TrackerInfo.URL)
-public class SpongeTrackerPlugin extends SpongePlugin {
+public class SpongeTrackerPlugin extends SpongeBattlePlugin {
 
     @Override
     public void onEnable() {

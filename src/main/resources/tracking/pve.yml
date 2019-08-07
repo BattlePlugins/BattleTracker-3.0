@@ -1,0 +1,118 @@
+# -----------------
+# Main config for the PvE tracker
+#
+# Documentation: https://docs.battleplugins.org/docs/bt/
+# Support: https://discord.gg/tMVPVJf
+# GitHub: https://github.com/BattlePlugins/BattleTracker
+# -----------------
+
+## Options
+# %k : the killer (can be a player, mob, or environment)
+# %d : the dead player
+# %i : item used to kill the player (if one exists)
+# %n : number (used for streaks, rampages)
+
+## Messages
+# If a BattleTracker message is defaulting to 'unknown', that most
+# likely means it has not been added yet. Upon an unknown death, a
+# message is sent to the console with the unformatted death reason (or entity).
+# If you want to add it yourself, take a look at this page:
+
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+
+pve:
+  enabled: true
+  command: pve
+  prefix: "&e[PvE]&f "
+  options:
+    overrideBukkitMessages: true
+    useHoverMessages: true
+    useClickMessages: true
+    hoverContent: all # can be 'all', 'armor' or 'recap', 'all' covers both
+    clickContent: all # can be 'all', 'inventory', 'armor' or 'recap', 'all' covers all three
+  messages:
+    entityDeaths:
+      creeper:
+        - "The &2creeper&f blast vaporized &6%d&f"
+      zombie:
+        - "&6%d&f has left this world as a &2zombie"
+        - "&2Zombies&f have devoured &6%d&f"
+        - "The &2zombie&f horde have claimed &6%d&f"
+      skeleton:
+        - "&6%d&f was pierced by a &7skeleton&f arrow"
+        - "&6%d&f was no match for the &7skeleton&f"
+      spider:
+        - "Spiders have drained &6%d&f"
+      cavespider:
+        - "Cavespiders have swarmed &6%d&f"
+      enderdragon:
+        - "The &8ender dragon&f has annihilated &6%d&f"
+      blaze:
+        - "The &4blaze&f has crisped &6%d&f"
+      silverfish:
+        - "&6%d&f was overwhelmed by silverfish"
+      enderman:
+        - "&8Endermen&f have taken &6%d&f to the nether"
+        - '&6%d&f looked into the eyes of the&8Endermen'
+      snowman:
+        - '&8Endermen&f have taken &6%d&f to the nether'
+      ozelot:
+        - 'The cute ocelot showed its power to &6%d&f'
+        - '&6%d&f discovered that ocelots have fangs'
+      anvil:
+        - '&6%d&f was crushed by an anvil'
+        - '&6%d&f found to use anvils, not stand under them'
+      wolf:
+        - "&6%d&f was hunted down by the pack"
+        - "&6%d&f was devored by wolves"
+      giant:
+        - "&6%d&f was smashed by a Giant"
+        - "A giant has flattened &6%d&f"
+      slime:
+        - "&6%d&f was liquified by a &aslime"
+        - "&6%d&f was enveloped by &aslime"
+      ghast:
+        - "&6%d&f was burned by ghasts"
+      pigzombie:
+        - "The PigZombie horde has claimed &6%d&f"
+      lavaslime:
+        - "&6%d&f has been lavaslimed!"
+      unknown:
+        - "&6%d&f has been slain by &6%k"
+        - "&6%d&f has lost against a puny &6%k"
+    causeDeaths:
+      fire:
+        - "&6%d&f was fried to a crisp"
+        - "&6%d&f burned to death"
+      fire_tick:
+        - "&6%d&f tried to extinguish the flames, but failed"
+      lava:
+        - "&6%d&f was no match for a pool of lava"
+      fall:
+        - "&6%d&f found out what the ground feels like"
+      contact:
+        - "&6%d&f should learn to not jump on a cactus"
+      block_explosion:
+        - "&6%d&f has been shredded by TNT"
+      primedtnt:
+        - "&6%d&f has been shredded by TNT"
+      suffocation:
+        - "&6%d&f ran out of breath"
+      starvation:
+        - "&6%d&f should learn to eat"
+      lightning:
+        - "&6%d&f was struck down by a bolt of lightning"
+      suicide:
+        - "hari kari suited &6%d&f"
+        - "&6%d&f chose the ignoble way out"
+      drowning:
+        - "&6%d&f needs to learn to swim"
+        - "dog paddling wasn't enough for &6%d&f"
+        - "&2water&f was the end of poor &6%d&f"
+      void:
+        - "The &0void&f has claimed &6%d&f"
+      unknown:
+        - "&6%d&f was slain!"
+        - "&6%d&f has lost in battle!"
+        - "&6%d&f should learn not to die!"

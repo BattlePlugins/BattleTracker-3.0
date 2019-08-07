@@ -1,0 +1,50 @@
+# -----------------
+# Main configuration for BattleTracker
+#
+# Documentation: https://docs.battleplugins.org/docs/bt/
+# Support: https://discord.gg/tMVPVJf
+# GitHub: https://github.com/BattlePlugins/BattleTracker
+# -----------------
+
+## If PvP should be tracked.
+trackPvP: true
+
+# If PvE should be tracked.
+trackPvE: true
+
+## Entities that should be ignored when they kill or are killed.
+ignoredEntities: []
+
+## Worlds that should be ignored for tracking.
+ignoreWorlds: []
+
+## If signs should be used.
+useSigns: true
+
+## A radius in which death messages should be sent.
+## Use '0' to send to everyone online.
+msgRadius: 0
+
+## If the number of seconds between kills is less than
+## this number, show a message that the player is on a rampage.
+rampageTime: 20
+
+## Display a streak message every x kills
+streakMessageEvery: 15
+
+## Database options.
+SQLOptions:
+  type: sqlite # sqlite or mysql
+  prefix: bt_
+  db: tracker # db name
+  url : localhost # ignored if not mysql
+  port : "3306" # ignored if not mysql
+  username: root
+  password: ""
+
+## These are the default rating options, can be overriden
+## by calling plugins (e.g. BattleArena)
+rating:
+  elo:
+    default: 1250
+    spread: 400

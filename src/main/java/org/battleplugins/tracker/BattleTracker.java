@@ -1,6 +1,7 @@
 package org.battleplugins.tracker;
 
 import mc.alk.mc.plugin.MCPlugin;
+import org.battleplugins.tracker.executor.PvPExecutor;
 
 /**
  * Overall main class for the BattleTracker plugin.
@@ -20,6 +21,8 @@ public final class BattleTracker {
     public BattleTracker(MCPlugin platform) {
         this.platform = platform;
         this.trackerManager = new TrackerManager();
+
+        platform.registerMCCommand("pvp", new PvPExecutor());
     }
 
     /**
@@ -55,6 +58,5 @@ public final class BattleTracker {
             throw new UnsupportedOperationException("Cannot redefine singleton BattleTracker!");
 
             instance = tracker;
-
     }
 }
