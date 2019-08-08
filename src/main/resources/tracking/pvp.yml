@@ -23,7 +23,7 @@
 
 pvp:
   enabled: true
-  command: pvp
+  name: PvP
   prefix: "&4[PvP]&f "
   options:
     overrideBukkitMessages: true

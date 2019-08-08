@@ -23,7 +23,7 @@
 
 pve:
   enabled: true
-  command: pve
+  name: PvE
   prefix: "&e[PvE]&f "
   options:
     overrideBukkitMessages: true

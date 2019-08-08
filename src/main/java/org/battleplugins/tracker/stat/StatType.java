@@ -8,21 +8,23 @@ package org.battleplugins.tracker.stat;
  */
 public enum StatType {
 
-    KILLS("Kills"),
-    DEATHS("Deaths"),
-    TIES("Ties"),
-    STREAK("Streak"),
-    MAX_STREAK("Max Streak"),
-    RANKING("Ranking"),
-    MAX_RANKING("Max Ranking"),
-    RATING("Rating"),
-    MAX_RATING("Max Rating"),
-    KD_RATIO("K/D Ratio");
+    KILLS("Kills", true),
+    DEATHS("Deaths", true),
+    TIES("Ties", true),
+    STREAK("Streak", false),
+    MAX_STREAK("Max Streak", true),
+    RANKING("Ranking", false),
+    MAX_RANKING("Max Ranking", true),
+    RATING("Rating", true),
+    MAX_RATING("Max Rating", true),
+    KD_RATIO("K/D Ratio", false);
 
     private String name;
+    private boolean track;
 
-    StatType(String name) {
+    StatType(String name, boolean track) {
         this.name = name;
+        this.track = track;
     }
 
     public String getInternalName() {
@@ -31,5 +33,9 @@ public enum StatType {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isTracking() {
+        return track;
     }
 }

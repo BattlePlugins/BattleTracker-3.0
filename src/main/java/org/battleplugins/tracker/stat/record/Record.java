@@ -1,8 +1,10 @@
 package org.battleplugins.tracker.stat.record;
 
+import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.stat.StatType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,15 +20,24 @@ public abstract class Record {
     protected String id;
     protected float rating;
 
-    protected Map<String, Integer> stats;
+    protected Map<String, Float> stats;
 
     protected boolean tracking;
 
-    public Record(TrackerInterface tracker, String id, Map<String, Integer> stats, int rating) {
+    public Record(TrackerInterface tracker, String id) {
+        this(tracker, id, new HashMap<>(), BattleTracker.getInstance().getDefaultCalculator().getDefaultRating());
+    }
+
+    public Record(TrackerInterface tracker, String id, float rating) {
+        this(tracker, id, new HashMap<>(), rating);
+    }
+
+    public Record(TrackerInterface tracker, String id, Map<String, Integer> stats, float rating) {
         this.tracker = tracker;
 
         this.id = id;
         this.rating = rating;
+        this.stats = new HashMap<>();
         this.tracking = true;
     }
 
@@ -46,7 +57,7 @@ public abstract class Record {
      * @param stat the StatType to get the value of
      * @return the value for the specified StatType
      */
-    public int getStat(StatType stat) {
+    public float getStat(StatType stat) {
         return getStat(stat.getInternalName());
     }
 
@@ -56,7 +67,7 @@ public abstract class Record {
      * @param stat the stat to get the value of
      * @return the value for the specified stat
      */
-    public int getStat(String stat) {
+    public float getStat(String stat) {
         if (!stats.containsKey(stat))
             return 0;
 
@@ -69,7 +80,7 @@ public abstract class Record {
      * @param stat the stat to set the value for
      * @param value the (new) value of the stat
      */
-    public void setValue(String stat, int value) {
+    public void setValue(String stat, float value) {
         stats.put(stat, value);
     }
 
@@ -81,7 +92,7 @@ public abstract class Record {
      *
      * @return a map of all the stats
      */
-    public Map<String, Integer> getStats() {
+    public Map<String, Float> getStats() {
         return stats;
     }
 

@@ -58,4 +58,23 @@ public class TrackerManager {
     public boolean hasInterface(String interfaceName) {
         return interfaces.containsKey(interfaceName);
     }
+
+    /**
+     * Adds a new tracker interface
+     *
+     * @param interfaceName the name of the tracker interface
+     * @param trackerInterface the tracker interface
+     */
+    public void addInterface(String interfaceName, TrackerInterface trackerInterface) {
+       interfaces.put(interfaceName, trackerInterface);
+    }
+
+    /**
+     * Removes an existing tracker interface
+     *
+     * @param interfaceName the name of the tracker interface
+     */
+    public void removeInterface(String interfaceName) {
+        interfaces.remove(interfaceName);
+    }
 }

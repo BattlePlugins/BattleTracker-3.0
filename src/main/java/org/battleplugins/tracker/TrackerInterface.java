@@ -4,6 +4,8 @@ import mc.alk.mc.MCOfflinePlayer;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.record.Record;
 
+import java.util.Map;
+
 /**
  * Main interface used for tracking.
  *
@@ -24,6 +26,32 @@ public interface TrackerInterface {
      * @return the amount of stored records
      */
     int getRecordCount();
+
+    /**
+     * Returns if a player has a record in the tracker
+     *
+     * @param player the player to check
+     * @return if a player has a record in the tracker
+     */
+    boolean hasRecord(MCOfflinePlayer player);
+
+    /**
+     * Returns the record for the given OfflinePlayer
+     *
+     * @param player the OfflinePlayer to get the record from
+     * @return the record for the given OfflinePlayer
+     */
+    Record getRecord(MCOfflinePlayer player);
+
+    /**
+     * Returns a map of all the records
+     *
+     * Key: the name of the player
+     * Value: the record value
+     *
+     * @return a map of all the records
+     */
+    Map<String, Record> getRecords();
 
     /**
      * Increments a value with the given stat type
@@ -64,7 +92,7 @@ public interface TrackerInterface {
      * @param value the value to set
      * @param player the player to set the value for
      */
-    void setValue(StatType statType, int value, MCOfflinePlayer player);
+    void setValue(StatType statType, float value, MCOfflinePlayer player);
 
     /**
      * Sets a value with the given stat type
@@ -73,15 +101,16 @@ public interface TrackerInterface {
      * @param value the value to set
      * @param player the player to set the value for
      */
-    void setValue(String statType, int value, MCOfflinePlayer player);
+    void setValue(String statType, float value, MCOfflinePlayer player);
 
     /**
      * Sets the ranking for the specified players
      *
      * @param killer the player to increment the rating for
      * @param loser the player to decrement the rating for
+     * @param tie if the end result was a tie
      */
-    void updateRating(MCOfflinePlayer killer, MCOfflinePlayer loser);
+    void updateRating(MCOfflinePlayer killer, MCOfflinePlayer loser, boolean tie);
 
     /**
      * Enables tracking for the specified player

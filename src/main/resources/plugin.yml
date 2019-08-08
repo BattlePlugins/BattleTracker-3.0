@@ -10,3 +10,6 @@ commands:
   pvp:
     description: Main command for the PvP tracker
     usage: /pvp help
+  pve:
+    description: Main command for the PvE tracker
+    usage: /pve help
