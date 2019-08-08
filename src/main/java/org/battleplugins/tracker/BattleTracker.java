@@ -1,12 +1,13 @@
 package org.battleplugins.tracker;
 
+import mc.alk.mc.command.MCCommand;
 import mc.alk.mc.plugin.MCPlugin;
 import org.battleplugins.tracker.executor.TrackerExecutor;
 import org.battleplugins.tracker.impl.Tracker;
 import org.battleplugins.tracker.stat.calculator.EloCalculator;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
-import org.battleplugins.tracker.stat.record.Record;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -37,8 +38,11 @@ public final class BattleTracker {
         trackerManager.addInterface(PVP_INTERFACE, new Tracker(PVP_INTERFACE, defaultCalculator, new HashMap<>()));
         trackerManager.addInterface(PVE_INTERFACE, new Tracker(PVE_INTERFACE, defaultCalculator, new HashMap<>()));
 
-        platform.registerMCCommand(PVP_INTERFACE.toLowerCase(), new TrackerExecutor(this, PVP_INTERFACE));
-        platform.registerMCCommand(PVE_INTERFACE.toLowerCase(), new TrackerExecutor(this, PVE_INTERFACE));
+        MCCommand pvpCommand = new MCCommand(PVP_INTERFACE.toLowerCase(), "Main " + PVP_INTERFACE.toLowerCase() + " executor.", "battletracker.pvp", new ArrayList<>());
+        MCCommand pveCommand = new MCCommand(PVE_INTERFACE.toLowerCase(), "Main " + PVE_INTERFACE.toLowerCase() + " executor.", "battletracker.pve", new ArrayList<>());
+
+        platform.registerMCCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
+        platform.registerMCCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
     }
 
     /**
