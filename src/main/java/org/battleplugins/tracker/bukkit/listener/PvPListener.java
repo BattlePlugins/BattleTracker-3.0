@@ -41,8 +41,6 @@ public class PvPListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(PlayerDeathEvent event) {
-        // TODO: Add untracked worlds here
-
         Player killed = event.getEntity();
 
         EntityDamageEvent lastDamageCause = killed.getLastDamageCause();
@@ -78,6 +76,11 @@ public class PvPListener implements Listener {
         }
 
         if (killer == null)
+            return;
+
+        // Check the killers world just incase for some reason the
+        // killed player was teleported to another world
+        if (tracker.getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
             return;
 
         updateStats(killed, killer);

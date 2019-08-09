@@ -36,7 +36,6 @@ public class PvPListener {
      */
     @Listener
     public void onDeath(DestructEntityEvent.Death event) {
-        // TODO: Add untracked worlds here
         if (!(event.getTargetEntity() instanceof Player))
             return;
 
@@ -65,6 +64,11 @@ public class PvPListener {
         // Sponge has no support for tameable entities..
 
         if (killer == null)
+            return;
+
+        // Check the killers world just incase for some reason the
+        // killed player was teleported to another world
+        if (tracker.getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
             return;
 
         updateStats(killed, killer);

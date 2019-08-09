@@ -6,18 +6,6 @@
 # GitHub: https://github.com/BattlePlugins/BattleTracker
 # -----------------
 
-## If PvP should be tracked.
-trackPvP: true
-
-# If PvE should be tracked.
-trackPvE: true
-
-## Entities that should be ignored when they kill or are killed.
-ignoredEntities: []
-
-## Worlds that should be ignored for tracking.
-ignoreWorlds: []
-
 ## If signs should be used.
 useSigns: true
 
@@ -42,9 +30,11 @@ SQLOptions:
   username: root
   password: ""
 
-## These are the default rating options, can be overriden
+## These are the default rating options, can be overridden
 ## by calling plugins (e.g. BattleArena)
 rating:
-  elo:
-    default: 1250
-    spread: 400
+  calculator: elo # currently just 'elo' works
+  options:
+    elo:
+      default: 1250
+      spread: 400

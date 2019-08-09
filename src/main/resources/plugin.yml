@@ -1,4 +1,4 @@
-# plugin.yml for Bukkit, nukkit.yml overrides this if Nukkit is installed
+# plugin.yml for Bukkit, nukkit.yml overrides this if Nukkit is used instead
 main: org.battleplugins.tracker.bukkit.BukkitTrackerPlugin
 name: ${project.name}
 api-version: 1.13
@@ -6,10 +6,3 @@ version: ${project.version}
 description: ${project.description}
 author: BattlePlugins
 website: ${project.url}
-commands:
-  pvp:
-    description: Main command for the PvP tracker
-    usage: /pvp help
-  pve:
-    description: Main command for the PvE tracker
-    usage: /pve help

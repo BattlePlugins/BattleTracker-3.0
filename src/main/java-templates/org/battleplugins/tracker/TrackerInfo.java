@@ -2,8 +2,8 @@ package org.battleplugins.tracker;
 
 /**
  * Class that holds information about BattleTracker
- * from the pom. Due to the nature of how the Sponge API
- * is written, this class had to be created.
+ * from the pom. Due to how the Sponge API is written,
+ * this class had to be created.
  *
  * Values here are replaced at runtime.
  *
