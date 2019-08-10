@@ -18,7 +18,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import java.util.Optional;
 
 /**
- * Main listener for PvE tracking in Nukkit.
+ * Main listener for PvE tracking in Sponge.
  *
  * @author Redned
  */
