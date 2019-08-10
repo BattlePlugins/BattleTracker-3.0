@@ -1,6 +1,6 @@
 package org.battleplugins.tracker.bukkit.listener;
 
-import mc.alk.bukkit.BukkitOfflinePlayer;
+import mc.alk.mc.MCServer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.bukkit.util.CompatUtil;
@@ -56,7 +56,7 @@ public class PvPListener implements Listener {
             if (damager instanceof Projectile) {
                 Projectile proj = (Projectile) damager;
                 if (proj.getShooter() instanceof Player) {
-                    killer = (Player) damager;
+                    killer = (Player) proj.getShooter();
                     weapon = CompatUtil.getItemInMainHand(killer);
                 }
             }
@@ -64,7 +64,7 @@ public class PvPListener implements Listener {
             if (damager instanceof Tameable && ((Tameable) damager).isTamed()) {
                 AnimalTamer owner = ((Tameable) damager).getOwner();
                 if (owner instanceof Player) {
-                    killer = (Player) damager;
+                    killer = (Player) owner;
                     // Use a bone to show the case was a wolf
                     ItemStack bone = new ItemStack(Material.BONE);
                     ItemMeta meta = bone.getItemMeta();
@@ -90,15 +90,15 @@ public class PvPListener implements Listener {
 
     public void updateStats(Player killed, Player killer) {
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        Record killerRecord = pvpTracker.getRecord(new BukkitOfflinePlayer(killer));
-        Record killedRecord = pvpTracker.getRecord(new BukkitOfflinePlayer(killed));
+        Record killerRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killer.getName()));
+        Record killedRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killed.getName()));
 
         if (killerRecord.isTracking())
-            pvpTracker.incrementValue(StatType.KILLS, new BukkitOfflinePlayer(killer));
+            pvpTracker.incrementValue(StatType.KILLS, MCServer.getOfflinePlayer(killer.getName()));
 
         if (killedRecord.isTracking())
-            pvpTracker.incrementValue(StatType.DEATHS, new BukkitOfflinePlayer(killed));
+            pvpTracker.incrementValue(StatType.DEATHS, MCServer.getOfflinePlayer(killed.getName()));
 
-        pvpTracker.updateRating(new BukkitOfflinePlayer(killer), new BukkitOfflinePlayer(killed), false);
+        pvpTracker.updateRating(MCServer.getOfflinePlayer(killer.getName()), MCServer.getOfflinePlayer(killed.getName()), false);
     }
 }

@@ -47,6 +47,9 @@ public final class BattleTracker {
         boolean trackPvP = pvpConfig.getBoolean("enabled", true);
         boolean trackPvE = pveConfig.getBoolean("enabled", true);
 
+        trackerManager.setTrackPvP(trackPvP);
+        trackerManager.setTrackPvE(trackPvE);
+
         PVP_INTERFACE = pvpConfig.getString("name");
         PVE_INTERFACE = pveConfig.getString("name");
 

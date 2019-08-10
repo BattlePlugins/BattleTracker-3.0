@@ -17,7 +17,8 @@ public enum StatType {
     MAX_RANKING("Max Ranking", true),
     RATING("Rating", true),
     MAX_RATING("Max Rating", true),
-    KD_RATIO("K/D Ratio", false);
+    KD_RATIO("K/D Ratio", false),
+    MAX_KD_RATIO("Max K/D Ratio", true);
 
     private String name;
     private boolean track;

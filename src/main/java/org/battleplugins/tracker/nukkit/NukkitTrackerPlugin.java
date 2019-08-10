@@ -4,8 +4,9 @@ import cn.nukkit.plugin.service.ServicePriority;
 import mc.alk.battlecore.nukkit.NukkitBattlePlugin;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerManager;
-import org.battleplugins.tracker.nukkit.listener.PvPListener;
 import org.battleplugins.tracker.nukkit.listener.TrackerListener;
+import org.battleplugins.tracker.nukkit.listener.PvEListener;
+import org.battleplugins.tracker.nukkit.listener.PvPListener;
 
 /**
  * Main class for BattleTracker Nukkit.
@@ -23,7 +24,14 @@ public class NukkitTrackerPlugin extends NukkitBattlePlugin {
         // Register the tracker manager into the service provider API
         getServer().getServiceManager().register(TrackerManager.class, BattleTracker.getInstance().getTrackerManager(), this, ServicePriority.NORMAL);
 
-        getServer().getPluginManager().registerEvents(new PvPListener(tracker), this);
+        if (tracker.getTrackerManager().isTrackingPvE()) {
+            getServer().getPluginManager().registerEvents(new PvEListener(tracker), this);
+        }
+
+        if (tracker.getTrackerManager().isTrackingPvP()) {
+            getServer().getPluginManager().registerEvents(new PvPListener(tracker), this);
+        }
+
         getServer().getPluginManager().registerEvents(new TrackerListener(tracker), this);
     }
 

@@ -30,11 +30,11 @@ public class TrackerListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
-        if (!pvpInterface.hasRecord(MCServer.getOfflinePlayer(event.getPlayer().getName()))) {
+        if (!pvpInterface.hasRecord(MCServer.getOfflinePlayer(event.getPlayer().getName())) && tracker.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(MCServer.getOfflinePlayer(event.getPlayer().getName()), new PlayerRecord(pvpInterface, event.getPlayer().getName()));
         }
 
-        if (!pveInterface.hasRecord(MCServer.getOfflinePlayer(event.getPlayer().getName()))) {
+        if (!pveInterface.hasRecord(MCServer.getOfflinePlayer(event.getPlayer().getName())) && tracker.getTrackerManager().isTrackingPvE()) {
             pveInterface.createNewRecord(MCServer.getOfflinePlayer(event.getPlayer().getName()), new PlayerRecord(pveInterface, event.getPlayer().getName()));
         }
     }

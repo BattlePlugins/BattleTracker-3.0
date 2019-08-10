@@ -59,13 +59,11 @@ public class PvPListener implements Listener {
 
             if (damager instanceof EntityTameable && ((EntityTameable) damager).isTamed()) {
                 Player owner = ((EntityTameable) damager).getOwner();
-                if (owner instanceof Player) {
-                    killer = (Player) damager;
-                    // Use a bone to show the case was a wolf
-                    Item bone = new Item(Item.BONE);
-                    bone.setCustomName(damager.getName() == null ? "Wolf" : damager.getName());
-                    weapon = bone;
-                }
+                killer = (Player) damager;
+                // Use a bone to show the case was a wolf
+                Item bone = new Item(Item.BONE);
+                bone.setCustomName(damager.getName() == null ? "Wolf" : damager.getName());
+                weapon = bone;
             }
         }
 

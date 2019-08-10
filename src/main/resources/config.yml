@@ -15,7 +15,7 @@ msgRadius: 0
 
 ## If the number of seconds between kills is less than
 ## this number, show a message that the player is on a rampage.
-rampageTime: 20
+rampageTime: 15
 
 ## Display a streak message every x kills
 streakMessageEvery: 15

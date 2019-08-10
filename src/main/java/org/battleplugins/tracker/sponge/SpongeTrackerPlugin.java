@@ -3,6 +3,7 @@ package org.battleplugins.tracker.sponge;
 import mc.alk.battlecore.sponge.SpongeBattlePlugin;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInfo;
+import org.battleplugins.tracker.sponge.listener.PvEListener;
 import org.battleplugins.tracker.sponge.listener.PvPListener;
 import org.battleplugins.tracker.sponge.listener.TrackerListener;
 import org.spongepowered.api.Sponge;
@@ -23,7 +24,14 @@ public class SpongeTrackerPlugin extends SpongeBattlePlugin {
         BattleTracker tracker = new BattleTracker(this);
         BattleTracker.setInstance(tracker);
 
-        Sponge.getEventManager().registerListeners(this, new PvPListener(tracker));
+        if (tracker.getTrackerManager().isTrackingPvE()) {
+            Sponge.getEventManager().registerListeners(this, new PvEListener(tracker));
+        }
+
+        if (tracker.getTrackerManager().isTrackingPvP()) {
+            Sponge.getEventManager().registerListeners(this, new PvPListener(tracker));
+        }
+
         Sponge.getEventManager().registerListeners(this, new TrackerListener(tracker));
     }
 

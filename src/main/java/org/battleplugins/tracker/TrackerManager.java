@@ -14,10 +14,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TrackerManager {
 
+    private boolean trackPvP;
+    private boolean trackPvE;
+
     private Map<String, TrackerInterface> interfaces;
 
     public TrackerManager() {
         interfaces = Collections.synchronizedMap(new ConcurrentHashMap<String, TrackerInterface>());
+        trackPvP = true;
+        trackPvE = true;
     }
 
     /**
@@ -76,5 +81,41 @@ public class TrackerManager {
      */
     public void removeInterface(String interfaceName) {
         interfaces.remove(interfaceName);
+    }
+
+    /**
+     * Returns if PvP is tracked
+     *
+     * @return if PvP is tracked
+     */
+    public boolean isTrackingPvP() {
+        return trackPvP;
+    }
+
+    /**
+     * Sets if PvP should be tracked
+     *
+     * @param trackPvP if PvP should be tracked
+     */
+    public void setTrackPvP(boolean trackPvP) {
+        this.trackPvP = trackPvP;
+    }
+
+    /**
+     * Returns if PvE is tracked
+     *
+     * @return if PvE is tracked
+     */
+    public boolean isTrackingPvE() {
+        return trackPvE;
+    }
+
+    /**
+     * Sets if PvE should be tracked
+     *
+     * @param trackPvE if PvE should be tracked
+     */
+    public void setTrackPvE(boolean trackPvE) {
+        this.trackPvE = trackPvE;
     }
 }

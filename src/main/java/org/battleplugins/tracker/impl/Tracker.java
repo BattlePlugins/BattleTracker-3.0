@@ -102,15 +102,30 @@ public class Tracker implements TrackerInterface {
         setValue(StatType.RATING, killedRecord.getRating(), killed);
 
         if (killerRating > killerMaxRating)
-            setValue(StatType.MAX_RATING, killerRecord.getRating(), killer);
+            setValue(StatType.MAX_RATING, killerRating, killer);
 
         if (killedRating > killedMaxRating)
-            setValue(StatType.MAX_RATING, killedRecord.getRating(), killed);
+            setValue(StatType.MAX_RATING, killedRating, killed);
 
         if (tie) {
             setValue(StatType.TIES, killerRecord.getStat(StatType.TIES) + 1, killer);
             setValue(StatType.TIES, killedRecord.getStat(StatType.TIES) + 1, killed);
         }
+
+        setValue(StatType.KD_RATIO, killerRecord.getStat(StatType.KILLS) / killerRecord.getStat(StatType.DEATHS), killer);
+        setValue(StatType.KD_RATIO, killedRecord.getStat(StatType.KILLS) / killedRecord.getStat(StatType.DEATHS), killed);
+
+        float killerKdr = killerRecord.getStat(StatType.KD_RATIO);
+        float killedKdr = killedRecord.getStat(StatType.KD_RATIO);
+
+        float killerMaxKdr = killerRecord.getStat(StatType.MAX_KD_RATIO);
+        float killedMaxKdr = killedRecord.getStat(StatType.MAX_KD_RATIO);
+
+        if (killerKdr > killerMaxKdr)
+            setValue(StatType.MAX_KD_RATIO, killerKdr, killer);
+
+        if (killedKdr > killedMaxKdr)
+            setValue(StatType.MAX_KD_RATIO, killedKdr, killed);
     }
 
     @Override
