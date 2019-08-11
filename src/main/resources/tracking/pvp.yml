@@ -1,0 +1,60 @@
+# -----------------
+# Main config for the PvP tracker
+#
+# Documentation: https://docs.battleplugins.org/docs/bt/
+# Support: https://discord.gg/tMVPVJf
+# GitHub: https://github.com/BattlePlugins/BattleTracker
+# -----------------
+
+## Options
+# %k : the killer (can be a player, mob, or environment)
+# %d : the dead player
+# %i : item used to kill the player (if one exists)
+# %n : number (used for streaks, rampages)
+
+## Messages
+# If a BattleTracker message is defaulting to 'unknown', that most
+# likely means it has not been added yet. Upon an unknown death, a
+# message is sent to the console with the unformatted death reason (or entity).
+# If you want to add it yourself, take a look at this page:
+
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+
+enabled: true
+name: PvP
+prefix: "&4[PvP]&f "
+options:
+  command: pvp
+  overrideBukkitMessages: true
+  useHoverMessages: true
+  useClickMessages: true
+  hoverContent: all
+  clickContent: all
+
+ignoredWorlds:
+  - disabledWorld1
+  - disabledWorld2
+
+messages:
+  bow:
+    - '&6%k&f feathered &6%d&f with arrows from &e%i &5%l'
+    - '&6%k&fs arrow pierced through &6%d&f with &e%i &5%l'
+  air:
+    - "&6%k&f pummeled &6%d&f with their bare hands!"
+    - "&6%d&f was no match for the combat skills of &6%k&f"
+    - "&6%k&f showed &6%d&f that fists are weapons too"
+    - "&6%k&f fists broke down &6%d&f"
+  diamond_sword:
+    - "&6%k&f sliced through &6%d&f with a &6%i&f"
+    - "&6%k&f's &6%i&f split &6%d&f in two"
+  iron_sword:
+    - "&6%k&f slayed &6%d&f with an &6%i&f"
+  wood_sword:
+    - "&6%k&f hacked &6%d&f to death with a &6%i&f"
+  diamond_axe:
+    - "&6%k&f used &6%d&f as mere lumber"
+    - "&6%k&f cleaved &6%d&f with a &6%i&f"
+  unknown:
+    - "&6%d&f was killed by &6%k"
+    - "&6%d&f was split in two by &6%k"
