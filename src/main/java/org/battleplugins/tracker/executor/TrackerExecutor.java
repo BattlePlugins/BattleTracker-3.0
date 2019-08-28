@@ -2,8 +2,10 @@ package org.battleplugins.tracker.executor;
 
 import mc.alk.battlecore.executor.CustomCommandExecutor;
 import mc.alk.mc.ChatColor;
+import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.command.MCCommandSender;
 import org.battleplugins.tracker.BattleTracker;
+import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.record.Record;
 
@@ -47,5 +49,13 @@ public class TrackerExecutor extends CustomCommandExecutor {
                     + ChatColor.RED + " Deaths: " + ChatColor.GOLD + (int) recordEntry.getValue().getStat(StatType.DEATHS));
             i++;
         }
+    }
+
+    @MCCommand(cmds = "reset", perm = "battletracker.reset")
+    public void resetCommand(MCCommandSender sender, MCOfflinePlayer player) {
+        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
+        trackerInterface.createNewRecord(player);
+
+        sender.sendMessage(ChatColor.GREEN + "Reset " + player.getName() + "'s " + trackerInterface.getName() + " data!");
     }
 }
