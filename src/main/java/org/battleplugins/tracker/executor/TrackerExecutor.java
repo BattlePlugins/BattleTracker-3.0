@@ -42,9 +42,9 @@ public class TrackerExecutor extends CustomCommandExecutor {
         int i = 1;
         for (Map.Entry<Integer, Record> recordEntry : sortedRecords.entrySet()) {
             sender.sendMessage(ChatColor.GOLD + "#" + i + " " + ChatColor.YELLOW + recordEntry.getValue().getName() + " - "
-                    + ChatColor.AQUA + recordEntry.getValue().getRating() + " "
-                    + ChatColor.RED + "Kills: " + ChatColor.GOLD + recordEntry.getValue().getStat(StatType.KILLS)
-                    + ChatColor.RED + " Deaths: " + ChatColor.GOLD + recordEntry.getValue().getStat(StatType.DEATHS));
+                    + ChatColor.AQUA + (int) recordEntry.getValue().getRating() + " "
+                    + ChatColor.RED + "Kills: " + ChatColor.GOLD + (int) recordEntry.getValue().getStat(StatType.KILLS)
+                    + ChatColor.RED + " Deaths: " + ChatColor.GOLD + (int) recordEntry.getValue().getStat(StatType.DEATHS));
             i++;
         }
     }
