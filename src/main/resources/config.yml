@@ -21,7 +21,7 @@ rampageTime: 15
 streakMessageEvery: 15
 
 ## Database options.
-SQLOptions:
+database:
   type: sqlite # sqlite or mysql
   prefix: bt_
   db: tracker # db name

@@ -2,11 +2,15 @@ package org.battleplugins.tracker.impl;
 
 import mc.alk.mc.MCOfflinePlayer;
 import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
+import org.battleplugins.tracker.stat.record.PlayerRecord;
 import org.battleplugins.tracker.stat.record.Record;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Main implementation of a tracker instance. Any plugin
@@ -20,12 +24,16 @@ public class Tracker implements TrackerInterface {
     private String name;
 
     protected RatingCalculator calculator;
-    protected Map<String, Record> records;
+    protected Map<UUID, Record> records;
 
-    public Tracker(String name, RatingCalculator calculator, Map<String, Record> records) {
+    private SQLInstance sql;
+
+    public Tracker(String name, RatingCalculator calculator, Map<UUID, Record> records) {
         this.name = name;
         this.calculator = calculator;
         this.records = records;
+
+        this.sql = new SQLInstance(this);
     }
 
     @Override
@@ -40,16 +48,16 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public boolean hasRecord(MCOfflinePlayer player) {
-        return records.containsKey(player.getName());
+        return records.containsKey(player.getUniqueId());
     }
 
     @Override
     public Record getRecord(MCOfflinePlayer player) {
-        return records.get(player.getName());
+        return records.get(player.getUniqueId());
     }
 
     @Override
-    public Map<String, Record> getRecords() {
+    public Map<UUID, Record> getRecords() {
         return records;
     }
 
@@ -60,7 +68,7 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void incrementValue(String statType, MCOfflinePlayer player) {
-        Record record = records.get(player.getName());
+        Record record = records.get(player.getUniqueId());
         record.setValue(statType, record.getStat(statType) + 1);
     }
 
@@ -71,7 +79,7 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void decrementValue(String statType, MCOfflinePlayer player) {
-        Record record = records.get(player.getName());
+        Record record = records.get(player.getUniqueId());
         record.setValue(statType, record.getStat(statType) - 1);
     }
 
@@ -82,7 +90,7 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void setValue(String statType, float value, MCOfflinePlayer player) {
-        Record record = records.get(player.getName());
+        Record record = records.get(player.getUniqueId());
         record.setValue(statType, value);
     }
 
@@ -130,13 +138,13 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void enableTracking(MCOfflinePlayer player) {
-        Record record = records.get(player.getName());
+        Record record = records.get(player.getUniqueId());
         record.setTracking(true);
     }
 
     @Override
     public void disableTracking(MCOfflinePlayer player) {
-        Record record = records.get(player.getName());
+        Record record = records.get(player.getUniqueId());
         record.setTracking(false);
     }
 
@@ -151,13 +159,35 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
+    public void createNewRecord(MCOfflinePlayer player) {
+        Map<String, Float> columns = new HashMap<>();
+        for (String column : sql.getOverallColumns()) {
+            columns.put(column, 0f);
+        }
+
+        Record record = new PlayerRecord(this, player.getUniqueId().toString(), player.getName(), columns);
+        record.setRating(calculator.getDefaultRating());
+        createNewRecord(player, record);
+    }
+
+    @Override
     public void createNewRecord(MCOfflinePlayer player, Record record) {
-        records.put(player.getName(), record);
+        record.setRating(calculator.getDefaultRating());
+        records.put(player.getUniqueId(), record);
+
+        save(player);
     }
 
     @Override
     public void removeRecord(MCOfflinePlayer player) {
-        records.remove(player.getName());
+        records.remove(player.getUniqueId());
+
+        save(player);
+    }
+
+    @Override
+    public RatingCalculator getRatingCalculator() {
+        return calculator;
     }
 
     @Override
@@ -167,11 +197,11 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void save(MCOfflinePlayer player) {
-
+        sql.save(records.get(player.getUniqueId()));
     }
 
     @Override
     public void saveAll() {
-
+        sql.saveAll(records.values().toArray(new Record[records.size()]));
     }
 }

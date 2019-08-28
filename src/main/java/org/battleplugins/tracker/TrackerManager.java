@@ -118,4 +118,16 @@ public class TrackerManager {
     public void setTrackPvE(boolean trackPvE) {
         this.trackPvE = trackPvE;
     }
+
+    /**
+     * Returns a map of the tracker interfaces.
+     *
+     * Key: the name of the interface
+     * Value: the tracker object
+     *
+     * @return a map of the tracker interfaces.
+     */
+    public Map<String, TrackerInterface> getInterfaces() {
+        return interfaces;
+    }
 }

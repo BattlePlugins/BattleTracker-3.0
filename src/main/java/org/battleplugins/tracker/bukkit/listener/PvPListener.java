@@ -90,15 +90,15 @@ public class PvPListener implements Listener {
 
     public void updateStats(Player killed, Player killer) {
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        Record killerRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killer.getName()));
-        Record killedRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killed.getName()));
+        Record killerRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killer.getUniqueId()));
+        Record killedRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killed.getUniqueId()));
 
         if (killerRecord.isTracking())
-            pvpTracker.incrementValue(StatType.KILLS, MCServer.getOfflinePlayer(killer.getName()));
+            pvpTracker.incrementValue(StatType.KILLS, MCServer.getOfflinePlayer(killer.getUniqueId()));
 
         if (killedRecord.isTracking())
-            pvpTracker.incrementValue(StatType.DEATHS, MCServer.getOfflinePlayer(killed.getName()));
+            pvpTracker.incrementValue(StatType.DEATHS, MCServer.getOfflinePlayer(killed.getUniqueId()));
 
-        pvpTracker.updateRating(MCServer.getOfflinePlayer(killer.getName()), MCServer.getOfflinePlayer(killed.getName()), false);
+        pvpTracker.updateRating(MCServer.getOfflinePlayer(killer.getUniqueId()), MCServer.getOfflinePlayer(killed.getUniqueId()), false);
     }
 }

@@ -1,11 +1,13 @@
 package org.battleplugins.tracker.sponge.listener;
 
+import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.MCServer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
-import org.battleplugins.tracker.stat.record.PlayerRecord;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+
+import java.util.Map;
 
 /**
  * Miscellaneous listener for BattleTracker in Sponge.
@@ -29,12 +31,21 @@ public class TrackerListener {
     public void onJoin(ClientConnectionEvent.Join event) {
         TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
-        if (!pvpInterface.hasRecord(MCServer.getOfflinePlayer(event.getTargetEntity().getName())) && tracker.getTrackerManager().isTrackingPvP()) {
-            pvpInterface.createNewRecord(MCServer.getOfflinePlayer(event.getTargetEntity().getName()), new PlayerRecord(pvpInterface, event.getTargetEntity().getName()));
+
+        MCOfflinePlayer offlinePlayer = MCServer.getOfflinePlayer(event.getTargetEntity().getUniqueId());
+        if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
+            pvpInterface.createNewRecord(offlinePlayer);
         }
 
-        if (!pveInterface.hasRecord(MCServer.getOfflinePlayer(event.getTargetEntity().getName())) && tracker.getTrackerManager().isTrackingPvE()) {
-            pveInterface.createNewRecord(MCServer.getOfflinePlayer(event.getTargetEntity().getName()), new PlayerRecord(pveInterface, event.getTargetEntity().getName()));
+        if (!pveInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvE()) {
+            pveInterface.createNewRecord(offlinePlayer);
+        }
+    }
+
+    @Listener
+    public void onQuit(ClientConnectionEvent.Disconnect event) {
+        for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
+            interfaces.getValue().save(MCServer.getOfflinePlayer(event.getTargetEntity().getUniqueId()));
         }
     }
 }

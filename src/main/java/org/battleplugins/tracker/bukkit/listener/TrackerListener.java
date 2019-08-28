@@ -1,12 +1,15 @@
 package org.battleplugins.tracker.bukkit.listener;
 
+import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.MCServer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
-import org.battleplugins.tracker.stat.record.PlayerRecord;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.Map;
 
 /**
  * Miscellaneous listener for BattleTracker in Bukkit.
@@ -30,12 +33,21 @@ public class TrackerListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
-        if (!pvpInterface.hasRecord(MCServer.getOfflinePlayer(event.getPlayer().getName())) && tracker.getTrackerManager().isTrackingPvP()) {
-            pvpInterface.createNewRecord(MCServer.getOfflinePlayer(event.getPlayer().getName()), new PlayerRecord(pvpInterface, event.getPlayer().getName()));
+
+        MCOfflinePlayer offlinePlayer = MCServer.getOfflinePlayer(event.getPlayer().getUniqueId());
+        if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
+            pvpInterface.createNewRecord(offlinePlayer);
         }
 
-        if (!pveInterface.hasRecord(MCServer.getOfflinePlayer(event.getPlayer().getName())) && tracker.getTrackerManager().isTrackingPvE()) {
-            pveInterface.createNewRecord(MCServer.getOfflinePlayer(event.getPlayer().getName()), new PlayerRecord(pveInterface, event.getPlayer().getName()));
+        if (!pveInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvE()) {
+            pveInterface.createNewRecord(offlinePlayer);
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
+            interfaces.getValue().save(MCServer.getOfflinePlayer(event.getPlayer().getUniqueId()));
         }
     }
 }

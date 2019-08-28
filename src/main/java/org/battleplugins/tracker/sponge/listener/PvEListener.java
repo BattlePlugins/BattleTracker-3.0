@@ -16,6 +16,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Main listener for PvE tracking in Sponge.
@@ -71,12 +72,13 @@ public class PvEListener {
         }
 
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCServer.getOfflinePlayer(killed.getName()));
+        Record record = pveTracker.getRecord(MCServer.getOfflinePlayer(killed.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.DEATHS, MCServer.getOfflinePlayer(killed.getName()));
+            pveTracker.incrementValue(StatType.DEATHS, MCServer.getOfflinePlayer(killed.getUniqueId()));
 
-        Record fakeRecord = new DummyRecord(pveTracker, killer, 1250);
-        tracker.getDefaultCalculator().updateRating(fakeRecord, record, false);
+        Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
+        fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
+        pveTracker.getRatingCalculator().updateRating(fakeRecord, record, false);
 
         // TODO: Add death messages here
     }
@@ -102,11 +104,12 @@ public class PvEListener {
 
         Player killer = (Player) source.getSource();
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCServer.getOfflinePlayer(killer.getName()));
+        Record record = pveTracker.getRecord(MCServer.getOfflinePlayer(killer.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.KILLS, MCServer.getOfflinePlayer(killer.getName()));
+            pveTracker.incrementValue(StatType.KILLS, MCServer.getOfflinePlayer(killer.getUniqueId()));
 
-        Record fakeRecord = new DummyRecord(pveTracker, killed.getType().getName().toLowerCase(), 1250);
-        tracker.getDefaultCalculator().updateRating(record, fakeRecord, false);
+        Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer.getType().getName().toLowerCase());
+        fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
+        pveTracker.getRatingCalculator().updateRating(record, fakeRecord, false);
     }
 }

@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Main executor for trackers.
@@ -31,7 +32,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
     @MCCommand(cmds = "top")
     public void topCommand(MCCommandSender sender) {
         sender.sendMessage(ChatColor.RED + "==== " + ChatColor.YELLOW + interfaceName + " Leaderboards" + ChatColor.RED + " ====");
-        Map<String, Record> records = tracker.getTrackerManager().getInterface(interfaceName).getRecords();
+        Map<UUID, Record> records = tracker.getTrackerManager().getInterface(interfaceName).getRecords();
         Map<Integer, Record> unsortedRecords = new HashMap<>();
         records.forEach((name, record) -> unsortedRecords.put((int) record.getRating(), record));
 
@@ -40,7 +41,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
         int i = 1;
         for (Map.Entry<Integer, Record> recordEntry : sortedRecords.entrySet()) {
-            sender.sendMessage(ChatColor.GOLD + "#" + i + " " + ChatColor.YELLOW + recordEntry.getValue().getID() + " - "
+            sender.sendMessage(ChatColor.GOLD + "#" + i + " " + ChatColor.YELLOW + recordEntry.getValue().getName() + " - "
                     + ChatColor.AQUA + recordEntry.getValue().getRating() + " "
                     + ChatColor.RED + "Kills: " + ChatColor.GOLD + recordEntry.getValue().getStat(StatType.KILLS)
                     + ChatColor.RED + " Deaths: " + ChatColor.GOLD + recordEntry.getValue().getStat(StatType.DEATHS));

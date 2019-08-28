@@ -2,9 +2,11 @@ package org.battleplugins.tracker;
 
 import mc.alk.mc.MCOfflinePlayer;
 import org.battleplugins.tracker.stat.StatType;
+import org.battleplugins.tracker.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.stat.record.Record;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Main interface used for tracking.
@@ -46,12 +48,12 @@ public interface TrackerInterface {
     /**
      * Returns a map of all the records
      *
-     * Key: the name of the player
+     * Key: the UUID of the player
      * Value: the record value
      *
      * @return a map of all the records
      */
-    Map<String, Record> getRecords();
+    Map<UUID, Record> getRecords();
 
     /**
      * Increments a value with the given stat type
@@ -141,6 +143,14 @@ public interface TrackerInterface {
     void disableMessages(MCOfflinePlayer player);
 
     /**
+     * Adds a record for the specified player to the tracker from the
+     * default SQL columns.
+     *
+     * @param player the player to create the record for
+     */
+    void createNewRecord(MCOfflinePlayer player);
+
+    /**
      * Adds a record for the specified player to the tracker
      *
      * @param player the player to create the record for
@@ -154,6 +164,13 @@ public interface TrackerInterface {
      * @param player the player to remove the record for
      */
     void removeRecord(MCOfflinePlayer player);
+
+    /**
+     * Returns the rating calculator for this tracker interface
+     *
+     * @return the rating calculator for this tracker interface
+     */
+    RatingCalculator getRatingCalculator();
 
     /**
      * Immediately save all records and empty the cache

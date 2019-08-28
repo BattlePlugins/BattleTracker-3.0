@@ -1,12 +1,14 @@
 package org.battleplugins.tracker;
 
 import mc.alk.battlecore.configuration.Configuration;
+import mc.alk.battlecore.configuration.ConfigurationSection;
 import mc.alk.battlecore.util.FileUtil;
 import mc.alk.battlecore.util.Log;
 import mc.alk.mc.command.MCCommand;
 import mc.alk.mc.plugin.MCPlugin;
 import org.battleplugins.tracker.executor.TrackerExecutor;
 import org.battleplugins.tracker.impl.Tracker;
+import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.calculator.EloCalculator;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
 
@@ -52,6 +54,24 @@ public final class BattleTracker {
 
         PVP_INTERFACE = pvpConfig.getString("name");
         PVE_INTERFACE = pveConfig.getString("name");
+
+        ConfigurationSection section = config.getSection("database");
+
+        String type = section.getString("type", "sqlite");
+        String prefix = section.getString("prefix", "bt_");
+        String url = section.getString("url", "localhost");
+        String database = section.getString("db", "tracker");
+        String port = section.getString("port", "3306");
+        String username = section.getString("username", "root");
+        String password = section.getString("password");
+
+        SQLInstance.TYPE = type;
+        SQLInstance.TABLE_PREFIX = prefix;
+        SQLInstance.DATABASE = database;
+        SQLInstance.URL = url;
+        SQLInstance.PORT = port;
+        SQLInstance.USERNAME = username;
+        SQLInstance.PASSWORD = password;
 
         switch (config.getString("rating.calculator")) {
             case "elo":

@@ -18,26 +18,22 @@ public abstract class Record {
     protected TrackerInterface tracker;
 
     protected String id;
-    protected float rating;
+    protected String name;
 
     protected Map<String, Float> stats;
 
     protected boolean tracking;
 
-    public Record(TrackerInterface tracker, String id) {
-        this(tracker, id, new HashMap<>(), BattleTracker.getInstance().getDefaultCalculator().getDefaultRating());
+    public Record(TrackerInterface tracker, String id, String name) {
+        this(tracker, id, name, new HashMap<>());
     }
 
-    public Record(TrackerInterface tracker, String id, float rating) {
-        this(tracker, id, new HashMap<>(), rating);
-    }
-
-    public Record(TrackerInterface tracker, String id, Map<String, Integer> stats, float rating) {
+    public Record(TrackerInterface tracker, String id, String name, Map<String, Float> stats) {
         this.tracker = tracker;
 
         this.id = id;
-        this.rating = rating;
-        this.stats = new HashMap<>();
+        this.name = name;
+        this.stats = stats;
         this.tracking = true;
     }
 
@@ -115,12 +111,30 @@ public abstract class Record {
     }
 
     /**
+     * Returns the name of the record
+     *
+     * @return the name of the record
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name of the record
+     *
+     * @param name the name of the record
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Returns the rating of the record
      *
      * @return the rating of the record
      */
     public float getRating() {
-        return rating;
+        return stats.get(StatType.RATING.getInternalName());
     }
 
     /**
@@ -129,7 +143,7 @@ public abstract class Record {
      * @param rating the rating of the record
      */
     public void setRating(float rating) {
-        this.rating = rating;
+        stats.put(StatType.RATING.getInternalName(), rating);
     }
 
     /**
