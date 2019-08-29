@@ -83,4 +83,22 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
         sender.sendMessage(ChatColor.GREEN + "Reset " + player.getName() + "'s " + trackerInterface.getName() + " data!");
     }
+
+    @MCCommand(cmds = "set")
+    public void setCommand(MCCommandSender sender, MCOfflinePlayer player, String statType, float value) {
+        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
+        Record record = trackerInterface.getRecord(player);
+        if (record == null) {
+            sender.sendMessage(ChatColor.RED + "This player has never joined the server before!");
+            return;
+        }
+
+        if (!record.getStats().containsKey(statType.toLowerCase())) {
+            sender.sendMessage(ChatColor.RED + "This stat type does not exist in this tracker!");
+            return;
+        }
+
+        trackerInterface.setValue(statType, value, player);
+        sender.sendMessage(ChatColor.GREEN + "Set " + player.getName() + "'s " + statType.toLowerCase() + " value to " + value + "!");
+    }
 }
