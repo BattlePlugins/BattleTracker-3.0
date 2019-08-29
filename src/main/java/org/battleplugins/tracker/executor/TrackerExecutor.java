@@ -61,6 +61,21 @@ public class TrackerExecutor extends CustomCommandExecutor {
         }
     }
 
+    @MCCommand(cmds = "rank")
+    public void rankCommand(MCCommandSender sender, MCOfflinePlayer player) {
+        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
+        Record record = trackerInterface.getRecord(player);
+        if (record == null) {
+            sender.sendMessage(ChatColor.RED + "This player has never joined the server before!");
+            return;
+        }
+
+        sender.sendMessage(ChatColor.YELLOW + player.getName() + " - " + ChatColor.AQUA + (int) record.getRating()
+                + ChatColor.YELLOW + " (Max Rating: " + (int) record.getStat(StatType.MAX_RATING) + ") " + ChatColor.RED + "Kills: "
+                + ChatColor.GOLD + (int) record.getStat(StatType.KILLS) + ChatColor.RED + " Deaths: " + ChatColor.GOLD + (int) record.getStat(StatType.DEATHS)
+                + ChatColor.RED + " KDR: " + ChatColor.YELLOW + (record.getStat(StatType.KILLS) / record.getStat(StatType.DEATHS)));
+    }
+
     @MCCommand(cmds = "reset", perm = "battletracker.reset")
     public void resetCommand(MCCommandSender sender, MCOfflinePlayer player) {
         TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
