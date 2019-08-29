@@ -35,18 +35,18 @@ public class TrackerExecutor extends CustomCommandExecutor {
     public void topCommand(MCCommandSender sender) {
         sender.sendMessage(ChatColor.RED + "==== " + ChatColor.YELLOW + interfaceName + " Leaderboards" + ChatColor.RED + " ====");
         Map<UUID, Record> records = tracker.getTrackerManager().getInterface(interfaceName).getRecords();
-        Map<Integer, Record> unsortedRecords = new HashMap<>();
-        records.forEach((name, record) -> unsortedRecords.put((int) record.getRating(), record));
+        Map<Record, Float> unsortedRecords = new HashMap<>();
+        records.forEach((uuid, record) -> unsortedRecords.put(record, record.getRating()));
 
-        LinkedHashMap<Integer, Record> sortedRecords = new LinkedHashMap<>();
-        unsortedRecords.entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.reverseOrder())).forEachOrdered(x -> sortedRecords.put(x.getKey(), x.getValue()));
+        Map<Record, Float> sortedRecords = new LinkedHashMap<>();
+        unsortedRecords.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedRecords.put(x.getKey(), x.getValue()));
 
         int i = 1;
-        for (Map.Entry<Integer, Record> recordEntry : sortedRecords.entrySet()) {
-            sender.sendMessage(ChatColor.GOLD + "#" + i + " " + ChatColor.YELLOW + recordEntry.getValue().getName() + " - "
-                    + ChatColor.AQUA + (int) recordEntry.getValue().getRating() + " "
-                    + ChatColor.RED + "Kills: " + ChatColor.GOLD + (int) recordEntry.getValue().getStat(StatType.KILLS)
-                    + ChatColor.RED + " Deaths: " + ChatColor.GOLD + (int) recordEntry.getValue().getStat(StatType.DEATHS));
+        for (Map.Entry<Record, Float> recordEntry : sortedRecords.entrySet()) {
+            sender.sendMessage(ChatColor.GOLD + "#" + i + " " + ChatColor.YELLOW + recordEntry.getKey().getName() + " - "
+                    + ChatColor.AQUA + (int) recordEntry.getKey().getRating() + " "
+                    + ChatColor.RED + "Kills: " + ChatColor.GOLD + (int) recordEntry.getKey().getStat(StatType.KILLS)
+                    + ChatColor.RED + " Deaths: " + ChatColor.GOLD + (int) recordEntry.getKey().getStat(StatType.DEATHS));
             i++;
         }
     }
