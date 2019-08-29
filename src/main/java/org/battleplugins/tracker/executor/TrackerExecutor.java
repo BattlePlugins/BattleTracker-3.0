@@ -33,6 +33,11 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = "top")
     public void topCommand(MCCommandSender sender) {
+        topCommand(sender, 5);
+    }
+
+    @MCCommand(cmds = "top")
+    public void topCommand(MCCommandSender sender, int amount) {
         sender.sendMessage(ChatColor.RED + "==== " + ChatColor.YELLOW + interfaceName + " Leaderboards" + ChatColor.RED + " ====");
         Map<UUID, Record> records = tracker.getTrackerManager().getInterface(interfaceName).getRecords();
         Map<Record, Float> unsortedRecords = new HashMap<>();
@@ -47,6 +52,11 @@ public class TrackerExecutor extends CustomCommandExecutor {
                     + ChatColor.AQUA + (int) recordEntry.getKey().getRating() + " "
                     + ChatColor.RED + "Kills: " + ChatColor.GOLD + (int) recordEntry.getKey().getStat(StatType.KILLS)
                     + ChatColor.RED + " Deaths: " + ChatColor.GOLD + (int) recordEntry.getKey().getStat(StatType.DEATHS));
+
+            // limit at 100 to prevent lag and spam
+            if (i >= amount || i >= 100)
+                break;
+
             i++;
         }
     }
