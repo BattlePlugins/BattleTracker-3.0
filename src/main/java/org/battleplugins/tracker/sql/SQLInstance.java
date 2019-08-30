@@ -2,6 +2,7 @@ package org.battleplugins.tracker.sql;
 
 import mc.alk.battlecore.serializers.SQLSerializer;
 import mc.alk.battlecore.util.Log;
+import mc.alk.mc.Scheduler;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.record.PlayerRecord;
@@ -118,9 +119,11 @@ public class SQLInstance extends SQLSerializer {
         try {
             RSCon rsCon = executeQuery("SELECT * FROM " + overallTable);
             createRecords(rsCon).whenComplete((records, exception) -> {
-                for (Record record : records) {
-                    tracker.getRecords().put(UUID.fromString(record.getID()), record);
-                }
+                Scheduler.scheduleAsynchrounousTask(() -> {
+                    for (Record record : records) {
+                        tracker.getRecords().put(UUID.fromString(record.getID()), record);
+                    }
+                });
             });
         } catch (Exception ex) {
             Log.err("Failed to generate info from tables!");
@@ -178,7 +181,6 @@ public class SQLInstance extends SQLSerializer {
         } finally {
             closeConnection(rsCon);
         }
-
         return future;
     }
 
