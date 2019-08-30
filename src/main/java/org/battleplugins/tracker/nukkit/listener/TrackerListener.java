@@ -5,7 +5,7 @@ import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCServer;
+import mc.alk.mc.MCPlatform;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 
@@ -34,7 +34,7 @@ public class TrackerListener implements Listener {
         TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
 
-        MCOfflinePlayer offlinePlayer = MCServer.getOfflinePlayer(event.getPlayer().getUniqueId());
+        MCOfflinePlayer offlinePlayer = MCPlatform.getOfflinePlayer(event.getPlayer().getUniqueId());
         if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(offlinePlayer);
         }
@@ -47,7 +47,7 @@ public class TrackerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
-            interfaces.getValue().save(MCServer.getOfflinePlayer(event.getPlayer().getUniqueId()));
+            interfaces.getValue().save(MCPlatform.getOfflinePlayer(event.getPlayer().getUniqueId()));
         }
     }
 }

@@ -1,6 +1,6 @@
 package org.battleplugins.tracker.bukkit.listener;
 
-import mc.alk.mc.MCServer;
+import mc.alk.mc.MCPlatform;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.bukkit.util.CompatUtil;
@@ -90,15 +90,15 @@ public class PvPListener implements Listener {
 
     public void updateStats(Player killed, Player killer) {
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        Record killerRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killer.getUniqueId()));
-        Record killedRecord = pvpTracker.getRecord(MCServer.getOfflinePlayer(killed.getUniqueId()));
+        Record killerRecord = pvpTracker.getRecord(MCPlatform.getOfflinePlayer(killer.getUniqueId()));
+        Record killedRecord = pvpTracker.getRecord(MCPlatform.getOfflinePlayer(killed.getUniqueId()));
 
         if (killerRecord.isTracking())
-            pvpTracker.incrementValue(StatType.KILLS, MCServer.getOfflinePlayer(killer.getUniqueId()));
+            pvpTracker.incrementValue(StatType.KILLS, MCPlatform.getOfflinePlayer(killer.getUniqueId()));
 
         if (killedRecord.isTracking())
-            pvpTracker.incrementValue(StatType.DEATHS, MCServer.getOfflinePlayer(killed.getUniqueId()));
+            pvpTracker.incrementValue(StatType.DEATHS, MCPlatform.getOfflinePlayer(killed.getUniqueId()));
 
-        pvpTracker.updateRating(MCServer.getOfflinePlayer(killer.getUniqueId()), MCServer.getOfflinePlayer(killed.getUniqueId()), false);
+        pvpTracker.updateRating(MCPlatform.getOfflinePlayer(killer.getUniqueId()), MCPlatform.getOfflinePlayer(killed.getUniqueId()), false);
     }
 }

@@ -11,7 +11,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDeathEvent;
 import cn.nukkit.event.player.PlayerDeathEvent;
-import mc.alk.mc.MCServer;
+import mc.alk.mc.MCPlatform;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.stat.StatType;
@@ -71,9 +71,9 @@ public class PvEListener implements Listener {
         }
 
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCServer.getOfflinePlayer(killed.getUniqueId()));
+        Record record = pveTracker.getRecord(MCPlatform.getOfflinePlayer(killed.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.DEATHS, MCServer.getOfflinePlayer(killed.getUniqueId()));
+            pveTracker.incrementValue(StatType.DEATHS, MCPlatform.getOfflinePlayer(killed.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -102,9 +102,9 @@ public class PvEListener implements Listener {
 
         Player killer = (Player) lastDamageCause.getDamager();
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCServer.getOfflinePlayer(killer.getUniqueId()));
+        Record record = pveTracker.getRecord(MCPlatform.getOfflinePlayer(killer.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.KILLS, MCServer.getOfflinePlayer(killer.getUniqueId()));
+            pveTracker.incrementValue(StatType.KILLS, MCPlatform.getOfflinePlayer(killer.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killed.getSaveId().toLowerCase());
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());

@@ -1,7 +1,7 @@
 package org.battleplugins.tracker.sponge.listener;
 
 import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCServer;
+import mc.alk.mc.MCPlatform;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.spongepowered.api.event.Listener;
@@ -32,7 +32,7 @@ public class TrackerListener {
         TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
 
-        MCOfflinePlayer offlinePlayer = MCServer.getOfflinePlayer(event.getTargetEntity().getUniqueId());
+        MCOfflinePlayer offlinePlayer = MCPlatform.getOfflinePlayer(event.getTargetEntity().getUniqueId());
         if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(offlinePlayer);
         }
@@ -45,7 +45,7 @@ public class TrackerListener {
     @Listener
     public void onQuit(ClientConnectionEvent.Disconnect event) {
         for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
-            interfaces.getValue().save(MCServer.getOfflinePlayer(event.getTargetEntity().getUniqueId()));
+            interfaces.getValue().save(MCPlatform.getOfflinePlayer(event.getTargetEntity().getUniqueId()));
         }
     }
 }
