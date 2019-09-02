@@ -131,6 +131,24 @@ public class MessageManager {
         this.enabled = enabled;
     }
 
+    /**
+     * Returns if Bukkit death messages should be overridden
+     *
+     * @return if Bukkit death messages should be overridden
+     */
+    public boolean shouldOverrideBukkitMessages() {
+        return overrideBukkitMessages;
+    }
+
+    /**
+     * Sets if Bukkit death messages should be overridden
+     *
+     * @param overrideBukkitMessages if Bukkit death messages should be overridden
+     */
+    public void setOverrideBukkitMessages(boolean overrideBukkitMessages) {
+        this.overrideBukkitMessages = overrideBukkitMessages;
+    }
+
     public void sendItemMessage(String killerName, String killedName, String itemName, int streak) {
         if (!enabled)
             return;

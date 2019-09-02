@@ -13,6 +13,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
@@ -74,6 +75,9 @@ public class PvPListener {
         updateStats(killed, killer);
 
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
+        if (pvpTracker.getMessageManager().shouldOverrideBukkitMessages())
+            event.setMessage(Text.of(""));
+
         pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase(), 0);
     }
 

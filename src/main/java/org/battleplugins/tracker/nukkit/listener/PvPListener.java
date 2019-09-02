@@ -78,6 +78,9 @@ public class PvPListener implements Listener {
         updateStats(killed, killer);
 
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
+        if (pvpTracker.getMessageManager().shouldOverrideBukkitMessages())
+            event.setDeathMessage("");
+
         pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getName().toLowerCase(), 0);
     }
 

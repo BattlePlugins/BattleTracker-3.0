@@ -14,6 +14,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -79,6 +80,9 @@ public class PvEListener {
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(fakeRecord, record, false);
+
+        if (pveTracker.getMessageManager().shouldOverrideBukkitMessages())
+            event.setMessage(Text.of(""));
 
         if (type.equals("entityDeaths")) {
             pveTracker.getMessageManager().sendEntityMessage(killer, killed.getName(), "air", 0);

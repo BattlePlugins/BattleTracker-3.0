@@ -79,6 +79,9 @@ public class PvEListener implements Listener {
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(fakeRecord, record, false);
 
+        if (pveTracker.getMessageManager().shouldOverrideBukkitMessages())
+            event.setDeathMessage(null);
+
         if (type.equals("entityDeaths")) {
             pveTracker.getMessageManager().sendEntityMessage(killer, killed.getName(), "air", 0);
         } else {
