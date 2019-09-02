@@ -22,7 +22,7 @@ public class NukkitTrackerPlugin extends NukkitBattlePlugin {
         BattleTracker tracker = new BattleTracker(this);
         BattleTracker.setInstance(tracker);
         // Register the tracker manager into the service provider API
-        getServer().getServiceManager().register(TrackerManager.class, BattleTracker.getInstance().getTrackerManager(), this, ServicePriority.NORMAL);
+        getServer().getServiceManager().register(TrackerManager.class, tracker.getTrackerManager(), this, ServicePriority.NORMAL);
 
         if (tracker.getTrackerManager().isTrackingPvE()) {
             getServer().getPluginManager().registerEvents(new PvEListener(tracker), this);

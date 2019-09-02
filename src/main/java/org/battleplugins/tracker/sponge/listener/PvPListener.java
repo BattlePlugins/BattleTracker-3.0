@@ -73,7 +73,8 @@ public class PvPListener {
 
         updateStats(killed, killer);
 
-        // TODO: Add death messages
+        TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
+        pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase(), 0);
     }
 
     public void updateStats(Player killed, Player killer) {

@@ -29,14 +29,16 @@ options:
   overrideBukkitMessages: true
   useHoverMessages: true
   useClickMessages: true
-  hoverContent: all
-  clickContent: all
+  hoverContent: all # can be 'all', 'armor' or 'recap', 'all' covers both
+  clickContent: all # can be 'all', 'inventory', 'armor' or 'recap', 'all' covers all three
+  msgRadius: 0 # A radius in which death messages should be sent, use 0 to send to everyone online
 
 ignoredWorlds:
   - disabledWorld1
   - disabledWorld2
 
 messages:
+  enabled: true
   bow:
     - '&6%k&f feathered &6%d&f with arrows from &e%i &5%l'
     - '&6%k&fs arrow pierced through &6%d&f with &e%i &5%l'

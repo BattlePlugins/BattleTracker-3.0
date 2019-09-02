@@ -9,10 +9,6 @@
 ## If signs should be used.
 useSigns: true
 
-## A radius in which death messages should be sent.
-## Use '0' to send to everyone online.
-msgRadius: 0
-
 ## If the number of seconds between kills is less than
 ## this number, show a message that the player is on a rampage.
 rampageTime: 15

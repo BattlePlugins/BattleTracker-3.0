@@ -2,6 +2,7 @@ package org.battleplugins.tracker.impl;
 
 import mc.alk.mc.MCOfflinePlayer;
 import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
@@ -21,12 +22,14 @@ import java.util.UUID;
  */
 public class Tracker implements TrackerInterface {
 
-    private String name;
+    protected String name;
 
+    protected MessageManager messageManager;
     protected RatingCalculator calculator;
+
     protected Map<UUID, Record> records;
 
-    private SQLInstance sql;
+    protected SQLInstance sql;
 
     public Tracker(String name, RatingCalculator calculator, Map<UUID, Record> records) {
         this.name = name;
@@ -183,6 +186,15 @@ public class Tracker implements TrackerInterface {
         records.remove(player.getUniqueId());
 
         save(player);
+    }
+
+    @Override
+    public MessageManager getMessageManager() {
+        return messageManager;
+    }
+
+    public void setMessageManager(MessageManager messageManager) {
+        this.messageManager = messageManager;
     }
 
     @Override

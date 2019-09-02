@@ -31,12 +31,14 @@ options:
   useClickMessages: true
   hoverContent: all # can be 'all', 'armor' or 'recap', 'all' covers both
   clickContent: all # can be 'all', 'inventory', 'armor' or 'recap', 'all' covers all three
+  msgRadius: 0 # A radius in which death messages should be sent, use 0 to send to everyone online
 
 ignoredWorlds:
   - disabledWorld1
   - disabledWorld2
 
 messages:
+  enabled: true
   entityDeaths:
     creeper:
       - "The &2creeper&f blast vaporized &6%d&f"

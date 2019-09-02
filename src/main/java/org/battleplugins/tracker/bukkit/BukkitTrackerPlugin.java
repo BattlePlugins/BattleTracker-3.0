@@ -22,7 +22,7 @@ public class BukkitTrackerPlugin extends BukkitBattlePlugin {
         BattleTracker tracker = new BattleTracker(this);
         BattleTracker.setInstance(tracker);
         // Register the tracker manager into the service provider API
-        getServer().getServicesManager().register(TrackerManager.class, BattleTracker.getInstance().getTrackerManager(), this, ServicePriority.Normal);
+        getServer().getServicesManager().register(TrackerManager.class, tracker.getTrackerManager(), this, ServicePriority.Normal);
 
         if (tracker.getTrackerManager().isTrackingPvE()) {
             getServer().getPluginManager().registerEvents(new PvEListener(tracker), this);
