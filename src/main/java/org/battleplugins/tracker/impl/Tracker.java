@@ -104,10 +104,7 @@ public class Tracker implements TrackerInterface {
         calculator.updateRating(killerRecord, killedRecord, tie);
 
         float killerRating = killerRecord.getRating();
-        float killedRating = killedRecord.getRating();
-
         float killerMaxRating = killerRecord.getStat(StatType.MAX_RATING);
-        float killedMaxRating = killedRecord.getStat(StatType.MAX_RATING);
 
         setValue(StatType.RATING, killerRecord.getRating(), killer);
         setValue(StatType.RATING, killedRecord.getRating(), killed);
@@ -115,28 +112,28 @@ public class Tracker implements TrackerInterface {
         if (killerRating > killerMaxRating)
             setValue(StatType.MAX_RATING, killerRating, killer);
 
-        if (killedRating > killedMaxRating)
-            setValue(StatType.MAX_RATING, killedRating, killed);
-
         if (tie) {
-            setValue(StatType.TIES, killerRecord.getStat(StatType.TIES) + 1, killer);
-            setValue(StatType.TIES, killedRecord.getStat(StatType.TIES) + 1, killed);
+            incrementValue(StatType.TIES, killer);
+            incrementValue(StatType.TIES, killed);
         }
 
         setValue(StatType.KD_RATIO, killerRecord.getStat(StatType.KILLS) / killerRecord.getStat(StatType.DEATHS), killer);
         setValue(StatType.KD_RATIO, killedRecord.getStat(StatType.KILLS) / killedRecord.getStat(StatType.DEATHS), killed);
 
         float killerKdr = killerRecord.getStat(StatType.KD_RATIO);
-        float killedKdr = killedRecord.getStat(StatType.KD_RATIO);
-
         float killerMaxKdr = killerRecord.getStat(StatType.MAX_KD_RATIO);
-        float killedMaxKdr = killedRecord.getStat(StatType.MAX_KD_RATIO);
 
         if (killerKdr > killerMaxKdr)
             setValue(StatType.MAX_KD_RATIO, killerKdr, killer);
 
-        if (killedKdr > killedMaxKdr)
-            setValue(StatType.MAX_KD_RATIO, killedKdr, killed);
+        setValue(StatType.STREAK, 0, killed);
+        incrementValue(StatType.STREAK, killer);
+
+        float killerStreak = killerRecord.getStat(StatType.STREAK);
+        float killerMaxStreak = killerRecord.getStat(StatType.MAX_STREAK);
+
+        if (killerStreak > killerMaxStreak)
+            setValue(StatType.MAX_STREAK, killerStreak, killer);
     }
 
     @Override
