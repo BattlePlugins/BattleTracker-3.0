@@ -170,7 +170,7 @@ public class MessageManager {
         message = replacePlaceholders(message, killerName, killedName, itemName, streak);
         message = MessageController.colorChat(message);
 
-        MessageBuilder messageBuilder = new MessageBuilder(message);
+        MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
         attachHoverEvent(messageBuilder, killed);
         attachClickEvent(messageBuilder, killed);
 
@@ -198,7 +198,7 @@ public class MessageManager {
         message = replacePlaceholders(message, killerName, killedName, itemName, streak);
         message = MessageController.colorChat(message);
 
-        MessageBuilder messageBuilder = new MessageBuilder(message);
+        MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
         attachHoverEvent(messageBuilder, killed);
         attachClickEvent(messageBuilder, killed);
 
@@ -226,7 +226,7 @@ public class MessageManager {
         message = replacePlaceholders(message, killerName, killedName, itemName, streak);
         message = MessageController.colorChat(message);
 
-        MessageBuilder messageBuilder = new MessageBuilder(message);
+        MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
         attachHoverEvent(messageBuilder, killed);
         attachClickEvent(messageBuilder, killed);
 
