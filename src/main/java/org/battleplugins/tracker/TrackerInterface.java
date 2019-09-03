@@ -1,7 +1,7 @@
 package org.battleplugins.tracker;
 
 import mc.alk.mc.MCOfflinePlayer;
-import org.battleplugins.tracker.message.MessageManager;
+import org.battleplugins.tracker.message.DeathMessageManager;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.stat.record.Record;
@@ -171,7 +171,7 @@ public interface TrackerInterface {
      *
      * @return the message manager for this tracker interface
      */
-    MessageManager getMessageManager();
+    DeathMessageManager getMessageManager();
 
     /**
      * Returns the rating calculator for this tracker interface

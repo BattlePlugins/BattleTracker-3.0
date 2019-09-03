@@ -8,7 +8,7 @@ import mc.alk.mc.command.MCCommand;
 import mc.alk.mc.plugin.MCPlugin;
 import org.battleplugins.tracker.executor.TrackerExecutor;
 import org.battleplugins.tracker.impl.Tracker;
-import org.battleplugins.tracker.message.MessageManager;
+import org.battleplugins.tracker.message.DeathMessageManager;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.calculator.EloCalculator;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
@@ -84,7 +84,7 @@ public final class BattleTracker {
 
         if (trackPvP) {
             Tracker tracker = new Tracker(PVP_INTERFACE, defaultCalculator, new HashMap<>());
-            tracker.setMessageManager(new MessageManager(tracker, pvpConfig));
+            tracker.setMessageManager(new DeathMessageManager(tracker, pvpConfig));
             trackerManager.addInterface(PVP_INTERFACE, tracker);
 
             MCCommand pvpCommand = new MCCommand(pvpConfig.getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
@@ -93,7 +93,7 @@ public final class BattleTracker {
 
         if (trackPvE) {
             Tracker tracker = new Tracker(PVE_INTERFACE, defaultCalculator, new HashMap<>());
-            tracker.setMessageManager(new MessageManager(tracker, pveConfig));
+            tracker.setMessageManager(new DeathMessageManager(tracker, pveConfig));
             trackerManager.addInterface(PVE_INTERFACE, tracker);
 
             MCCommand pveCommand = new MCCommand(pveConfig.getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());

@@ -3,14 +3,12 @@ package org.battleplugins.tracker.message;
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.controllers.MessageController;
 import mc.alk.mc.ChatColor;
-import mc.alk.mc.MCLocation;
 import mc.alk.mc.MCPlatform;
 import mc.alk.mc.MCPlayer;
 import mc.alk.mc.chat.HoverAction;
 import mc.alk.mc.chat.Message;
 import mc.alk.mc.chat.MessageBuilder;
 import mc.alk.mc.entity.MCEntity;
-import mc.alk.mc.inventory.MCItemStack;
 import org.battleplugins.tracker.TrackerInterface;
 
 import java.util.HashMap;
@@ -19,11 +17,11 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Main message manager for BattleTracker.
+ * Main death message manager for BattleTracker.
  *
  * @author Redned
  */
-public class MessageManager {
+public class DeathMessageManager {
 
     private TrackerInterface tracker;
 
@@ -44,7 +42,7 @@ public class MessageManager {
     private Map<String, List<String>> entityMessages;
     private Map<String, List<String>> causeMessages;
 
-    public MessageManager(TrackerInterface tracker) {
+    public DeathMessageManager(TrackerInterface tracker) {
         this.tracker = tracker;
 
         this.enabled = true;
@@ -64,7 +62,7 @@ public class MessageManager {
         this.causeMessages = new HashMap<>();
     }
 
-    public MessageManager(TrackerInterface tracker, Configuration config) {
+    public DeathMessageManager(TrackerInterface tracker, Configuration config) {
         this.tracker = tracker;
 
         loadDataFromConfig(config);
@@ -149,7 +147,15 @@ public class MessageManager {
         this.overrideBukkitMessages = overrideBukkitMessages;
     }
 
-    public void sendItemMessage(String killerName, String killedName, String itemName, int streak) {
+    /**
+     * Sends a death message relating to the item used to kill
+     * an entity or another player
+     *
+     * @param killerName the name of the killer (can be an entity or cause)
+     * @param killedName the name of the killed player
+     * @param itemName the name of the item used to kill the target
+     */
+    public void sendItemMessage(String killerName, String killedName, String itemName) {
         if (!enabled)
             return;
 
@@ -167,7 +173,7 @@ public class MessageManager {
 
         Random random = new Random();
         String message = items.get(random.nextInt(items.size()));
-        message = replacePlaceholders(message, killerName, killedName, itemName, streak);
+        message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
         MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
@@ -177,7 +183,15 @@ public class MessageManager {
         sendDeathMessage(killed, messageBuilder.build());
     }
 
-    public void sendEntityMessage(String killerName, String killedName, String itemName, int streak) {
+    /**
+     * Sends a death message relating to the entity a player
+     * was killed by
+     *
+     * @param killerName the name of the killer (name of entity)
+     * @param killedName the name of the killed player
+     * @param itemName the item the mob had in its hand at the time of the player's death
+     */
+    public void sendEntityMessage(String killerName, String killedName, String itemName) {
         if (!enabled)
             return;
 
@@ -195,7 +209,7 @@ public class MessageManager {
 
         Random random = new Random();
         String message = entities.get(random.nextInt(entities.size()));
-        message = replacePlaceholders(message, killerName, killedName, itemName, streak);
+        message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
         MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
@@ -205,7 +219,15 @@ public class MessageManager {
         sendDeathMessage(killed, messageBuilder.build());
     }
 
-    public void sendCauseMessage(String killerName, String killedName, String itemName, int streak) {
+    /**
+     * Sends a death message relating to why the player
+     * died (if not an entity or with an item)
+     *
+     * @param killerName the name of the killer (name of cause)
+     * @param killedName the name of the killed player
+     * @param itemName the item the player currently has in their hand
+     */
+    public void sendCauseMessage(String killerName, String killedName, String itemName) {
         if (!enabled)
             return;
 
@@ -223,7 +245,7 @@ public class MessageManager {
 
         Random random = new Random();
         String message = causes.get(random.nextInt(causes.size()));
-        message = replacePlaceholders(message, killerName, killedName, itemName, streak);
+        message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
         MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
@@ -233,6 +255,22 @@ public class MessageManager {
         sendDeathMessage(killed, messageBuilder.build());
     }
 
+    /**
+     * Does a variable replacement of the death message
+     * with the specified parameters.
+     *
+     * %k : the killer (can be a player, mob, or environment)
+     * %d : the dead player
+     * %i : item used to kill the player (if one exists)
+     * %n : number (used for streaks, rampages)
+     *
+     * @param message the message to replace variables in
+     * @param killer the name of the killer
+     * @param killed the name of the player killed
+     * @param itemName the item in the killer or killed player's hand (varies from usage)
+     * @param streak the streak of the killer/killed player (varies from usage)
+     * @return the replaced message
+     */
     public String replacePlaceholders(String message, String killer, String killed, String itemName, int streak) {
         message = message.replace("%k", killer);
         message = message.replace("%d", killed);

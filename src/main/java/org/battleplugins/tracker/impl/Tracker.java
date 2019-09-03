@@ -2,7 +2,7 @@ package org.battleplugins.tracker.impl;
 
 import mc.alk.mc.MCOfflinePlayer;
 import org.battleplugins.tracker.TrackerInterface;
-import org.battleplugins.tracker.message.MessageManager;
+import org.battleplugins.tracker.message.DeathMessageManager;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
@@ -24,7 +24,7 @@ public class Tracker implements TrackerInterface {
 
     protected String name;
 
-    protected MessageManager messageManager;
+    protected DeathMessageManager messageManager;
     protected RatingCalculator calculator;
 
     protected Map<UUID, Record> records;
@@ -186,11 +186,11 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public MessageManager getMessageManager() {
+    public DeathMessageManager getMessageManager() {
         return messageManager;
     }
 
-    public void setMessageManager(MessageManager messageManager) {
+    public void setMessageManager(DeathMessageManager messageManager) {
         this.messageManager = messageManager;
     }
 
