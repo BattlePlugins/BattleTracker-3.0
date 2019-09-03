@@ -78,7 +78,7 @@ public class PvPListener {
         if (pvpTracker.getMessageManager().shouldOverrideBukkitMessages())
             event.setMessage(Text.of(""));
 
-        pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase(), 0);
+        pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase());
     }
 
     public void updateStats(Player killed, Player killer) {

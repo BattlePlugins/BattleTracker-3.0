@@ -83,9 +83,9 @@ public class PvEListener implements Listener {
             event.setDeathMessage(null);
 
         if (type.equals("entityDeaths")) {
-            pveTracker.getMessageManager().sendEntityMessage(killer, killed.getName(), "air", 0);
+            pveTracker.getMessageManager().sendEntityMessage(killer, killed.getName(), "air");
         } else {
-            pveTracker.getMessageManager().sendCauseMessage(killer, killed.getName(), "air", 0);
+            pveTracker.getMessageManager().sendCauseMessage(killer, killed.getName(), "air");
         }
     }
 

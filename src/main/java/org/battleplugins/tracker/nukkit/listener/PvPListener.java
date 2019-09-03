@@ -81,7 +81,7 @@ public class PvPListener implements Listener {
         if (pvpTracker.getMessageManager().shouldOverrideBukkitMessages())
             event.setDeathMessage("");
 
-        pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getName().toLowerCase(), 0);
+        pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getName().toLowerCase());
     }
 
     public void updateStats(Player killed, Player killer) {
