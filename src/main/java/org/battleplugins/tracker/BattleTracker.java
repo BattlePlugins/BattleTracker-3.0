@@ -145,7 +145,7 @@ public final class BattleTracker {
         if (instance != null)
             throw new UnsupportedOperationException("Cannot redefine singleton BattleTracker!");
 
-            instance = tracker;
+        instance = tracker;
     }
 
     /**
