@@ -167,7 +167,7 @@ public class DeathMessageManager {
         if (items == null)
             return;
 
-        MCPlayer killed = MCPlatform.getPlayer(killerName);
+        MCPlayer killed = MCPlatform.getPlayer(killedName);
         if (killed == null)
             return;
 
@@ -231,7 +231,7 @@ public class DeathMessageManager {
         if (!enabled)
             return;
 
-        List<String> causes = causeMessages.get(killerName);
+        List<String> causes = causeMessages.get(killedName);
         if (causes == null || causes.isEmpty())
             causes = causeMessages.get("unknown"); // cause isn't in list
 
