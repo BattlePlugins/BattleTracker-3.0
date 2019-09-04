@@ -79,12 +79,17 @@ public class TrackerExecutor extends CustomCommandExecutor {
     @MCCommand(cmds = "reset", perm = "battletracker.reset")
     public void resetCommand(MCCommandSender sender, MCOfflinePlayer player) {
         TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
+        if (!trackerInterface.hasRecord(player)) {
+            sender.sendMessage(ChatColor.RED + "This player has never joined the server before!");
+            return;
+        }
+
         trackerInterface.createNewRecord(player);
 
         sender.sendMessage(ChatColor.GREEN + "Reset " + player.getName() + "'s " + trackerInterface.getName() + " data!");
     }
 
-    @MCCommand(cmds = "set")
+    @MCCommand(cmds = "set", perm = "battletracker.set")
     public void setCommand(MCCommandSender sender, MCOfflinePlayer player, String statType, float value) {
         TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
         Record record = trackerInterface.getRecord(player);
