@@ -9,7 +9,6 @@ import mc.alk.mc.chat.HoverAction;
 import mc.alk.mc.chat.Message;
 import mc.alk.mc.chat.MessageBuilder;
 import mc.alk.mc.entity.MCEntity;
-import org.battleplugins.tracker.TrackerInterface;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +20,8 @@ import java.util.Random;
  *
  * @author Redned
  */
+// TODO: Move most of this to a MessageManager class once editable messages are complete
 public class DeathMessageManager {
-
-    private TrackerInterface tracker;
 
     private boolean enabled;
     private String prefix;
@@ -42,9 +40,7 @@ public class DeathMessageManager {
     private Map<String, List<String>> entityMessages;
     private Map<String, List<String>> causeMessages;
 
-    public DeathMessageManager(TrackerInterface tracker) {
-        this.tracker = tracker;
-
+    public DeathMessageManager() {
         this.enabled = true;
         this.prefix = "[Tracker]";
 
@@ -62,9 +58,7 @@ public class DeathMessageManager {
         this.causeMessages = new HashMap<>();
     }
 
-    public DeathMessageManager(TrackerInterface tracker, Configuration config) {
-        this.tracker = tracker;
-
+    public DeathMessageManager(Configuration config) {
         loadDataFromConfig(config);
     }
 

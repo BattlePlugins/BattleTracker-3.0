@@ -31,8 +31,9 @@ public class Tracker implements TrackerInterface {
 
     protected SQLInstance sql;
 
-    public Tracker(String name, RatingCalculator calculator, Map<UUID, Record> records) {
+    public Tracker(String name, DeathMessageManager messageManager, RatingCalculator calculator, Map<UUID, Record> records) {
         this.name = name;
+        this.messageManager = messageManager;
         this.calculator = calculator;
         this.records = records;
 
@@ -188,10 +189,6 @@ public class Tracker implements TrackerInterface {
     @Override
     public DeathMessageManager getMessageManager() {
         return messageManager;
-    }
-
-    public void setMessageManager(DeathMessageManager messageManager) {
-        this.messageManager = messageManager;
     }
 
     @Override

@@ -83,8 +83,7 @@ public final class BattleTracker {
         }
 
         if (trackPvP) {
-            Tracker tracker = new Tracker(PVP_INTERFACE, defaultCalculator, new HashMap<>());
-            tracker.setMessageManager(new DeathMessageManager(tracker, pvpConfig));
+            Tracker tracker = new Tracker(PVP_INTERFACE, new DeathMessageManager(pvpConfig), defaultCalculator, new HashMap<>());
             trackerManager.addInterface(PVP_INTERFACE, tracker);
 
             MCCommand pvpCommand = new MCCommand(pvpConfig.getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
@@ -92,8 +91,7 @@ public final class BattleTracker {
         }
 
         if (trackPvE) {
-            Tracker tracker = new Tracker(PVE_INTERFACE, defaultCalculator, new HashMap<>());
-            tracker.setMessageManager(new DeathMessageManager(tracker, pveConfig));
+            Tracker tracker = new Tracker(PVE_INTERFACE, new DeathMessageManager(pveConfig), defaultCalculator, new HashMap<>());
             trackerManager.addInterface(PVE_INTERFACE, tracker);
 
             MCCommand pveCommand = new MCCommand(pveConfig.getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
