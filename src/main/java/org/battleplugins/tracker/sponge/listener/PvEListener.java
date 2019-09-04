@@ -81,7 +81,7 @@ public class PvEListener {
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(fakeRecord, record, false);
 
-        if (pveTracker.getMessageManager().shouldOverrideBukkitMessages())
+        if (pveTracker.getMessageManager().shouldOverrideDefaultMessages())
             event.setMessage(Text.of(""));
 
         if (type.equals("entityDeaths")) {

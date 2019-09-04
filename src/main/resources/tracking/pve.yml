@@ -26,7 +26,7 @@ name: PvE
 prefix: "&e[PvE]&f "
 options:
   command: pve
-  overrideBukkitMessages: true
+  overrideDefaultMessages: true
   useHoverMessages: true
   useClickMessages: true
   hoverContent: all # can be 'all', 'armor' or 'recap', 'all' covers both

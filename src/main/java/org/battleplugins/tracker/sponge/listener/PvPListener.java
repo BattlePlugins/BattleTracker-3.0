@@ -75,7 +75,7 @@ public class PvPListener {
         updateStats(killed, killer);
 
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        if (pvpTracker.getMessageManager().shouldOverrideBukkitMessages())
+        if (pvpTracker.getMessageManager().shouldOverrideDefaultMessages())
             event.setMessage(Text.of(""));
 
         pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase());

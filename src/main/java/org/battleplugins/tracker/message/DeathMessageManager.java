@@ -27,7 +27,7 @@ public class DeathMessageManager {
     private String prefix;
 
     // Options
-    private boolean overrideBukkitMessages;
+    private boolean overrideDefaultMessages;
     private boolean useHoverMessages;
     private boolean useClickMessages;
 
@@ -44,7 +44,7 @@ public class DeathMessageManager {
         this.enabled = true;
         this.prefix = "[Tracker]";
 
-        this.overrideBukkitMessages = true;
+        this.overrideDefaultMessages = true;
         this.useHoverMessages = true;
         this.useClickMessages = true;
 
@@ -70,7 +70,7 @@ public class DeathMessageManager {
     public void loadDataFromConfig(Configuration config) {
         this.enabled = config.getBoolean("messages.enabled");
         this.prefix = MessageController.colorChat(config.getString("prefix"));
-        this.overrideBukkitMessages = config.getBoolean("options.overrideBukkitMessages");
+        this.overrideDefaultMessages = config.getBoolean("options.overrideDefaultMessages");
         this.useHoverMessages = config.getBoolean("options.useHoverMessages");
         this.useClickMessages = config.getBoolean("options.useClickMessages");
 
@@ -124,21 +124,21 @@ public class DeathMessageManager {
     }
 
     /**
-     * Returns if Bukkit death messages should be overridden
+     * Returns if default death messages should be overridden
      *
-     * @return if Bukkit death messages should be overridden
+     * @return if default death messages should be overridden
      */
-    public boolean shouldOverrideBukkitMessages() {
-        return overrideBukkitMessages;
+    public boolean shouldOverrideDefaultMessages() {
+        return overrideDefaultMessages;
     }
 
     /**
-     * Sets if Bukkit death messages should be overridden
+     * Sets if default death messages should be overridden
      *
-     * @param overrideBukkitMessages if Bukkit death messages should be overridden
+     * @param overrideDefaultMessages if default death messages should be overridden
      */
-    public void setOverrideBukkitMessages(boolean overrideBukkitMessages) {
-        this.overrideBukkitMessages = overrideBukkitMessages;
+    public void setOverrideDefaultMessages(boolean overrideDefaultMessages) {
+        this.overrideDefaultMessages = overrideDefaultMessages;
     }
 
     /**

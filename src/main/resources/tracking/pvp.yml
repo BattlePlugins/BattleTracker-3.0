@@ -26,7 +26,7 @@ name: PvP
 prefix: "&4[PvP]&f "
 options:
   command: pvp
-  overrideBukkitMessages: true
+  overrideDefaultMessages: true
   useHoverMessages: true
   useClickMessages: true
   hoverContent: all # can be 'all', 'armor' or 'recap', 'all' covers both

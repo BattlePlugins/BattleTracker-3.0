@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This class contains all the necessary tracker info and handles
  * saving/loading new tracker interfaces. It is also injected into
- * Bukkit's service provider API, so other plugins can easily
+ * the platform's service provider API, so other plugins can easily
  * access this class.
  *
  * @author Redned
