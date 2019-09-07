@@ -40,6 +40,6 @@ messages:
   recordsReset: "&aReset %player_name%'s records %tracker% data successfully!"
   statNotInTracker: "&cThis stat type does not exist in this tracker!"
   setStatValue: "&aSet %player_name%'s %stat% value to %value%!"
-  leaderboardHeader: "&c======= &e%tracker% Leaderboards &c======="
+  leaderboardHeader: "&c============= &e%tracker% Leaderboards &c============="
   leaderboardText: "&6#%ranking% &e%player_name% &b%rating% &cKills: &6%kills% &cDeaths: &6%deaths%"
   rankingText: "&6%player_name% &7- &b%rating% &e(Max Rating: %max_rating%) &cKills: &6%kills% &cDeaths: &6%deaths% &cKDR: &6%kd_ratio%"
