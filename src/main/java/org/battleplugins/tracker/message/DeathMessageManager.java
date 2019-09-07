@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Main death message manager for BattleTracker.
+ * Main death message manager for BattleTracker, mainly
+ * used in individual trackers.
  *
  * @author Redned
  */
-// TODO: Move most of this to a MessageManager class once editable messages are complete
 public class DeathMessageManager {
 
     private boolean enabled;

@@ -6,6 +6,7 @@ import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.command.MCCommandSender;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.record.Record;
 
@@ -63,10 +64,11 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = "rank")
     public void rankCommand(MCCommandSender sender, MCOfflinePlayer player) {
+        MessageManager messageManager = tracker.getMessageManager();
         TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
         Record record = trackerInterface.getRecord(player);
         if (record == null) {
-            sender.sendMessage(ChatColor.RED + "This player has never joined the server before!");
+            sender.sendMessage(messageManager.getFormattedMessage(player, "recordNotFound"));
             return;
         }
 
@@ -78,9 +80,10 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = "reset", perm = "battletracker.reset")
     public void resetCommand(MCCommandSender sender, MCOfflinePlayer player) {
+        MessageManager messageManager = tracker.getMessageManager();
         TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
         if (!trackerInterface.hasRecord(player)) {
-            sender.sendMessage(ChatColor.RED + "This player has never joined the server before!");
+            sender.sendMessage(messageManager.getFormattedMessage(player, "recordNotFound"));
             return;
         }
 
@@ -91,10 +94,11 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = "set", perm = "battletracker.set")
     public void setCommand(MCCommandSender sender, MCOfflinePlayer player, String statType, float value) {
+        MessageManager messageManager = tracker.getMessageManager();
         TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
         Record record = trackerInterface.getRecord(player);
         if (record == null) {
-            sender.sendMessage(ChatColor.RED + "This player has never joined the server before!");
+            sender.sendMessage(messageManager.getFormattedMessage(player, "recordNotFound"));
             return;
         }
 

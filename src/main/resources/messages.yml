@@ -34,6 +34,6 @@ special:
 messages:
   prefix: "&5[Tracker]&f "
   xBetween: "&cx must be between 1 and %s"
-  recordNotFound: "&cA record for player &6%s&4 couldn't be found"
-  playerNotFound: "&cThe player %s was not found"
+  recordNotFound: "&cA record for player &6%player_name%&c couldn't be found"
+  playerNotFound: "&cThe player %player_name% was not found"
   noRecordsInTable: "&cThere are no records in the &6%s&c table"

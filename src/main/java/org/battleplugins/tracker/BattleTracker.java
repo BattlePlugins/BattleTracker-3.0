@@ -9,6 +9,7 @@ import mc.alk.mc.plugin.MCPlugin;
 import org.battleplugins.tracker.executor.TrackerExecutor;
 import org.battleplugins.tracker.impl.Tracker;
 import org.battleplugins.tracker.message.DeathMessageManager;
+import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.calculator.EloCalculator;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
@@ -32,6 +33,7 @@ public final class BattleTracker {
 
     private MCPlugin platform;
     private TrackerManager trackerManager;
+    private MessageManager messageManager;
 
     private Configuration config;
     private Configuration messagesConfig;
@@ -46,6 +48,8 @@ public final class BattleTracker {
         this.trackerManager = new TrackerManager();
 
         loadConfigs();
+
+        this.messageManager = new MessageManager("messages", messagesConfig);
 
         boolean trackPvP = pvpConfig.getBoolean("enabled", true);
         boolean trackPvE = pveConfig.getBoolean("enabled", true);
@@ -106,6 +110,15 @@ public final class BattleTracker {
      */
     public TrackerManager getTrackerManager() {
         return trackerManager;
+    }
+
+    /**
+     * Returns the MessageManager instance
+     *
+     * @return the MessageManager instance
+     */
+    public MessageManager getMessageManager() {
+        return messageManager;
     }
 
     /**
