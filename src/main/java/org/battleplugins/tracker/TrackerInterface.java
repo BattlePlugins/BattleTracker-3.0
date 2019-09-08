@@ -167,11 +167,11 @@ public interface TrackerInterface {
     void removeRecord(MCOfflinePlayer player);
 
     /**
-     * Returns the message manager for this tracker interface
+     * Returns thedeath  message manager for this tracker interface
      *
-     * @return the message manager for this tracker interface
+     * @return the death message manager for this tracker interface
      */
-    DeathMessageManager getMessageManager();
+    DeathMessageManager getDeathMessageManager();
 
     /**
      * Returns the rating calculator for this tracker interface

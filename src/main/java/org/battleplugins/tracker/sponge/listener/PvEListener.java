@@ -81,13 +81,13 @@ public class PvEListener {
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(fakeRecord, record, false);
 
-        if (pveTracker.getMessageManager().shouldOverrideDefaultMessages())
+        if (pveTracker.getDeathMessageManager().shouldOverrideDefaultMessages())
             event.setMessage(Text.of(""));
 
         if (type.equals("entityDeaths")) {
-            pveTracker.getMessageManager().sendEntityMessage(killer, killed.getName(), "air");
+            pveTracker.getDeathMessageManager().sendEntityMessage(killer, killed.getName(), "air");
         } else {
-            pveTracker.getMessageManager().sendCauseMessage(killer, killed.getName(), "air");
+            pveTracker.getDeathMessageManager().sendCauseMessage(killer, killed.getName(), "air");
         }
     }
 

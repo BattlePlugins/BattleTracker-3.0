@@ -76,10 +76,10 @@ public class PvPListener {
         updateStats(killed, killer);
 
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        if (pvpTracker.getMessageManager().shouldOverrideDefaultMessages())
+        if (pvpTracker.getDeathMessageManager().shouldOverrideDefaultMessages())
             event.setMessage(Text.of(""));
 
-        pvpTracker.getMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase());
+        pvpTracker.getDeathMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase());
     }
 
     public void updateStats(Player killed, Player killer) {

@@ -187,7 +187,7 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public DeathMessageManager getMessageManager() {
+    public DeathMessageManager getDeathMessageManager() {
         return messageManager;
     }
 
