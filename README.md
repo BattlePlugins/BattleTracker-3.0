@@ -2,7 +2,7 @@
 ==========
 
 An SQL tracker for Minecraft and [BattleArena](https://github.com/BattlePlugins/BattleArena). 
-* Full [Bukkit](http://bukkit.org), [Sponge](https://www.spongepowered.org/) and [Nukkit](https://nukkitx.com/) support
+* [Bukkit](http://bukkit.org), [Sponge](https://www.spongepowered.org/) and [Nukkit](https://nukkitx.com/) support.
 * PvE and PvP tracking.
 * Allows overall stats, tallies, and individual records.
 * Allows for win/loss tracking inside of BattleArena.
@@ -16,17 +16,17 @@ Live Chat on Discord:
 
 
 Battle Arena Links:
-* [Bukkit Page](http://dev.bukkit.org/bukkit-plugins/battlearena/) (BattleArena on Bukkit!)
+* [Bukkit Page](https://dev.bukkit.org/projects/battlearena) (BattleArena on Bukkit!)
 * [Spigot Page](http://spigotmc.org/resources/battlearena.2164/) (BattleArena on Spigot!)
 
 Battle Tracker Links:
-* [Bukkit Page](http://dev.bukkit.org/bukkit-plugins/battletracker/) (BattleTracker on Bukkit!)
+* [Bukkit Page](http://dev.bukkit.org/projects/battletracker/) (BattleTracker on Bukkit!)
 * [Spigot Page](http://spigotmc.org/resources/battletracker.2165/) (BattleTracker on Spigot!)
 
 Other Links:
 * [BattleDocs](http://docs.battleplugins.org) (BattlePlugins Documentation)
-* [Ci Server](http://ci.battleplugins.org/job/BattlePlugins/job/BattleTracker/) (Jenkins Build Server)
-* [Battle Plugin Donations] (Donation link coming soon)
+* [CI Server](http://ci.battleplugins.org/job/BattlePlugins/job/BattleTracker/) (Jenkins Build Server)
+* [BattlePlugin Donations] (Donation link coming soon)
 * [JavaDocs](http://rainbowcraft.sytes.net/javadocs/battletracker/apidocs/) (WIP)
 
 Reporting Issues:
@@ -53,4 +53,4 @@ you have a good amount of information about it, creating a new issue might be a 
 
 Stats
 ------------
-![Plugin Stats](https://bstats.org/signatures/bukkit/BattleTracker.svg "Plugin Stats")
+[![Plugin Stats](https://bstats.org/signatures/bukkit/BattleTracker.svg "Plugin Stats")](https://bstats.org/plugin/bukkit/BattleTracker)
