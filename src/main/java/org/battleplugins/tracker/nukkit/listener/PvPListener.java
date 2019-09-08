@@ -99,7 +99,7 @@ public class PvPListener implements Listener {
         pvpTracker.updateRating(MCPlatform.getOfflinePlayer(killer.getUniqueId()), MCPlatform.getOfflinePlayer(killed.getUniqueId()), false);
 
         if (killerRecord.getStat(StatType.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
-            String streakMessage = tracker.getMessageManager().getStreakMessage(MCPlatform.getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
+            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(MCPlatform.getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
             MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
         }
     }
