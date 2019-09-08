@@ -49,7 +49,7 @@ public final class BattleTracker {
 
         loadConfigs();
 
-        this.messageManager = new MessageManager("messages", messagesConfig);
+        this.messageManager = new MessageManager("messages", "special", messagesConfig);
 
         boolean trackPvP = pvpConfig.getBoolean("enabled", true);
         boolean trackPvE = pveConfig.getBoolean("enabled", true);

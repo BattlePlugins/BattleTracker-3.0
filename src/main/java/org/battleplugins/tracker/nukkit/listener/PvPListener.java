@@ -12,6 +12,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerDeathEvent;
 import cn.nukkit.item.Item;
 import mc.alk.mc.MCPlatform;
+import mc.alk.mc.chat.MessageBuilder;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.stat.StatType;
@@ -96,5 +97,10 @@ public class PvPListener implements Listener {
             pvpTracker.incrementValue(StatType.DEATHS, MCPlatform.getOfflinePlayer(killed.getUniqueId()));
 
         pvpTracker.updateRating(MCPlatform.getOfflinePlayer(killer.getUniqueId()), MCPlatform.getOfflinePlayer(killed.getUniqueId()), false);
+
+        if (killerRecord.getStat(StatType.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
+            String streakMessage = tracker.getMessageManager().getStreakMessage(MCPlatform.getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
+            MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
+        }
     }
 }

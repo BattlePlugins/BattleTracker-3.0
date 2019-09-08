@@ -16,17 +16,93 @@ import java.util.Map;
 public class MessageManager {
 
     private Map<String, String> messages;
+    private Map<String, String> rampageMessages;
+    private Map<String, String> streakMessages;
 
     public MessageManager() {
         this.messages = new HashMap<>();
+        this.rampageMessages = new HashMap<>();
+        this.streakMessages = new HashMap<>();
     }
 
-    public MessageManager(String path, Configuration config) {
+    public MessageManager(String path, String specialPath, Configuration config) {
         this();
 
         for (String str : config.getSection(path).getKeys(false)) {
             messages.put(str, config.getString(path + "." + str));
         }
+
+        for (String str : config.getSection(specialPath + ".rampage").getKeys(false)) {
+            rampageMessages.put(str, config.getString(specialPath + ".rampage." + str));
+        }
+
+        for (String str : config.getSection(specialPath + ".streak").getKeys(false)) {
+            streakMessages.put(str, config.getString(specialPath + ".streak." + str));
+        }
+    }
+
+    /**
+     * Returns a streak message with the given key/path
+     *
+     * @param key the name (key) of the message in the config
+     * @return a message with the given key/path
+     */
+    public String getStreakMessage(String key) {
+        String streakMessage = streakMessages.get(key);
+        if (streakMessage == null)
+            streakMessage = streakMessages.get("default");
+
+        return streakMessage;
+    }
+
+    /**
+     * Returns a streak message with the given key/path which
+     * is formatted with color replacements and the
+     * prefix
+     *
+     * @param key the name (key) of the message in the config
+     * @return a message with the given key/path
+     */
+    public String getFormattedStreakMessage(String key) {
+        String streakMessage = streakMessages.get(key);
+        if (streakMessage == null)
+            streakMessage = streakMessages.get("default");
+
+        return MessageController.colorChat(messages.get("prefix") + MessageController.colorChat(streakMessage));
+    }
+
+    /**
+     * Returns a streak message with the given key/path and
+     * variable replacement for the specified player
+     *
+     * @param player the player to perform the variable replacement on
+     * @param key the name (key) of the message in the config
+     * @return a message with the given key/path
+     */
+    public String getStreakMessage(MCOfflinePlayer player, String key) {
+        String streakMessage = streakMessages.get(key);
+        if (streakMessage == null)
+            streakMessage = streakMessages.get("default");
+
+        return getPlaceholderMessage(player, streakMessage);
+    }
+
+    /**
+     * Returns a streak message with the given key/path and
+     * variable replacement for the specified player,
+     * which is also formatted with color replacements
+     * and prefix
+     *
+     * @param player the player to perform the variable replacement on
+     * @param key the name (key) of the message in the config
+     * @return a message with the given key/path
+     */
+    public String getFormattedStreakMessage(MCOfflinePlayer player, String key) {
+        String streakMessage = streakMessages.get(key);
+        if (streakMessage == null)
+            streakMessage = streakMessages.get("default");
+
+        return MessageController.colorChat(messages.get("prefix") + getPlaceholderMessage(player, streakMessage));
     }
 
     /**
