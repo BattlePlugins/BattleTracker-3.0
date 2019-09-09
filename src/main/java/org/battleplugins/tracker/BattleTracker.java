@@ -31,7 +31,7 @@ public final class BattleTracker {
 
     private static BattleTracker instance;
 
-    private MCPlugin platform;
+    private MCPlugin plugin;
     private TrackerManager trackerManager;
     private MessageManager messageManager;
 
@@ -43,8 +43,8 @@ public final class BattleTracker {
 
     private RatingCalculator defaultCalculator;
 
-    public BattleTracker(MCPlugin platform) {
-        this.platform = platform;
+    public BattleTracker(MCPlugin plugin) {
+        this.plugin = plugin;
         this.trackerManager = new TrackerManager();
 
         loadConfigs();
@@ -91,7 +91,7 @@ public final class BattleTracker {
             trackerManager.addInterface(PVP_INTERFACE, tracker);
 
             MCCommand pvpCommand = new MCCommand(pvpConfig.getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
-            platform.registerMCCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
+            plugin.registerMCCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
         }
 
         if (trackPvE) {
@@ -99,7 +99,7 @@ public final class BattleTracker {
             trackerManager.addInterface(PVE_INTERFACE, tracker);
 
             MCCommand pveCommand = new MCCommand(pveConfig.getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
-            platform.registerMCCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
+            plugin.registerMCCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
         }
     }
 
@@ -131,12 +131,12 @@ public final class BattleTracker {
     }
 
     /**
-     * Returns the current platform 
+     * Returns the current plugin
      *
-     * @return the current platform
+     * @return the current plugin
      */
-    public MCPlugin getPlatform() {
-        return platform;
+    public MCPlugin getPlugin() {
+        return plugin;
     }
 
     /**
@@ -165,14 +165,14 @@ public final class BattleTracker {
      * Loads the config files
      */
     private void loadConfigs() {
-        if (!platform.getDataFolder().exists()) {
-            platform.getDataFolder().mkdir();
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdir();
         }
 
-        File configFile = new File(platform.getDataFolder(), "config.yml");
-        File messagesFile = new File(platform.getDataFolder(), "messages.yml");
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        File messagesFile = new File(plugin.getDataFolder(), "messages.yml");
 
-        File trackerFolder = new File(platform.getDataFolder(), "tracking");
+        File trackerFolder = new File(plugin.getDataFolder(), "tracking");
         if (!trackerFolder.exists()) {
             trackerFolder.mkdir();
         }
