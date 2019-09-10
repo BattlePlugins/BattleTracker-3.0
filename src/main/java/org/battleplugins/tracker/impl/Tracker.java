@@ -151,12 +151,12 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void enableMessages(MCOfflinePlayer player) {
-
+        records.get(player.getUniqueId()).setSendMessages(true);
     }
 
     @Override
     public void disableMessages(MCOfflinePlayer player) {
-
+        records.get(player.getUniqueId()).setSendMessages(false);
     }
 
     @Override

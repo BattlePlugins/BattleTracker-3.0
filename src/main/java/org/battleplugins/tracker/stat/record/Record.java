@@ -1,6 +1,5 @@
 package org.battleplugins.tracker.stat.record;
 
-import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.stat.StatType;
 
@@ -23,6 +22,7 @@ public abstract class Record {
     protected Map<String, Float> stats;
 
     protected boolean tracking;
+    protected boolean sendMessages;
 
     public Record(TrackerInterface tracker, String id, String name) {
         this(tracker, id, name, new HashMap<>());
@@ -35,6 +35,7 @@ public abstract class Record {
         this.name = name;
         this.stats = stats;
         this.tracking = true;
+        this.sendMessages = true;
     }
 
     /**
@@ -162,5 +163,23 @@ public abstract class Record {
      */
     public void setTracking(boolean tracking) {
         this.tracking = tracking;
+    }
+
+    /**
+     * Returns if tracker messages should be sent for this record
+     *
+     * @return if tracker messages should be sent for this record
+     */
+    public boolean isSendingMessages() {
+        return sendMessages;
+    }
+
+    /**
+     * Sets if tracker messages should be sent for this record
+     *
+     * @param sendMessages if tracker messages should be sent for this record
+     */
+    public void setSendMessages(boolean sendMessages) {
+        this.sendMessages = sendMessages;
     }
 }
