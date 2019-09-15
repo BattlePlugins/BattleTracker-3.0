@@ -2,10 +2,8 @@ package org.battleplugins.tracker.nukkit;
 
 import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.plugin.service.ServicePriority;
 import mc.alk.mc.plugin.platform.PlatformCodeHandler;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerManager;
 import org.battleplugins.tracker.nukkit.listener.TrackerListener;
 import org.battleplugins.tracker.nukkit.listener.PvEListener;
 import org.battleplugins.tracker.nukkit.listener.PvPListener;
@@ -26,10 +24,6 @@ public class NukkitCodeHandler extends PlatformCodeHandler {
     @Override
     public void onEnable() {
         Plugin plugin = (Plugin) tracker.getPlatformPlugin();
-
-        // Register the tracker manager into the service provider API
-        Server.getInstance().getServiceManager().register(TrackerManager.class, tracker.getTrackerManager(), plugin, ServicePriority.NORMAL);
-
         if (tracker.getTrackerManager().isTrackingPvE()) {
             Server.getInstance().getPluginManager().registerEvents(new PvEListener(tracker), plugin);
         }

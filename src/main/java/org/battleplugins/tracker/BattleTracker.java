@@ -8,6 +8,7 @@ import mc.alk.mc.APIType;
 import mc.alk.mc.MCPlatform;
 import mc.alk.mc.command.MCCommand;
 import mc.alk.mc.plugin.MCPlugin;
+import mc.alk.mc.plugin.MCServicePriority;
 import mc.alk.mc.plugin.PluginProperties;
 import org.battleplugins.tracker.bukkit.BukkitCodeHandler;
 import org.battleplugins.tracker.executor.TrackerExecutor;
@@ -27,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Overall main class for the BattleTracker plugin.
@@ -69,6 +69,9 @@ public final class BattleTracker extends MCPlugin {
             }
 
             this.trackerManager = new TrackerManager();
+
+            // Register the tracker manager into the service provider API
+            MCPlatform.registerService(TrackerManager.class, trackerManager, this, MCServicePriority.NORMAL);
 
             loadConfigs();
 

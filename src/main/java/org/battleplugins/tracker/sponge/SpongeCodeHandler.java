@@ -2,7 +2,6 @@ package org.battleplugins.tracker.sponge;
 
 import mc.alk.mc.plugin.platform.PlatformCodeHandler;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerManager;
 import org.battleplugins.tracker.sponge.listener.PvEListener;
 import org.battleplugins.tracker.sponge.listener.PvPListener;
 import org.battleplugins.tracker.sponge.listener.TrackerListener;
@@ -23,9 +22,6 @@ public class SpongeCodeHandler extends PlatformCodeHandler {
 
     @Override
     public void onEnable() {
-        // Register the tracker manager into the service provider API
-        Sponge.getServiceManager().setProvider(tracker.getPlatformPlugin(), TrackerManager.class, tracker.getTrackerManager());
-
         if (tracker.getTrackerManager().isTrackingPvE()) {
             Sponge.getEventManager().registerListeners(tracker.getPlatformPlugin(), new PvEListener(tracker));
         }
