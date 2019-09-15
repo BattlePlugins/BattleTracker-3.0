@@ -19,12 +19,15 @@ import org.battleplugins.tracker.sponge.SpongeCodeHandler;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.calculator.EloCalculator;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
+import org.battleplugins.tracker.util.DependencyUtil;
+import org.battleplugins.tracker.util.DependencyUtil.DownloadResult;
 import org.battleplugins.tracker.util.Util;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Overall main class for the BattleTracker plugin.
@@ -55,74 +58,85 @@ public final class BattleTracker extends MCPlugin {
         instance = this;
 
         getLogger().info("You are running " + TrackerInfo.NAME + " on " + Util.capitalizeFirst(MCPlatform.getType().name()) + "!");
-        this.trackerManager = new TrackerManager();
+        DependencyUtil.setLibFolder(new File(getDataFolder(), "libraries"));
+        DependencyUtil.downloadDepedencies().whenComplete((result, action) -> {
+            if (result != DownloadResult.SUCCESS) {
+                getLogger().severe("Unable to download SQL libraries for BattleTracker!");
+                getLogger().severe("If this error persists, there may be a restraint on your host or server provider.");
+                getLogger().severe("Please view the tutorial on how to download the libraries manually on the BattlePlugins documentation.");
+                MCPlatform.getPluginManager().disablePlugin();
+                return;
+            }
 
-        loadConfigs();
+            this.trackerManager = new TrackerManager();
 
-        this.messageManager = new MessageManager("messages", "special", messagesConfig);
+            loadConfigs();
 
-        boolean trackPvP = pvpConfig.getBoolean("enabled", true);
-        boolean trackPvE = pveConfig.getBoolean("enabled", true);
+            this.messageManager = new MessageManager("messages", "special", messagesConfig);
 
-        trackerManager.setTrackPvP(trackPvP);
-        trackerManager.setTrackPvE(trackPvE);
+            boolean trackPvP = pvpConfig.getBoolean("enabled", true);
+            boolean trackPvE = pveConfig.getBoolean("enabled", true);
 
-        PVP_INTERFACE = pvpConfig.getString("name");
-        PVE_INTERFACE = pveConfig.getString("name");
+            trackerManager.setTrackPvP(trackPvP);
+            trackerManager.setTrackPvE(trackPvE);
 
-        ConfigurationSection section = config.getSection("database");
+            PVP_INTERFACE = pvpConfig.getString("name");
+            PVE_INTERFACE = pveConfig.getString("name");
 
-        String type = section.getString("type", "sqlite");
-        String prefix = section.getString("prefix", "bt_");
-        String url = section.getString("url", "localhost");
-        String database = section.getString("db", "tracker");
-        String port = section.getString("port", "3306");
-        String username = section.getString("username", "root");
-        String password = section.getString("password");
+            ConfigurationSection section = config.getSection("database");
 
-        SQLInstance.TYPE = type;
-        SQLInstance.TABLE_PREFIX = prefix;
-        SQLInstance.DATABASE = database;
-        SQLInstance.URL = url;
-        SQLInstance.PORT = port;
-        SQLInstance.USERNAME = username;
-        SQLInstance.PASSWORD = password;
+            String type = section.getString("type", "sqlite");
+            String prefix = section.getString("prefix", "bt_");
+            String url = section.getString("url", "localhost");
+            String database = section.getString("db", "tracker");
+            String port = section.getString("port", "3306");
+            String username = section.getString("username", "root");
+            String password = section.getString("password");
 
-        switch (config.getString("rating.calculator")) {
-            case "elo":
-                this.defaultCalculator = new EloCalculator(config.getFloat("rating.options.elo.default", 1250), config.getFloat("rating.options.elo.spread", 400));
-                break;
-            default:
-                this.defaultCalculator = new EloCalculator(1250, 400);
-        }
+            SQLInstance.TYPE = type;
+            SQLInstance.TABLE_PREFIX = prefix;
+            SQLInstance.DATABASE = database;
+            SQLInstance.URL = url;
+            SQLInstance.PORT = port;
+            SQLInstance.USERNAME = username;
+            SQLInstance.PASSWORD = password;
 
-        if (trackPvP) {
-            Tracker tracker = new Tracker(PVP_INTERFACE, new DeathMessageManager(pvpConfig), defaultCalculator, new HashMap<>());
-            trackerManager.addInterface(PVP_INTERFACE, tracker);
+            switch (config.getString("rating.calculator")) {
+                case "elo":
+                    this.defaultCalculator = new EloCalculator(config.getFloat("rating.options.elo.default", 1250), config.getFloat("rating.options.elo.spread", 400));
+                    break;
+                default:
+                    this.defaultCalculator = new EloCalculator(1250, 400);
+            }
 
-            MCCommand pvpCommand = new MCCommand(pvpConfig.getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
-            registerCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
-        }
+            if (trackPvP) {
+                Tracker tracker = new Tracker(PVP_INTERFACE, new DeathMessageManager(pvpConfig), defaultCalculator, new HashMap<>());
+                trackerManager.addInterface(PVP_INTERFACE, tracker);
 
-        if (trackPvE) {
-            Tracker tracker = new Tracker(PVE_INTERFACE, new DeathMessageManager(pveConfig), defaultCalculator, new HashMap<>());
-            trackerManager.addInterface(PVE_INTERFACE, tracker);
+                MCCommand pvpCommand = new MCCommand(pvpConfig.getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
+                registerCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
+            }
 
-            MCCommand pveCommand = new MCCommand(pveConfig.getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
-            registerCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
-        }
+            if (trackPvE) {
+                Tracker tracker = new Tracker(PVE_INTERFACE, new DeathMessageManager(pveConfig), defaultCalculator, new HashMap<>());
+                trackerManager.addInterface(PVE_INTERFACE, tracker);
 
-        APIType api = MCPlatform.getType();
-        if (api == APIType.BUKKIT)
-            platformCode.put(APIType.BUKKIT, new BukkitCodeHandler(this));
+                MCCommand pveCommand = new MCCommand(pveConfig.getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
+                registerCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
+            }
 
-        if (api == APIType.NUKKIT)
-            platformCode.put(APIType.NUKKIT, new NukkitCodeHandler(this));
+            APIType api = MCPlatform.getType();
+            if (api == APIType.BUKKIT)
+                platformCode.put(APIType.BUKKIT, new BukkitCodeHandler(this));
 
-        if (api == APIType.SPONGE)
-            platformCode.put(APIType.SPONGE, new SpongeCodeHandler(this));
+            if (api == APIType.NUKKIT)
+                platformCode.put(APIType.NUKKIT, new NukkitCodeHandler(this));
 
-        Log.setPlugin(this);
+            if (api == APIType.SPONGE)
+                platformCode.put(APIType.SPONGE, new SpongeCodeHandler(this));
+
+            Log.setPlugin(this);
+        });
     }
 
     @Override
