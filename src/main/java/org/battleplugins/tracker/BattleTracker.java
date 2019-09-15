@@ -4,15 +4,22 @@ import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.configuration.ConfigurationSection;
 import mc.alk.battlecore.util.FileUtil;
 import mc.alk.battlecore.util.Log;
+import mc.alk.mc.APIType;
+import mc.alk.mc.MCPlatform;
 import mc.alk.mc.command.MCCommand;
 import mc.alk.mc.plugin.MCPlugin;
+import mc.alk.mc.plugin.PluginProperties;
+import org.battleplugins.tracker.bukkit.BukkitCodeHandler;
 import org.battleplugins.tracker.executor.TrackerExecutor;
 import org.battleplugins.tracker.impl.Tracker;
 import org.battleplugins.tracker.message.DeathMessageManager;
 import org.battleplugins.tracker.message.MessageManager;
+import org.battleplugins.tracker.nukkit.NukkitCodeHandler;
+import org.battleplugins.tracker.sponge.SpongeCodeHandler;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.calculator.EloCalculator;
 import org.battleplugins.tracker.stat.calculator.RatingCalculator;
+import org.battleplugins.tracker.util.Util;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,14 +31,14 @@ import java.util.HashMap;
  *
  * @author Zach443, Redned
  */
-public final class BattleTracker {
+@PluginProperties(id = "bt", authors = "BattlePlugins", name = TrackerInfo.NAME, version = TrackerInfo.VERSION, description = TrackerInfo.DESCRIPTION, url = TrackerInfo.URL)
+public final class BattleTracker extends MCPlugin {
 
     public static String PVP_INTERFACE = "PvP";
     public static String PVE_INTERFACE = "PvE";
 
     private static BattleTracker instance;
 
-    private MCPlugin plugin;
     private TrackerManager trackerManager;
     private MessageManager messageManager;
 
@@ -43,8 +50,11 @@ public final class BattleTracker {
 
     private RatingCalculator defaultCalculator;
 
-    public BattleTracker(MCPlugin plugin) {
-        this.plugin = plugin;
+    @Override
+    public void onEnable() {
+        instance = this;
+
+        getLogger().info("You are running " + TrackerInfo.NAME + " on " + Util.capitalizeFirst(MCPlatform.getType().name()) + "!");
         this.trackerManager = new TrackerManager();
 
         loadConfigs();
@@ -91,7 +101,7 @@ public final class BattleTracker {
             trackerManager.addInterface(PVP_INTERFACE, tracker);
 
             MCCommand pvpCommand = new MCCommand(pvpConfig.getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
-            plugin.registerMCCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
+            registerCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
         }
 
         if (trackPvE) {
@@ -99,7 +109,34 @@ public final class BattleTracker {
             trackerManager.addInterface(PVE_INTERFACE, tracker);
 
             MCCommand pveCommand = new MCCommand(pveConfig.getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
-            plugin.registerMCCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
+            registerCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
+        }
+
+        APIType api = MCPlatform.getType();
+        if (api == APIType.BUKKIT)
+            platformCode.put(APIType.BUKKIT, new BukkitCodeHandler(this));
+
+        if (api == APIType.NUKKIT)
+            platformCode.put(APIType.NUKKIT, new NukkitCodeHandler(this));
+
+        if (api == APIType.SPONGE)
+            platformCode.put(APIType.SPONGE, new SpongeCodeHandler(this));
+
+        Log.setPlugin(this);
+    }
+
+    @Override
+    public void onDisable() {
+        getLogger().info("Saving all records...");
+        try {
+            for (TrackerInterface trackerInterface : trackerManager.getInterfaces().values()) {
+                trackerInterface.saveAll();
+            }
+            getLogger().info("Saved all records successfully!");
+        } catch (Exception ex) {
+            getLogger().error("Could not save all records! Please make sure everything is configured correctly!");
+            getLogger().error("If this error persists, please open a report on GitHub!");
+            ex.printStackTrace();
         }
     }
 
@@ -131,48 +168,26 @@ public final class BattleTracker {
     }
 
     /**
-     * Returns the current plugin
+     * Returns the BattleTracker instance
      *
-     * @return the current plugin
-     */
-    public MCPlugin getPlugin() {
-        return plugin;
-    }
-
-    /**
-     * Returns the current BattleTracker instance
-     *
-     * @return the current BattleTracker instance
+     * @return the BattleTracker instance
      */
     public static BattleTracker getInstance() {
         return instance;
     }
 
     /**
-     * Sets the current BattleTracker singleton. Cannot
-     * be done if it's already set
-     *
-     * @param tracker the BattleTracker instance to set
-     */
-    public static void setInstance(BattleTracker tracker) {
-        if (instance != null)
-            throw new UnsupportedOperationException("Cannot redefine singleton BattleTracker!");
-
-        instance = tracker;
-    }
-
-    /**
      * Loads the config files
      */
     private void loadConfigs() {
-        if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdir();
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdir();
         }
 
-        File configFile = new File(plugin.getDataFolder(), "config.yml");
-        File messagesFile = new File(plugin.getDataFolder(), "messages.yml");
+        File configFile = new File(getDataFolder(), "config.yml");
+        File messagesFile = new File(getDataFolder(), "messages.yml");
 
-        File trackerFolder = new File(plugin.getDataFolder(), "tracking");
+        File trackerFolder = new File(getDataFolder(), "tracking");
         if (!trackerFolder.exists()) {
             trackerFolder.mkdir();
         }

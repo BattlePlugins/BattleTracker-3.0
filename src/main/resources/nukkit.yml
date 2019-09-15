@@ -1,8 +1,0 @@
-# nukkit.yml for Nukkit
-main: org.battleplugins.tracker.nukkit.NukkitTrackerPlugin
-name: ${project.name}
-api: [1.0.0]
-version: ${project.version}
-description: ${project.description}
-author: BattlePlugins
-website: ${project.url}
