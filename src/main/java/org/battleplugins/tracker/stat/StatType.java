@@ -28,14 +28,31 @@ public enum StatType {
         this.track = track;
     }
 
+    /**
+     * Returns the internal name of the stat type, this
+     * is what's used when storing data in a database
+     *
+     * @return the internal name of the stat type
+     */
     public String getInternalName() {
         return name().toLowerCase();
     }
 
+    /**
+     * Returns the name of the stat type
+     *
+     * @return the name of the stat type
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns if the stat type should be tracked/
+     * stored inside of the database
+     *
+     * @return if the stat type should be tracked
+     */
     public boolean isTracking() {
         return track;
     }
