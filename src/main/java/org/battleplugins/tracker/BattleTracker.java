@@ -2,7 +2,6 @@ package org.battleplugins.tracker;
 
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.configuration.ConfigurationSection;
-import mc.alk.battlecore.util.FileUtil;
 import mc.alk.battlecore.util.Log;
 import mc.alk.mc.APIType;
 import mc.alk.mc.MCPlatform;
@@ -11,6 +10,7 @@ import mc.alk.mc.plugin.MCPlugin;
 import mc.alk.mc.plugin.MCServicePriority;
 import mc.alk.mc.plugin.PluginProperties;
 import org.battleplugins.tracker.bukkit.BukkitCodeHandler;
+import org.battleplugins.tracker.config.ConfigManager;
 import org.battleplugins.tracker.executor.TrackerExecutor;
 import org.battleplugins.tracker.impl.Tracker;
 import org.battleplugins.tracker.message.DeathMessageManager;
@@ -25,7 +25,6 @@ import org.battleplugins.tracker.util.DependencyUtil.DownloadResult;
 import org.battleplugins.tracker.util.Util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,14 +41,9 @@ public final class BattleTracker extends MCPlugin {
 
     private static BattleTracker instance;
 
+    private ConfigManager configManager;
     private TrackerManager trackerManager;
     private MessageManager messageManager;
-
-    private Configuration config;
-    private Configuration messagesConfig;
-
-    private Configuration pvpConfig;
-    private Configuration pveConfig;
 
     private RatingCalculator defaultCalculator;
 
@@ -68,25 +62,24 @@ public final class BattleTracker extends MCPlugin {
                 return;
             }
 
+            this.configManager = new ConfigManager(this);
             this.trackerManager = new TrackerManager();
 
             // Register the tracker manager into the service provider API
             MCPlatform.registerService(TrackerManager.class, trackerManager, this, MCServicePriority.NORMAL);
 
-            loadConfigs();
+            this.messageManager = new MessageManager("messages", "special", configManager.getMessagesConfig());
 
-            this.messageManager = new MessageManager("messages", "special", messagesConfig);
-
-            boolean trackPvP = pvpConfig.getBoolean("enabled", true);
-            boolean trackPvE = pveConfig.getBoolean("enabled", true);
+            boolean trackPvP = configManager.getPvPConfig().getBoolean("enabled", true);
+            boolean trackPvE = configManager.getPvEConfig().getBoolean("enabled", true);
 
             trackerManager.setTrackPvP(trackPvP);
             trackerManager.setTrackPvE(trackPvE);
 
-            PVP_INTERFACE = pvpConfig.getString("name");
-            PVE_INTERFACE = pveConfig.getString("name");
+            PVP_INTERFACE = configManager.getPvPConfig().getString("name");
+            PVE_INTERFACE = configManager.getPvEConfig().getString("name");
 
-            ConfigurationSection section = config.getSection("database");
+            ConfigurationSection section = configManager.getConfig().getSection("database");
 
             String type = section.getString("type", "sqlite");
             String prefix = section.getString("prefix", "bt_");
@@ -99,32 +92,36 @@ public final class BattleTracker extends MCPlugin {
             SQLInstance.TYPE = type;
             SQLInstance.TABLE_PREFIX = prefix;
             SQLInstance.DATABASE = database;
-            SQLInstance.URL = url;
             SQLInstance.PORT = port;
             SQLInstance.USERNAME = username;
             SQLInstance.PASSWORD = password;
 
-            switch (config.getString("rating.calculator")) {
+            if (type.equalsIgnoreCase("sqlite"))
+                SQLInstance.URL = getDataFolder().toString();
+            else
+                SQLInstance.URL = url;
+
+            switch (configManager.getConfig().getString("rating.calculator")) {
                 case "elo":
-                    this.defaultCalculator = new EloCalculator(config.getFloat("rating.options.elo.default", 1250), config.getFloat("rating.options.elo.spread", 400));
+                    this.defaultCalculator = new EloCalculator(configManager.getConfig().getFloat("rating.options.elo.default", 1250), configManager.getConfig().getFloat("rating.options.elo.spread", 400));
                     break;
                 default:
                     this.defaultCalculator = new EloCalculator(1250, 400);
             }
 
             if (trackPvP) {
-                Tracker tracker = new Tracker(PVP_INTERFACE, new DeathMessageManager(pvpConfig), defaultCalculator, new HashMap<>());
+                Tracker tracker = new Tracker(PVP_INTERFACE, new DeathMessageManager(configManager.getPvPConfig()), defaultCalculator, new HashMap<>());
                 trackerManager.addInterface(PVP_INTERFACE, tracker);
 
-                MCCommand pvpCommand = new MCCommand(pvpConfig.getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
+                MCCommand pvpCommand = new MCCommand(configManager.getPvPConfig().getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
                 registerCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
             }
 
             if (trackPvE) {
-                Tracker tracker = new Tracker(PVE_INTERFACE, new DeathMessageManager(pveConfig), defaultCalculator, new HashMap<>());
+                Tracker tracker = new Tracker(PVE_INTERFACE, new DeathMessageManager(configManager.getPvEConfig()), defaultCalculator, new HashMap<>());
                 trackerManager.addInterface(PVE_INTERFACE, tracker);
 
-                MCCommand pveCommand = new MCCommand(pveConfig.getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
+                MCCommand pveCommand = new MCCommand(configManager.getPvEConfig().getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
                 registerCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
             }
 
@@ -139,6 +136,7 @@ public final class BattleTracker extends MCPlugin {
                 platformCode.put(APIType.SPONGE, new SpongeCodeHandler(this));
 
             Log.setPlugin(this);
+            Log.setDebug(configManager.getConfig().getBoolean("debugMode", false));
         });
     }
 
@@ -155,6 +153,24 @@ public final class BattleTracker extends MCPlugin {
             getLogger().error("If this error persists, please open a report on GitHub!");
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Returns the configuration manager
+     *
+     * @return the configuration manager
+     */
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    /**
+     * Returns the config for BattleTracker
+     *
+     * @return the config for BattleTracker
+     */
+    public Configuration getConfig() {
+        return configManager.getConfig();
     }
 
     /**
@@ -191,103 +207,5 @@ public final class BattleTracker extends MCPlugin {
      */
     public static BattleTracker getInstance() {
         return instance;
-    }
-
-    /**
-     * Loads the config files
-     */
-    private void loadConfigs() {
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdir();
-        }
-
-        File configFile = new File(getDataFolder(), "config.yml");
-        File messagesFile = new File(getDataFolder(), "messages.yml");
-
-        File trackerFolder = new File(getDataFolder(), "tracking");
-        if (!trackerFolder.exists()) {
-            trackerFolder.mkdir();
-        }
-
-        File pvpFile = new File(trackerFolder, "pvp.yml");
-        File pveFile = new File(trackerFolder, "pve.yml");
-
-        if (!configFile.exists()) {
-            try {
-                FileUtil.writeFile(configFile, getClass().getResourceAsStream("/config.yml"));
-            } catch (IOException ex) {
-                Log.err("Could not create config.yml config file!");
-                ex.printStackTrace();
-            }
-        }
-
-        if (!messagesFile.exists()) {
-            try {
-                FileUtil.writeFile(messagesFile, getClass().getResourceAsStream("/messages.yml"));
-            } catch (IOException ex) {
-                Log.err("Could not create messages.yml config file!");
-                ex.printStackTrace();
-            }
-        }
-
-        if (!pvpFile.exists()) {
-            try {
-                FileUtil.writeFile(pvpFile, getClass().getResourceAsStream("/tracking/pvp.yml"));
-            } catch (IOException ex) {
-                Log.err("Could not create pvp.yml config file!");
-                ex.printStackTrace();
-            }
-        }
-
-        if (!pveFile.exists()) {
-            try {
-                FileUtil.writeFile(pveFile, getClass().getResourceAsStream("/tracking/pve.yml"));
-            } catch (IOException ex) {
-                Log.err("Could not create pve.yml config file!");
-                ex.printStackTrace();
-            }
-        }
-
-        config = new Configuration(configFile);
-        messagesConfig = new Configuration(messagesFile);
-
-        pvpConfig = new Configuration(pvpFile);
-        pveConfig = new Configuration(pveFile);
-    }
-
-    /**
-     * Returns the main config.yml for BattleTracker
-     *
-     * @return the main config.yml
-     */
-    public Configuration getConfig() {
-        return config;
-    }
-
-    /**
-     * Returns the messages.yml config file for BattleTracker
-     *
-     * @return the messages.yml config file
-     */
-    public Configuration getMessagesConfig() {
-        return messagesConfig;
-    }
-
-    /**
-     * Returns the pvp.yml config file for BattleTracker
-     *
-     * @return the pvp.yml config file
-     */
-    public Configuration getPvPConfig() {
-        return pvpConfig;
-    }
-
-    /**
-     * Returns the pve.yml config file for BattleTracker
-     *
-     * @return the pve.yml config file
-     */
-    public Configuration getPvEConfig() {
-        return pveConfig;
     }
 }

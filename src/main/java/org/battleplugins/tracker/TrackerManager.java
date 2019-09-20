@@ -20,7 +20,7 @@ public class TrackerManager {
     private Map<String, TrackerInterface> interfaces;
 
     public TrackerManager() {
-        interfaces = Collections.synchronizedMap(new ConcurrentHashMap<String, TrackerInterface>());
+        interfaces = Collections.synchronizedMap(new ConcurrentHashMap<>());
         trackPvP = true;
         trackPvE = true;
     }

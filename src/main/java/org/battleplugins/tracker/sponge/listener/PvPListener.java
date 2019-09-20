@@ -70,7 +70,7 @@ public class PvPListener {
 
         // Check the killers world just incase for some reason the
         // killed player was teleported to another world
-        if (tracker.getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
+        if (tracker.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
             return;
 
         updateStats(killed, killer);
