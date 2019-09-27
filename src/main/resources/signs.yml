@@ -1,0 +1,31 @@
+# -----------------
+# Main sign config for BattleTracker
+#
+# Documentation: https://docs.battleplugins.org/docs/bt/signs
+# Support: https://discord.gg/tMVPVJf
+# GitHub: https://github.com/BattlePlugins/BattleTracker
+# -----------------
+
+## Leaderboard sign configuration
+signs:
+  leaderboard:
+    updateSignsBelow: true
+    # %tracker% and %stat% needs to be included SOMEWHERE in this
+    # format or else the sign won't work.
+    lines:
+      1: "&0[&e%tracker%&0]"
+      2: "&6%stat%"
+      3: "%listing_format%"
+      4: "%listing_format%"
+    listingFormat: "&6%ranking%. &0%player_name% %value%"
+
+  ## Personal sign configuration
+  # Shows when you right-click a leaderboard sign. Does not require that
+  # the tracker or stat type is specified.
+  personal:
+    enabled: true
+    lines:
+      1: "Your Stats"
+      2: "[&e%rating%&0] &6#%ranking%"
+      3: "K/D &a%kills%&0/&c%deaths%"
+      4: "Streak: &b%streak%"

@@ -9,6 +9,7 @@ import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.stat.StatType;
 import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.util.Util;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,12 +41,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
     public void topCommand(MCCommandSender sender, int amount) {
         MessageManager messageManager = tracker.getMessageManager();
         sender.sendMessage(MessageController.colorChat(messageManager.getMessage("leaderboardHeader").replace("%tracker%", interfaceName)));
-        Map<UUID, Record> records = tracker.getTrackerManager().getInterface(interfaceName).getRecords();
-        Map<Record, Float> unsortedRecords = new HashMap<>();
-        records.forEach((uuid, record) -> unsortedRecords.put(record, record.getRating()));
-
-        Map<Record, Float> sortedRecords = new LinkedHashMap<>();
-        unsortedRecords.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedRecords.put(x.getKey(), x.getValue()));
+        Map<Record, Float> sortedRecords = Util.getSortedRecords(tracker.getTrackerManager().getInterface(interfaceName), amount);
 
         int i = 1;
         for (Map.Entry<Record, Float> recordEntry : sortedRecords.entrySet()) {

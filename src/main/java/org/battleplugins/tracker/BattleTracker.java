@@ -16,6 +16,8 @@ import org.battleplugins.tracker.impl.Tracker;
 import org.battleplugins.tracker.message.DeathMessageManager;
 import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.nukkit.NukkitCodeHandler;
+import org.battleplugins.tracker.sign.SignManager;
+import org.battleplugins.tracker.sign.SignUpdateTask;
 import org.battleplugins.tracker.sponge.SpongeCodeHandler;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.stat.calculator.EloCalculator;
@@ -44,6 +46,7 @@ public final class BattleTracker extends MCPlugin {
     private ConfigManager configManager;
     private TrackerManager trackerManager;
     private MessageManager messageManager;
+    private SignManager signManager;
 
     private RatingCalculator defaultCalculator;
 
@@ -64,11 +67,11 @@ public final class BattleTracker extends MCPlugin {
 
             this.configManager = new ConfigManager(this);
             this.trackerManager = new TrackerManager();
+            this.signManager = new SignManager(this);
+            this.messageManager = new MessageManager("messages", "special", configManager.getMessagesConfig());
 
             // Register the tracker manager into the service provider API
             MCPlatform.registerService(TrackerManager.class, trackerManager, this, MCServicePriority.NORMAL);
-
-            this.messageManager = new MessageManager("messages", "special", configManager.getMessagesConfig());
 
             boolean trackPvP = configManager.getPvPConfig().getBoolean("enabled", true);
             boolean trackPvE = configManager.getPvEConfig().getBoolean("enabled", true);
@@ -137,11 +140,20 @@ public final class BattleTracker extends MCPlugin {
 
             Log.setPlugin(this);
             Log.setDebug(configManager.getConfig().getBoolean("debugMode", false));
+
+            MCPlatform.scheduleSyncRepeatingTask(this, new SignUpdateTask(signManager), 60000); // 1 minute
         });
     }
 
     @Override
     public void onDisable() {
+        try {
+            signManager.saveSigns("signs", configManager.getSignSaves());
+        } catch (Exception ex) {
+            getLogger().warning("Could not save configs!");
+            ex.printStackTrace();
+        }
+
         getLogger().info("Saving all records...");
         try {
             for (TrackerInterface trackerInterface : trackerManager.getInterfaces().values()) {
@@ -189,6 +201,15 @@ public final class BattleTracker extends MCPlugin {
      */
     public MessageManager getMessageManager() {
         return messageManager;
+    }
+
+    /**
+     * Returns the SignManager instance
+     *
+     * @return the SignManager instance
+     */
+    public SignManager getSignManager() {
+        return signManager;
     }
 
     /**

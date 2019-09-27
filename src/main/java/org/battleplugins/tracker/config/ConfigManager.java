@@ -20,6 +20,7 @@ public class ConfigManager {
 
     private Configuration config;
     private Configuration messagesConfig;
+    private Configuration signsConfig;
 
     private Configuration pvpConfig;
     private Configuration pveConfig;
@@ -52,6 +53,7 @@ public class ConfigManager {
 
         config = loadConfig(tracker.getDataFolder(), "", "config.yml");
         messagesConfig = loadConfig(tracker.getDataFolder(), "", "messages.yml");
+        signsConfig = loadConfig(tracker.getDataFolder(), "", "signs.yml");
 
         pvpConfig = loadConfig(trackerFolder, "tracking/", "pvp.yml");
         pveConfig = loadConfig(trackerFolder, "tracking/", "pve.yml");
@@ -94,9 +96,22 @@ public class ConfigManager {
     public void reloadConfigs() {
         reloadConfig(config);
         reloadConfig(messagesConfig);
+        reloadConfig(signsConfig);
         reloadConfig(pvpConfig);
         reloadConfig(pveConfig);
         reloadConfig(signSaves);
+    }
+
+    /**
+     * Savesall the config files for BattleTracker
+     */
+    public void saveConfigs() {
+        config.save();
+        messagesConfig.save();
+        signsConfig.save();
+        pvpConfig.save();
+        pveConfig.save();
+        signSaves.save();
     }
 
     /**
@@ -128,6 +143,15 @@ public class ConfigManager {
     }
 
     /**
+     * Returns the signs.yml config file for BattleTracker
+     *
+     * @return the signs.yml config file
+     */
+    public Configuration getSignsConfig() {
+        return signsConfig;
+    }
+
+    /**
      * Returns the pvp.yml config file for BattleTracker
      *
      * @return the pvp.yml config file
@@ -143,5 +167,14 @@ public class ConfigManager {
      */
     public Configuration getPvEConfig() {
         return pveConfig;
+    }
+
+    /**
+     * Returns the signs.yml save file for BattleTracker
+     *
+     * @return the signs.yml save file
+     */
+    public Configuration getSignSaves() {
+        return signSaves;
     }
 }

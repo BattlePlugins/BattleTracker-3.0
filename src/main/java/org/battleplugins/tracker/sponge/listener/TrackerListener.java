@@ -42,6 +42,11 @@ public class TrackerListener {
         }
     }
 
+    /**
+     * Event called when player quits
+     *
+     * @param event the event being called
+     */
     @Listener
     public void onQuit(ClientConnectionEvent.Disconnect event) {
         for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
