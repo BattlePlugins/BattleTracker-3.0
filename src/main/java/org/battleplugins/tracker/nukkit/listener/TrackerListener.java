@@ -1,21 +1,26 @@
 package org.battleplugins.tracker.nukkit.listener;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
+import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import mc.alk.mc.MCLocation;
 import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.MCPlatform;
 import mc.alk.mc.MCPlayer;
 import mc.alk.mc.block.MCSign;
+import mc.alk.nukkit.block.NukkitSign;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.TrackerInterface;
 import org.battleplugins.tracker.sign.LeaderboardSign;
 import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.util.SignUtil;
 import org.battleplugins.tracker.util.Util;
 
 import java.util.Map;
@@ -63,6 +68,39 @@ public class TrackerListener implements Listener {
         for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
             interfaces.getValue().save(MCPlatform.getOfflinePlayer(event.getPlayer().getUniqueId()));
         }
+    }
+
+    /**
+     * Event called when a sign is changed
+     *
+     * @param event the event being called
+     */
+    @EventHandler
+    public void onSignChange(SignChangeEvent event) {
+        MCPlayer player = MCPlatform.getPlayer(event.getPlayer().getName());
+        MCSign sign = new NukkitSign((BlockEntitySign) event.getBlock().getLevel().getBlockEntity(event.getBlock().getLocation()));
+        if (!SignUtil.isLeaderboardSign(event.getLines()))
+            return;
+
+        if (!event.getPlayer().hasPermission("battletracker.sign")) {
+            event.setCancelled(true); // cancel anyway
+            event.getBlock().getLevel().setBlock(event.getBlock().getLocation(), Block.get(Block.AIR));
+            event.getBlock().getLevel().dropItem(event.getBlock().getLocation(), Item.get(event.getBlock().getId()));
+            player.sendMessage(tracker.getMessageManager().getFormattedMessage("cantCreateSign"));
+            return;
+        }
+
+        String statType = SignUtil.getStatType(event.getLines());
+        String trackerName = SignUtil.getTrackerName(event.getLines());
+
+        LeaderboardSign leaderboardSign = new LeaderboardSign(sign.getLocation(), statType, trackerName);
+        tracker.getSignManager().addSign(leaderboardSign);
+
+        MCPlatform.scheduleSyncDelayedTask(tracker, () -> {
+            MCSign reobtainedSign = sign.getWorld().toType(sign.getWorld().getBlockAt(sign.getLocation()), MCSign.class);
+            tracker.getSignManager().refreshSignContent(reobtainedSign);
+        }, 2000);
+        player.sendMessage(tracker.getMessageManager().getFormattedMessage("createdNewSign"));
     }
 
     /**
