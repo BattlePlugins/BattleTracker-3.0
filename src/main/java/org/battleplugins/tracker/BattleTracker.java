@@ -150,7 +150,7 @@ public final class BattleTracker extends MCPlugin {
         try {
             signManager.saveSigns("signs", configManager.getSignSaves());
         } catch (Exception ex) {
-            getLogger().warning("Could not save configs!");
+            getLogger().warning("Could not save signs!");
             ex.printStackTrace();
         }
 
