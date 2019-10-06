@@ -26,7 +26,7 @@ Battle Tracker Links:
 Other Links:
 * [BattleDocs](http://docs.battleplugins.org) (BattlePlugins Documentation)
 * [CI Server](http://ci.battleplugins.org/job/BattlePlugins/job/BattleTracker/) (Jenkins Build Server)
-* [BattlePlugin Donations] (Donation link coming soon)
+* [BattlePlugin Donations](https://www.patreon.com/battleplugins)
 * [JavaDocs](http://rainbowcraft.sytes.net/javadocs/battletracker/apidocs/) (WIP)
 
 Reporting Issues:
