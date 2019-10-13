@@ -1,12 +1,13 @@
 ![BattleTracker](https://wiki.battleplugins.org/images/0/0c/BattleTracker.png "BattleTracker")
 ==========
 
-An SQL tracker for Minecraft and [BattleArena](https://github.com/BattlePlugins/BattleArena). 
+An advanced SQL-based tracker for Minecraftt and [BattleArena](https://github.com/BattlePlugins/BattleArena). 
 * [Bukkit](http://bukkit.org), [Sponge](https://www.spongepowered.org/) and [Nukkit](https://nukkitx.com/) support.
 * PvE and PvP tracking.
-* Allows overall stats, tallies, and individual records.
-* Allows for win/loss tracking inside of BattleArena.
-* Premium-quality death messages and death recounter.
+* Overall stats, tallies, and individual records.
+* Win/loss tracking inside of BattleArena.
+* Premium-quality death messages and damage recounter.
+* Easy-to-understand API for developers.
 * ... and more!
 
 Links
