@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.battleplugins.tracker</groupId>
     <artifactId>BattleTracker</artifactId>
-    <version>3.0.0.0</version>
+    <version>3.0.0</version>
     <name>BattleTracker</name>
     <description>An advanced SQL-based tracker for Minecraft.</description>
     <url>https://github.com/BattlePlugins/BattleTracker</url>
