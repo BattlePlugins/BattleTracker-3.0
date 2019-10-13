@@ -13,7 +13,7 @@ public class CompatUtil {
 
     /**
      * Returns the item in main hand. Uses getItemInHand() in
-     * versions <1.9
+     * versions below 1.9
      *
      * @param player the player to get the hand item for
      * @return the item in the main hand

@@ -20,6 +20,7 @@ public class Util {
      * Returns the formatted entity name from the given string
      *
      * @param name the formatted name
+     * @param capitalizeFirst if the first letter of each word should be capitalized
      * @return the formatted entity name
      */
     public static String getFormattedEntityName(String name, boolean capitalizeFirst) {
