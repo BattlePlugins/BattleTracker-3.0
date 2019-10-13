@@ -5,6 +5,7 @@ import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.bukkit.listener.PvEListener;
 import org.battleplugins.tracker.bukkit.listener.PvPListener;
 import org.battleplugins.tracker.bukkit.listener.TrackerListener;
+import org.battleplugins.tracker.bukkit.plugins.BTPlaceholderExtension;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -33,5 +34,9 @@ public class BukkitCodeHandler extends PlatformCodeHandler {
         }
 
         Bukkit.getServer().getPluginManager().registerEvents(new TrackerListener(tracker), plugin);
+
+        if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new BTPlaceholderExtension(tracker).register();
+        }
     }
 }

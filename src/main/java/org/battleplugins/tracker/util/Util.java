@@ -121,8 +121,9 @@ public class Util {
         for (Map.Entry<UUID, Record> record : records.entrySet()) {
             unsortedRecords.put(record.getValue(), record.getValue().getRating());
 
-            if (i >= limit)
+            if (i >= limit && limit != -1)
                 break;
+
             i++;
         }
 
