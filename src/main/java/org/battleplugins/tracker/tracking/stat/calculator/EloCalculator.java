@@ -1,6 +1,6 @@
-package org.battleplugins.tracker.stat.calculator;
+package org.battleplugins.tracker.tracking.stat.calculator;
 
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 
 /**
  * Class for calculating for elo.

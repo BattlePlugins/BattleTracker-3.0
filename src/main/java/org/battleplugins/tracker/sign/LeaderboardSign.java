@@ -3,7 +3,7 @@ package org.battleplugins.tracker.sign;
 import mc.alk.mc.MCLocation;
 
 /**
- * Holds information about trackerName signs.
+ * Holds information about tracker signs.
  *
  * @author Redned
  */

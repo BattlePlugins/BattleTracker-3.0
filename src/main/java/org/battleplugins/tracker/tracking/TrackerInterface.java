@@ -1,10 +1,11 @@
-package org.battleplugins.tracker;
+package org.battleplugins.tracker.tracking;
 
 import mc.alk.mc.MCOfflinePlayer;
-import org.battleplugins.tracker.message.DeathMessageManager;
-import org.battleplugins.tracker.stat.StatType;
-import org.battleplugins.tracker.stat.calculator.RatingCalculator;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.message.DeathMessageManager;
+import org.battleplugins.tracker.tracking.recap.RecapManager;
+import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 
 import java.util.Map;
 import java.util.UUID;
@@ -167,11 +168,18 @@ public interface TrackerInterface {
     void removeRecord(MCOfflinePlayer player);
 
     /**
-     * Returns thedeath  message manager for this tracker interface
+     * Returns the death message manager for this tracker interface
      *
      * @return the death message manager for this tracker interface
      */
     DeathMessageManager getDeathMessageManager();
+
+    /**
+     * Returns the recap manager for this tracker interface
+     *
+     * @return the recap manager for this tracker interface
+     */
+    RecapManager getRecapManager();
 
     /**
      * Returns the rating calculator for this tracker interface

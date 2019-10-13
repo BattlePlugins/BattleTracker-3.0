@@ -1,18 +1,25 @@
 package org.battleplugins.tracker.sponge.listener;
 
-import mc.alk.mc.MCPlatform;
+import mc.alk.mc.MCPlayer;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
-import org.battleplugins.tracker.stat.StatType;
-import org.battleplugins.tracker.stat.record.DummyRecord;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.TrackerInterface;
+import org.battleplugins.tracker.tracking.recap.DamageInfo;
+import org.battleplugins.tracker.tracking.recap.Recap;
+import org.battleplugins.tracker.tracking.recap.RecapManager;
+import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.record.DummyRecord;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.Util;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.text.Text;
 
@@ -73,22 +80,24 @@ public class PvEListener {
         }
 
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCPlatform.getOfflinePlayer(killed.getUniqueId()));
+        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.DEATHS, MCPlatform.getOfflinePlayer(killed.getUniqueId()));
+            pveTracker.incrementValue(StatType.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(fakeRecord, record, false);
 
         if (pveTracker.getDeathMessageManager().shouldOverrideDefaultMessages())
-            event.setMessage(Text.of(""));
+            event.setMessageCancelled(true);
 
         if (type.equals("entityDeaths")) {
             pveTracker.getDeathMessageManager().sendEntityMessage(killer, killed.getName(), "air");
         } else {
             pveTracker.getDeathMessageManager().sendCauseMessage(killer, killed.getName(), "air");
         }
+
+        pveTracker.getRecapManager().getDeathRecaps().get(killed.getName()).setVisible(true);
     }
 
     /**
@@ -112,12 +121,44 @@ public class PvEListener {
 
         Player killer = (Player) source.getSource();
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCPlatform.getOfflinePlayer(killer.getUniqueId()));
+        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.KILLS, MCPlatform.getOfflinePlayer(killer.getUniqueId()));
+            pveTracker.incrementValue(StatType.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer.getType().getName().toLowerCase());
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(record, fakeRecord, false);
+    }
+
+    /**
+     * Event called when a player takes damage
+     *
+     * @param event the event being called
+     */
+    @Listener
+    public void onEntityDamage(DamageEntityEvent event) {
+        if (!(event.getTargetEntity() instanceof Player))
+            return;
+
+        Player spongePlayer = (Player) event.getTargetEntity();
+        MCPlayer player = tracker.getPlatform().getPlayer(spongePlayer.getName());
+        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
+
+        RecapManager recapManager = pveTracker.getRecapManager();
+        Recap recap = recapManager.getDeathRecaps().computeIfAbsent(player.getName(), (value) -> new Recap(player));
+        if (recap.isVisible()) {
+            recap = recapManager.getDeathRecaps().compute(player.getName(), (key, value) -> new Recap(player));
+        }
+
+        final Recap finalRecap = recap;
+        Optional<EntityDamageSource> opEntitySource = event.getCause().first(EntityDamageSource.class);
+        Optional<DamageSource> opDamageSource = event.getCause().first(DamageSource.class);
+
+        if (opEntitySource.isPresent()) {
+            EntityDamageSource source = opEntitySource.get();
+            recap.getLastDamages().add(new DamageInfo(source.getSource().get(Keys.DISPLAY_NAME).orElse(Text.of(source.getSource().getType().getName())).toPlain(), event.getFinalDamage()));
+        } else if (opDamageSource.isPresent()) {
+            finalRecap.getLastDamages().add(new DamageInfo(opDamageSource.get().getType().getName(), event.getFinalDamage()));
+        }
     }
 }

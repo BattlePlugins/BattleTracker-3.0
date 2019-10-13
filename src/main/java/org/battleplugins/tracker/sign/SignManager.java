@@ -9,7 +9,7 @@ import mc.alk.mc.MCLocation;
 import mc.alk.mc.block.MCBlock;
 import mc.alk.mc.block.MCSign;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.SignUtil;
 import org.battleplugins.tracker.util.Util;
 

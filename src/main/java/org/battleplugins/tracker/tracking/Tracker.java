@@ -1,13 +1,15 @@
-package org.battleplugins.tracker.impl;
+package org.battleplugins.tracker.tracking;
 
+import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.mc.MCOfflinePlayer;
-import org.battleplugins.tracker.TrackerInterface;
-import org.battleplugins.tracker.message.DeathMessageManager;
+import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.sql.SQLInstance;
-import org.battleplugins.tracker.stat.StatType;
-import org.battleplugins.tracker.stat.calculator.RatingCalculator;
-import org.battleplugins.tracker.stat.record.PlayerRecord;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.message.DeathMessageManager;
+import org.battleplugins.tracker.tracking.recap.RecapManager;
+import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
+import org.battleplugins.tracker.tracking.stat.record.PlayerRecord;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,15 +27,17 @@ public class Tracker implements TrackerInterface {
     protected String name;
 
     protected DeathMessageManager messageManager;
+    protected RecapManager recapManager;
     protected RatingCalculator calculator;
 
     protected Map<UUID, Record> records;
 
     protected SQLInstance sql;
 
-    public Tracker(String name, DeathMessageManager messageManager, RatingCalculator calculator, Map<UUID, Record> records) {
+    public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator, Map<UUID, Record> records) {
         this.name = name;
-        this.messageManager = messageManager;
+        this.recapManager = new RecapManager(plugin);
+        this.messageManager = new DeathMessageManager(plugin, this, config);
         this.calculator = calculator;
         this.records = records;
 
@@ -189,6 +193,11 @@ public class Tracker implements TrackerInterface {
     @Override
     public DeathMessageManager getDeathMessageManager() {
         return messageManager;
+    }
+
+    @Override
+    public RecapManager getRecapManager() {
+        return recapManager;
     }
 
     @Override

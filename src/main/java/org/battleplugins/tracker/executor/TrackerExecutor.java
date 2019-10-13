@@ -3,19 +3,18 @@ package org.battleplugins.tracker.executor;
 import mc.alk.battlecore.controllers.MessageController;
 import mc.alk.battlecore.executor.CustomCommandExecutor;
 import mc.alk.mc.MCOfflinePlayer;
+import mc.alk.mc.MCPlayer;
 import mc.alk.mc.command.MCCommandSender;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.message.MessageManager;
-import org.battleplugins.tracker.stat.StatType;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.recap.Recap;
+import org.battleplugins.tracker.tracking.recap.RecapManager;
+import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.Util;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Main executor for trackers.
@@ -114,5 +113,31 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
         trackerInterface.setValue(statType, value, player);
         sender.sendMessage(messageManager.getFormattedMessage(player, "setStatValue").replace("%stat%", statType.toLowerCase()).replace("%value%", String.valueOf(value)));
+    }
+
+    @MCCommand(cmds = "recap", perm = "battletracker.recap")
+    public void recapCommand(MCPlayer player, String name) {
+        MessageManager messageManager = tracker.getMessageManager();
+        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
+        RecapManager recapManager = trackerInterface.getRecapManager();
+
+        if (!recapManager.getDeathRecaps().containsKey(name)) {
+            player.sendMessage(messageManager.getFormattedMessage("noRecapForPlayer"));
+            return;
+        }
+
+        Recap recap = recapManager.getDeathRecaps().get(name);
+        if (!recap.isVisible()) {
+            player.sendMessage(messageManager.getFormattedMessage("noRecapForPlayer"));
+            return;
+        }
+
+        switch (trackerInterface.getDeathMessageManager().getClickContent()) {
+            case "armor":
+                trackerInterface.getRecapManager().sendArmorRecap(player, recap);
+                break;
+            case "inventory":
+                trackerInterface.getRecapManager().sendInventoryRecap(player, recap);
+        }
     }
 }

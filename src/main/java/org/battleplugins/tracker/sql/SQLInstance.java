@@ -3,10 +3,10 @@ package org.battleplugins.tracker.sql;
 import mc.alk.battlecore.serializers.SQLSerializer;
 import mc.alk.battlecore.util.Log;
 import mc.alk.mc.scheduler.Scheduler;
-import org.battleplugins.tracker.TrackerInterface;
-import org.battleplugins.tracker.stat.StatType;
-import org.battleplugins.tracker.stat.record.PlayerRecord;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.TrackerInterface;
+import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.record.PlayerRecord;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Main SQL storage instance for Trackers
+ * Main SQL config instance for Trackers.
  *
  * @author alkarinv, Redned
  */

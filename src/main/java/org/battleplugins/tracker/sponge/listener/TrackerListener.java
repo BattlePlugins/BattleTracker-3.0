@@ -1,12 +1,11 @@
 package org.battleplugins.tracker.sponge.listener;
 
 import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCPlatform;
 import mc.alk.mc.MCPlayer;
 import mc.alk.mc.block.MCSign;
 import mc.alk.sponge.block.SpongeSign;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.sign.LeaderboardSign;
 import org.battleplugins.tracker.util.SignUtil;
 import org.spongepowered.api.block.BlockTypes;
@@ -17,6 +16,7 @@ import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -47,7 +47,7 @@ public class TrackerListener {
         TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
 
-        MCOfflinePlayer offlinePlayer = MCPlatform.getOfflinePlayer(event.getTargetEntity().getUniqueId());
+        MCOfflinePlayer offlinePlayer = tracker.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId());
         if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(offlinePlayer);
         }
@@ -65,7 +65,14 @@ public class TrackerListener {
     @Listener
     public void onQuit(ClientConnectionEvent.Disconnect event) {
         for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
-            interfaces.getValue().save(MCPlatform.getOfflinePlayer(event.getTargetEntity().getUniqueId()));
+            interfaces.getValue().save(tracker.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId()));
+        }
+
+        for (TrackerInterface trackerInterface : tracker.getTrackerManager().getInterfaces().values()) {
+            if (!trackerInterface.getRecapManager().getDeathRecaps().containsKey(event.getTargetEntity().getName()))
+                continue;
+
+            trackerInterface.getRecapManager().getDeathRecaps().remove(event.getTargetEntity().getName());
         }
     }
 
@@ -89,7 +96,7 @@ public class TrackerListener {
             lines[i] = Text.of(event.getText().get(i)).toPlain();
         }
 
-        MCPlayer player = MCPlatform.getPlayer(source.get().getName());
+        MCPlayer player = tracker.getPlatform().getPlayer(source.get().getName());
         MCSign sign = new SpongeSign(event.getTargetTile());
         if (!SignUtil.isLeaderboardSign(lines))
             return;
@@ -115,10 +122,21 @@ public class TrackerListener {
         LeaderboardSign leaderboardSign = new LeaderboardSign(sign.getLocation(), statType, trackerName);
         tracker.getSignManager().addSign(leaderboardSign);
 
-        MCPlatform.scheduleSyncDelayedTask(tracker, () -> {
+        tracker.getPlatform().scheduleSyncTask(tracker, () -> {
             MCSign reobtainedSign = sign.getWorld().toType(sign.getWorld().getBlockAt(sign.getLocation()), MCSign.class);
             tracker.getSignManager().refreshSignContent(reobtainedSign);
         }, 2000);
         player.sendMessage(tracker.getMessageManager().getFormattedMessage("createdNewSign"));
+    }
+
+    /**
+     * Event called when a player clicks in a recap inventory
+     *
+     * @param event the event being called
+     */
+    @Listener
+    public void onInventoryClick(ClickInventoryEvent event) {
+        if (event.getTargetInventory().getName().get().endsWith("'s Recap"))
+            event.setCancelled(true);
     }
 }

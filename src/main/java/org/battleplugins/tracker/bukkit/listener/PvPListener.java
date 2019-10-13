@@ -1,12 +1,16 @@
 package org.battleplugins.tracker.bukkit.listener;
 
 import mc.alk.mc.MCPlatform;
+import mc.alk.mc.MCPlayer;
 import mc.alk.mc.chat.MessageBuilder;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.bukkit.util.CompatUtil;
-import org.battleplugins.tracker.stat.StatType;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.recap.DamageInfo;
+import org.battleplugins.tracker.tracking.recap.Recap;
+import org.battleplugins.tracker.tracking.recap.RecapManager;
+import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.bukkit.Material;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Entity;
@@ -90,24 +94,66 @@ public class PvPListener implements Listener {
             event.setDeathMessage(null);
 
         pvpTracker.getDeathMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().name().toLowerCase());
+        pvpTracker.getRecapManager().getDeathRecaps().get(killed.getName()).setVisible(true);
     }
 
     public void updateStats(Player killed, Player killer) {
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        Record killerRecord = pvpTracker.getRecord(MCPlatform.getOfflinePlayer(killer.getUniqueId()));
-        Record killedRecord = pvpTracker.getRecord(MCPlatform.getOfflinePlayer(killed.getUniqueId()));
+        Record killerRecord = pvpTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+        Record killedRecord = pvpTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
 
         if (killerRecord.isTracking())
-            pvpTracker.incrementValue(StatType.KILLS, MCPlatform.getOfflinePlayer(killer.getUniqueId()));
+            pvpTracker.incrementValue(StatType.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
 
         if (killedRecord.isTracking())
-            pvpTracker.incrementValue(StatType.DEATHS, MCPlatform.getOfflinePlayer(killed.getUniqueId()));
+            pvpTracker.incrementValue(StatType.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
 
-        pvpTracker.updateRating(MCPlatform.getOfflinePlayer(killer.getUniqueId()), MCPlatform.getOfflinePlayer(killed.getUniqueId()), false);
+        pvpTracker.updateRating(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()), false);
 
         if (killerRecord.getStat(StatType.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
-            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(MCPlatform.getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
+            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
             MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
         }
+    }
+
+    /**
+     * Event called when a player takes damage from another player
+     *
+     * @param event the event being called
+     */
+    @EventHandler
+    public void onEntityDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player) || !(getTrueDamager(event) instanceof Player))
+            return;
+
+        MCPlayer player = tracker.getPlatform().getPlayer(event.getEntity().getName());
+        TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
+
+        RecapManager recapManager = pvpTracker.getRecapManager();
+        Recap recap = recapManager.getDeathRecaps().computeIfAbsent(player.getName(), (value) -> new Recap(player));
+        if (recap.isVisible()) {
+            recap = recapManager.getDeathRecaps().compute(player.getName(), (key, value) -> new Recap(player));
+        }
+
+        recap.getLastDamages().add(new DamageInfo(event.getEntity().getName(), event.getDamage()));
+    }
+
+    private Entity getTrueDamager(EntityDamageByEntityEvent event) {
+        Entity damager = event.getDamager();
+        if (damager instanceof Projectile) {
+            Projectile proj = (Projectile) damager;
+            if (proj.getShooter() instanceof Entity) {
+                return (Entity) proj.getShooter();
+            }
+        }
+
+        if (damager instanceof Tameable && ((Tameable) damager).isTamed()) {
+            AnimalTamer owner = ((Tameable) damager).getOwner();
+            if (owner instanceof Entity) {
+                return (Entity) owner;
+            }
+        }
+
+        return damager;
     }
 }

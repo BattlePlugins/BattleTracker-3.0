@@ -54,7 +54,7 @@ public class DependencyUtil {
         CompletableFuture<DownloadResult> sqliteFuture = new CompletableFuture<>();
 
         // Sponge has its own libraries for this, no need to install anything
-        if (MCPlatform.getType() == APIType.SPONGE) {
+        if (MCPlatform.getAPI() == APIType.SPONGE) {
             future.complete(DownloadResult.SUCCESS);
             return future;
         }

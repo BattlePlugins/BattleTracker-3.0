@@ -12,16 +12,17 @@ import mc.alk.mc.plugin.PluginProperties;
 import org.battleplugins.tracker.bukkit.BukkitCodeHandler;
 import org.battleplugins.tracker.config.ConfigManager;
 import org.battleplugins.tracker.executor.TrackerExecutor;
-import org.battleplugins.tracker.impl.Tracker;
-import org.battleplugins.tracker.message.DeathMessageManager;
+import org.battleplugins.tracker.tracking.Tracker;
+import org.battleplugins.tracker.tracking.TrackerInterface;
+import org.battleplugins.tracker.tracking.TrackerManager;
 import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.nukkit.NukkitCodeHandler;
 import org.battleplugins.tracker.sign.SignManager;
 import org.battleplugins.tracker.sign.SignUpdateTask;
 import org.battleplugins.tracker.sponge.SpongeCodeHandler;
 import org.battleplugins.tracker.sql.SQLInstance;
-import org.battleplugins.tracker.stat.calculator.EloCalculator;
-import org.battleplugins.tracker.stat.calculator.RatingCalculator;
+import org.battleplugins.tracker.tracking.stat.calculator.EloCalculator;
+import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.util.DependencyUtil;
 import org.battleplugins.tracker.util.DependencyUtil.DownloadResult;
 import org.battleplugins.tracker.util.Util;
@@ -54,7 +55,7 @@ public final class BattleTracker extends MCPlugin {
     public void onEnable() {
         instance = this;
 
-        getLogger().info("You are running " + TrackerInfo.NAME + " on " + Util.capitalizeFirst(MCPlatform.getType().name()) + "!");
+        getLogger().info("You are running " + TrackerInfo.NAME + " on " + Util.capitalizeFirst(getPlatform().getAPIType().name()) + "!");
         DependencyUtil.setLibFolder(new File(getDataFolder(), "libraries"));
         DependencyUtil.downloadDepedencies().whenComplete((result, action) -> {
             if (result != DownloadResult.SUCCESS) {
@@ -71,7 +72,7 @@ public final class BattleTracker extends MCPlugin {
             this.messageManager = new MessageManager("messages", "special", configManager.getMessagesConfig());
 
             // Register the tracker manager into the service provider API
-            MCPlatform.registerService(TrackerManager.class, trackerManager, this, MCServicePriority.NORMAL);
+            getPlatform().registerService(TrackerManager.class, trackerManager, this, MCServicePriority.NORMAL);
 
             boolean trackPvP = configManager.getPvPConfig().getBoolean("enabled", true);
             boolean trackPvE = configManager.getPvEConfig().getBoolean("enabled", true);
@@ -113,7 +114,7 @@ public final class BattleTracker extends MCPlugin {
             }
 
             if (trackPvP) {
-                Tracker tracker = new Tracker(PVP_INTERFACE, new DeathMessageManager(configManager.getPvPConfig()), defaultCalculator, new HashMap<>());
+                Tracker tracker = new Tracker(this, PVP_INTERFACE, configManager.getPvPConfig(), defaultCalculator, new HashMap<>());
                 trackerManager.addInterface(PVP_INTERFACE, tracker);
 
                 MCCommand pvpCommand = new MCCommand(configManager.getPvPConfig().getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
@@ -121,14 +122,14 @@ public final class BattleTracker extends MCPlugin {
             }
 
             if (trackPvE) {
-                Tracker tracker = new Tracker(PVE_INTERFACE, new DeathMessageManager(configManager.getPvEConfig()), defaultCalculator, new HashMap<>());
+                Tracker tracker = new Tracker(this, PVE_INTERFACE, configManager.getPvEConfig(), defaultCalculator, new HashMap<>());
                 trackerManager.addInterface(PVE_INTERFACE, tracker);
 
                 MCCommand pveCommand = new MCCommand(configManager.getPvEConfig().getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
                 registerCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
             }
 
-            APIType api = MCPlatform.getType();
+            APIType api = getPlatform().getAPIType();
             if (api == APIType.BUKKIT)
                 platformCode.put(APIType.BUKKIT, new BukkitCodeHandler(this));
 
@@ -141,7 +142,7 @@ public final class BattleTracker extends MCPlugin {
             Log.setPlugin(this);
             Log.setDebug(configManager.getConfig().getBoolean("debugMode", false));
 
-            MCPlatform.scheduleSyncRepeatingTask(this, new SignUpdateTask(signManager), 60000); // 1 minute
+            getPlatform().scheduleRepeatingTask(this, new SignUpdateTask(signManager), 60000); // 1 minute
         });
     }
 

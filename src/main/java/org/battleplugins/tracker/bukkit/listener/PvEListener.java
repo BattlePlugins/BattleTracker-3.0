@@ -1,11 +1,14 @@
 package org.battleplugins.tracker.bukkit.listener;
 
-import mc.alk.mc.MCPlatform;
+import mc.alk.mc.MCPlayer;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
-import org.battleplugins.tracker.stat.StatType;
-import org.battleplugins.tracker.stat.record.DummyRecord;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.TrackerInterface;
+import org.battleplugins.tracker.tracking.recap.DamageInfo;
+import org.battleplugins.tracker.tracking.recap.Recap;
+import org.battleplugins.tracker.tracking.recap.RecapManager;
+import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.record.DummyRecord;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.Util;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -71,9 +74,9 @@ public class PvEListener implements Listener {
         }
 
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCPlatform.getOfflinePlayer(killed.getUniqueId()));
+        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.DEATHS, MCPlatform.getOfflinePlayer(killed.getUniqueId()));
+            pveTracker.incrementValue(StatType.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -87,6 +90,8 @@ public class PvEListener implements Listener {
         } else {
             pveTracker.getDeathMessageManager().sendCauseMessage(killer, killed.getName(), "air");
         }
+
+        pveTracker.getRecapManager().getDeathRecaps().get(killed.getName()).setVisible(true);
     }
 
     /**
@@ -109,12 +114,39 @@ public class PvEListener implements Listener {
 
         Player killer = (Player) lastDamageCause.getDamager();
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(MCPlatform.getOfflinePlayer(killer.getUniqueId()));
+        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.KILLS, MCPlatform.getOfflinePlayer(killer.getUniqueId()));
+            pveTracker.incrementValue(StatType.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer.getType().name().toLowerCase());
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(record, fakeRecord, false);
+    }
+
+    /**
+     * Event called when a player takes damage
+     *
+     * @param event the event being called
+     */
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player))
+            return;
+
+        MCPlayer player = tracker.getPlatform().getPlayer(event.getEntity().getName());
+        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
+
+        RecapManager recapManager = pveTracker.getRecapManager();
+        Recap recap = recapManager.getDeathRecaps().computeIfAbsent(player.getName(), (value) -> new Recap(player));
+        if (recap.isVisible()) {
+            recap = recapManager.getDeathRecaps().compute(player.getName(), (key, value) -> new Recap(player));
+        }
+
+        if (event instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) event;
+            recap.getLastDamages().add(new DamageInfo(damageByEntityEvent.getDamager().getCustomName() == null ? damageByEntityEvent.getDamager().getName() : damageByEntityEvent.getDamager().getCustomName(), event.getDamage()));
+        } else {
+            recap.getLastDamages().add(new DamageInfo(event.getCause().name().toLowerCase(), event.getDamage()));
+        }
     }
 }

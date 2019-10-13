@@ -1,19 +1,27 @@
-package org.battleplugins.tracker.message;
+package org.battleplugins.tracker.tracking.message;
 
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.controllers.MessageController;
 import mc.alk.mc.ChatColor;
 import mc.alk.mc.MCPlatform;
 import mc.alk.mc.MCPlayer;
+import mc.alk.mc.chat.ClickAction;
 import mc.alk.mc.chat.HoverAction;
 import mc.alk.mc.chat.Message;
 import mc.alk.mc.chat.MessageBuilder;
 import mc.alk.mc.entity.MCEntity;
+import org.battleplugins.tracker.BattleTracker;
+import org.battleplugins.tracker.tracking.TrackerInterface;
+import org.battleplugins.tracker.tracking.recap.DamageInfo;
+import org.battleplugins.tracker.tracking.recap.Recap;
+import org.battleplugins.tracker.util.Util;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Main death message manager for BattleTracker, mainly
@@ -22,6 +30,9 @@ import java.util.Random;
  * @author Redned
  */
 public class DeathMessageManager {
+
+    private BattleTracker tracker;
+    private TrackerInterface trackerInterface;
 
     private boolean enabled;
     private String prefix;
@@ -40,25 +51,10 @@ public class DeathMessageManager {
     private Map<String, List<String>> entityMessages;
     private Map<String, List<String>> causeMessages;
 
-    public DeathMessageManager() {
-        this.enabled = true;
-        this.prefix = "[Tracker]";
+    public DeathMessageManager(BattleTracker tracker, TrackerInterface trackerInterface, Configuration config) {
+        this.tracker = tracker;
+        this.trackerInterface = trackerInterface;
 
-        this.overrideDefaultMessages = true;
-        this.useHoverMessages = true;
-        this.useClickMessages = true;
-
-        this.hoverContent = "all";
-        this.clickContent = "all";
-
-        this.msgRadius = 0;
-
-        this.itemMessages = new HashMap<>();
-        this.entityMessages = new HashMap<>();
-        this.causeMessages = new HashMap<>();
-    }
-
-    public DeathMessageManager(Configuration config) {
         loadDataFromConfig(config);
     }
 
@@ -68,28 +64,28 @@ public class DeathMessageManager {
      * @param config the config file
      */
     public void loadDataFromConfig(Configuration config) {
-        this.enabled = config.getBoolean("messages.enabled");
-        this.prefix = MessageController.colorChat(config.getString("prefix"));
-        this.overrideDefaultMessages = config.getBoolean("options.overrideDefaultMessages");
-        this.useHoverMessages = config.getBoolean("options.useHoverMessages");
-        this.useClickMessages = config.getBoolean("options.useClickMessages");
+        this.enabled = config.getBoolean("messages.enabled", true);
+        this.prefix = MessageController.colorChat(config.getString("prefix", "[Tracker]"));
+        this.overrideDefaultMessages = config.getBoolean("options.overrideDefaultMessages", true);
+        this.useHoverMessages = config.getBoolean("options.useHoverMessages", true);
+        this.useClickMessages = config.getBoolean("options.useClickMessages", true);
 
-        this.hoverContent = config.getString("options.hoverContent");
-        this.clickContent = config.getString("options.clickContent");
+        this.hoverContent = config.getString("options.hoverContent", "all");
+        this.clickContent = config.getString("options.clickContent", "all");
 
-        this.msgRadius = config.getInt("options.msgRadius");
+        this.msgRadius = config.getInt("options.msgRadius", 0);
 
-        entityMessages = new HashMap<>();
+        this.entityMessages = new HashMap<>();
         for (String str : config.getSection("messages.entityDeaths").getKeys(false)) {
             entityMessages.put(str, config.getStringList("messages.entityDeaths." + str));
         }
 
-        causeMessages = new HashMap<>();
+        this.causeMessages = new HashMap<>();
         for (String str : config.getSection("messages.causeDeaths").getKeys(false)) {
             causeMessages.put(str, config.getStringList("messages.causeDeaths." + str));
         }
 
-        itemMessages = new HashMap<>();
+        this.itemMessages = new HashMap<>();
         for (String str : config.getSection("messages").getKeys(false)) {
             // Item messages are just defined right in the messages section, so check for other sections first
             if (str.equalsIgnoreCase("entityDeaths"))
@@ -142,6 +138,24 @@ public class DeathMessageManager {
     }
 
     /**
+     * Returns the hover content option
+     *
+     * @return the hover content option
+     */
+    public String getHoverContent() {
+        return hoverContent;
+    }
+
+    /**
+     * Returns the click content option
+     *
+     * @return the click content option
+     */
+    public String getClickContent() {
+        return clickContent;
+    }
+
+    /**
      * Sends a death message relating to the item used to kill
      * an entity or another player
      *
@@ -161,7 +175,7 @@ public class DeathMessageManager {
         if (items == null)
             return;
 
-        MCPlayer killed = MCPlatform.getPlayer(killedName);
+        MCPlayer killed = tracker.getPlatform().getPlayer(killedName);
         if (killed == null)
             return;
 
@@ -197,7 +211,7 @@ public class DeathMessageManager {
         if (entities == null)
             return;
 
-        MCPlayer killed = MCPlatform.getPlayer(killedName);
+        MCPlayer killed = tracker.getPlatform().getPlayer(killedName);
         if (killed == null)
             return;
 
@@ -233,7 +247,7 @@ public class DeathMessageManager {
         if (causes == null)
             return;
 
-        MCPlayer killed = MCPlatform.getPlayer(killedName);
+        MCPlayer killed = tracker.getPlatform().getPlayer(killedName);
         if (killed == null)
             return;
 
@@ -278,29 +292,21 @@ public class DeathMessageManager {
         if (!useHoverMessages)
             return;
 
+        Recap recap = trackerInterface.getRecapManager().getDeathRecaps().get(player.getName());
         String hoverMessage = "";
         switch (hoverContent) {
             case "all":
-                hoverMessage += ChatColor.GOLD + "Armor:"
-                        + "\n" + ChatColor.GRAY + "Helmet: " + ChatColor.YELLOW + player.getInventory().getHelmet().getFormattedCommonName()
-                        + "\n" + ChatColor.GRAY + "Chestplate: " + ChatColor.YELLOW + player.getInventory().getChestplate().getFormattedCommonName()
-                        + "\n" + ChatColor.GRAY + "Leggings: " + ChatColor.YELLOW + player.getInventory().getLeggings().getFormattedCommonName()
-                        + "\n" + ChatColor.GRAY + "Boots: " + ChatColor.YELLOW + player.getInventory().getBoots().getFormattedCommonName();
-
-                hoverMessage += "\n \n" + ChatColor.GOLD + "Recap: ";
+                hoverMessage += getArmorHoverMessage(player);
+                hoverMessage += "\n" + getRecapHoverMessage(recap);
                 break;
             case "armor":
-                hoverMessage += ChatColor.GOLD + "Armor:"
-                        + "\n" + ChatColor.GRAY + "Helmet: " + ChatColor.YELLOW + player.getInventory().getHelmet().getFormattedCommonName()
-                        + "\n" + ChatColor.GRAY + "Chestplate: " + ChatColor.YELLOW + player.getInventory().getChestplate().getFormattedCommonName()
-                        + "\n" + ChatColor.GRAY + "Leggings: " + ChatColor.YELLOW + player.getInventory().getLeggings().getFormattedCommonName()
-                        + "\n" + ChatColor.GRAY + "Boots: " + ChatColor.YELLOW + player.getInventory().getBoots().getFormattedCommonName();
-
+                hoverMessage += getArmorHoverMessage(player);
                 break;
             case "recap":
+                hoverMessage += getRecapHoverMessage(recap);
                 break;
             case "none":
-                break;
+                return;
         }
 
         if (hoverMessage.isEmpty())
@@ -311,10 +317,11 @@ public class DeathMessageManager {
     }
 
     private void attachClickEvent(MessageBuilder messageBuilder, MCPlayer player) {
-        if (!useClickMessages)
+        if (!useClickMessages || clickContent.equalsIgnoreCase("none"))
             return;
 
-        // TODO: Add click event support (requires inventory/modal support for McAPI)
+        messageBuilder.setClickAction(ClickAction.RUN_COMMAND);
+        messageBuilder.setClickValue("/" + trackerInterface.getName() + " recap " + player.getName());
     }
 
     private void sendDeathMessage(MCPlayer source, Message message) {
@@ -329,5 +336,31 @@ public class DeathMessageManager {
                 radiusPlayer.sendMessage(message);
             }
         }
+    }
+
+    private String getRecapHoverMessage(Recap recap) {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+        String hoverMessage = ChatColor.GOLD + "Damage Recap:";
+
+        // Obtains last 10 damages dealt
+        List<DamageInfo> damageInfos = recap.getLastDamages().stream().sorted((recap1, recap2) -> (int) (recap2.getLogTime() - recap1.getLogTime())).collect(Collectors.toList());
+        int max = damageInfos.size();
+        if (max > 10)
+            max = 10;
+
+        for (int i = damageInfos.size() - max; i < damageInfos.size(); i++) {
+            DamageInfo damageInfo = damageInfos.get(i);
+            hoverMessage += "\n" + ChatColor.RED + " ♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + ChatColor.AQUA + Util.capitalizeFirst(damageInfo.getCause().replace("_", " "));
+        }
+
+        return hoverMessage;
+    }
+
+    private String getArmorHoverMessage(MCPlayer player) {
+        return ChatColor.GOLD + "Armor:"
+                + "\n" + ChatColor.GRAY + " Helmet: " + ChatColor.YELLOW + player.getInventory().getHelmet().getFormattedCommonName()
+                + "\n" + ChatColor.GRAY + " Chestplate: " + ChatColor.YELLOW + player.getInventory().getChestplate().getFormattedCommonName()
+                + "\n" + ChatColor.GRAY + " Leggings: " + ChatColor.YELLOW + player.getInventory().getLeggings().getFormattedCommonName()
+                + "\n" + ChatColor.GRAY + " Boots: " + ChatColor.YELLOW + player.getInventory().getBoots().getFormattedCommonName();
     }
 }

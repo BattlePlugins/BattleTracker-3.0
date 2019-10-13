@@ -1,4 +1,6 @@
-package org.battleplugins.tracker;
+package org.battleplugins.tracker.tracking;
+
+import org.battleplugins.tracker.BattleTracker;
 
 import java.util.Collections;
 import java.util.Map;

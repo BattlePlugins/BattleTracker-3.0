@@ -12,14 +12,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import mc.alk.mc.MCLocation;
 import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCPlatform;
 import mc.alk.mc.MCPlayer;
 import mc.alk.mc.block.MCSign;
 import mc.alk.nukkit.block.NukkitSign;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.sign.LeaderboardSign;
-import org.battleplugins.tracker.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.SignUtil;
 import org.battleplugins.tracker.util.Util;
 
@@ -48,7 +47,7 @@ public class TrackerListener implements Listener {
         TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
 
-        MCOfflinePlayer offlinePlayer = MCPlatform.getOfflinePlayer(event.getPlayer().getUniqueId());
+        MCOfflinePlayer offlinePlayer = tracker.getPlatform().getOfflinePlayer(event.getPlayer().getUniqueId());
         if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(offlinePlayer);
         }
@@ -66,7 +65,14 @@ public class TrackerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
-            interfaces.getValue().save(MCPlatform.getOfflinePlayer(event.getPlayer().getUniqueId()));
+            interfaces.getValue().save(tracker.getPlatform().getOfflinePlayer(event.getPlayer().getUniqueId()));
+        }
+
+        for (TrackerInterface trackerInterface : tracker.getTrackerManager().getInterfaces().values()) {
+            if (!trackerInterface.getRecapManager().getDeathRecaps().containsKey(event.getPlayer().getName()))
+                continue;
+
+            trackerInterface.getRecapManager().getDeathRecaps().remove(event.getPlayer().getName());
         }
     }
 
@@ -77,7 +83,7 @@ public class TrackerListener implements Listener {
      */
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        MCPlayer player = MCPlatform.getPlayer(event.getPlayer().getName());
+        MCPlayer player = tracker.getPlatform().getPlayer(event.getPlayer().getName());
         MCSign sign = new NukkitSign((BlockEntitySign) event.getBlock().getLevel().getBlockEntity(event.getBlock().getLocation()));
         if (!SignUtil.isLeaderboardSign(event.getLines()))
             return;
@@ -96,7 +102,7 @@ public class TrackerListener implements Listener {
         LeaderboardSign leaderboardSign = new LeaderboardSign(sign.getLocation(), statType, trackerName);
         tracker.getSignManager().addSign(leaderboardSign);
 
-        MCPlatform.scheduleSyncDelayedTask(tracker, () -> {
+        tracker.getPlatform().scheduleSyncTask(tracker, () -> {
             MCSign reobtainedSign = sign.getWorld().toType(sign.getWorld().getBlockAt(sign.getLocation()), MCSign.class);
             tracker.getSignManager().refreshSignContent(reobtainedSign);
         }, 2000);
@@ -110,13 +116,13 @@ public class TrackerListener implements Listener {
      */
     @EventHandler
     public void onSignClick(PlayerInteractEvent event) {
-        MCPlayer player = MCPlatform.getPlayer(event.getPlayer().getName());
+        MCPlayer player = tracker.getPlatform().getPlayer(event.getPlayer().getName());
 
         if (event.getBlock() == null || event.getBlock().getId() == Block.AIR)
             return;
 
         Location nukkitLocation = event.getBlock().getLocation();
-        MCLocation location = MCPlatform.getLocation(nukkitLocation.getLevel().getName(), nukkitLocation.getX(), nukkitLocation.getY(), nukkitLocation.getZ());
+        MCLocation location = tracker.getPlatform().getLocation(nukkitLocation.getLevel().getName(), nukkitLocation.getX(), nukkitLocation.getY(), nukkitLocation.getZ());
         LeaderboardSign leaderboardSign = tracker.getSignManager().getSigns().get(location);
         if (leaderboardSign == null)
             return; // not a BattleTracker sign

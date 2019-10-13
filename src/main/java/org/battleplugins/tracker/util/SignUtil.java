@@ -4,7 +4,7 @@ import mc.alk.mc.ChatColor;
 import mc.alk.mc.MCWorld;
 import mc.alk.mc.block.MCSign;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.sign.LeaderboardSign;
 import org.battleplugins.tracker.sign.SignManager;
 

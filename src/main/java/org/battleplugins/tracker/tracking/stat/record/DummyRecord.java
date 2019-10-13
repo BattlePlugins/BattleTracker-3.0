@@ -1,7 +1,6 @@
-package org.battleplugins.tracker.stat.record;
+package org.battleplugins.tracker.tracking.stat.record;
 
-import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.TrackerInterface;
+import org.battleplugins.tracker.tracking.TrackerInterface;
 
 import java.util.HashMap;
 import java.util.Map;

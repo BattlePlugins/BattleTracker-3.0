@@ -1,4 +1,4 @@
-package org.battleplugins.tracker.stat;
+package org.battleplugins.tracker.tracking.stat;
 
 /**
  * An enum of the default StatTypes

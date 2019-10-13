@@ -30,7 +30,7 @@ options:
   useHoverMessages: true
   useClickMessages: true
   hoverContent: all # can be 'all', 'armor' or 'recap', 'all' covers both
-  clickContent: all # can be 'all', 'inventory', 'armor' or 'recap', 'all' covers all three
+  clickContent: inventory # can be 'armor', 'inventory' or 'recap'
   msgRadius: 0 # A radius in which death messages should be sent, use 0 to send to everyone online
 
 ignoredWorlds:

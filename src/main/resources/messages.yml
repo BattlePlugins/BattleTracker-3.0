@@ -42,6 +42,7 @@ messages:
   setStatValue: "&aSet %player_name%'s %stat% value to %value%!"
   createdNewSign: "&aYou have successfully created a new tracker sign!"
   cantCreateSign: "&cYou are unable to create a tracker sign!"
+  noRecapForPlayer: "&cThere is not a death recap available for this player!"
   leaderboardHeader: "&c============= &e%tracker% Leaderboards &c============="
   leaderboardText: "&6#%ranking% &e%player_name% &b%rating% &cKills: &6%kills% &cDeaths: &6%deaths%"
   rankingText: "&6%player_name% &7- &b%rating% &e(Max Rating: %max_rating%) &cKills: &6%kills% &cDeaths: &6%deaths% &cKDR: &6%kd_ratio%"
