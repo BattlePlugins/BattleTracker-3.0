@@ -11,7 +11,9 @@ import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.tracking.stat.record.PlayerRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,13 +37,20 @@ public class Tracker implements TrackerInterface {
     protected SQLInstance sql;
 
     public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator, Map<UUID, Record> records) {
+        this(plugin, name, config, calculator, records, new ArrayList<>());
+    }
+
+    public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator, Map<UUID, Record> records, List<String> columns) {
         this.name = name;
         this.recapManager = new RecapManager(plugin);
         this.messageManager = new DeathMessageManager(plugin, this, config);
         this.calculator = calculator;
         this.records = records;
 
-        this.sql = new SQLInstance(this);
+        if (!columns.isEmpty())
+            this.sql = new SQLInstance(this, columns);
+        else
+            this.sql = new SQLInstance(this);
     }
 
     @Override
@@ -203,11 +212,6 @@ public class Tracker implements TrackerInterface {
     @Override
     public RatingCalculator getRatingCalculator() {
         return calculator;
-    }
-
-    @Override
-    public void flush() {
-
     }
 
     @Override

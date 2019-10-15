@@ -189,11 +189,6 @@ public interface TrackerInterface {
     RatingCalculator getRatingCalculator();
 
     /**
-     * Immediately save all records and empty the cache
-     */
-    void flush();
-
-    /**
      * Saves the records to the database for the specified player
      *
      * @param player the player to save records for
