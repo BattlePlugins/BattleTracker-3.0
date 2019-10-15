@@ -61,10 +61,13 @@ messages:
       - "&6%d&f was overwhelmed by silverfish"
     enderman:
       - "&8Endermen&f have taken &6%d&f to the nether"
-      - '&6%d&f looked into the eyes of the&8Endermen'
+      - '&6%d&f looked into the eyes of the &8Endermen'
     snowman:
       - '&8Endermen&f have taken &6%d&f to the nether'
-    ozelot:
+    cat:
+      - 'The cute kitty showed its power to &6%d&f'
+      - '&6%d&f discovered that precious little cats have fangs too'
+    ocelot:
       - 'The cute ocelot showed its power to &6%d&f'
       - '&6%d&f discovered that ocelots have fangs'
     anvil:
@@ -85,6 +88,39 @@ messages:
       - "The PigZombie horde has claimed &6%d&f"
     lavaslime:
       - "&6%d&f has been lavaslimed!"
+    drowned:
+      - "&6%d&f has been suffocated by a &bdrowned"
+      - "A wet zombie has drenched &6%d&f"
+    guardian:
+      - "A guardian has claimed &6%d&f"
+    evoker:
+      - "&6%d&f has found themselves &cevoked&f!"
+    evokerfangs:
+      - "&6%d&fhas been evocated by the fierce fangs of an evoker!"
+      - "&6%d&f's life was claimed by an evoker fang"
+    husk:
+      - "&6Husks &fhave claimed &6%d"
+    llamaspit:
+      - "&6%d&f had a bad day with a llama"
+      - "&eLlamas &fdid not want to be friendly to &6%d"
+    pillager:
+      - "&6%d&f was not careful when saving the villagers!"
+      - "&6%d&f lost against a puny pillager"
+    polarbear:
+      - "&6%d&f learned that polar bears are not only cute, but dangerous"
+      - "&6%d&f tried to pet a polar bear"
+    ravager:
+      - "Ravagers have destroyed &6%d&f"
+    shulker:
+      - "Shulkers have split &6%d&f in two"
+    stray:
+      - "&7Shadow skeletons have phased into &6%d"
+    vex:
+      - "&6%d&f tried to fly with the vexes"
+      - "&7Vexes showed &6%d&f who was boss"
+      - "&6%d&f tried to make friends with vexes"
+    zombievillager:
+      - "&6%d&f couldn't tell the different between a villager and a zombie"
     unknown:
       - "&6%d&f has been slain by &6%k"
       - "&6%d&f has lost against a puny &6%k"
@@ -98,14 +134,16 @@ messages:
       - "&6%d&f was no match for a pool of lava"
     fall:
       - "&6%d&f found out what the ground feels like"
+      - "&6%d&f has fallen and can't get up"
     contact:
       - "&6%d&f should learn to not jump on a cactus"
     block_explosion:
-      - "&6%d&f has been shredded by TNT"
+      - "&6%d&f has been shredded by explosives"
     primedtnt:
       - "&6%d&f has been shredded by TNT"
     suffocation:
       - "&6%d&f ran out of breath"
+      - "&6%d&f should learn not to suffocate"
     starvation:
       - "&6%d&f should learn to eat"
     lightning:
@@ -113,10 +151,15 @@ messages:
     suicide:
       - "hari kari suited &6%d&f"
       - "&6%d&f chose the ignoble way out"
+      - "&6%d&f committed toaster bath"
+      - "&6%d&f committed funeral"
+      - "&6%d&f committed lego step"
     drowning:
       - "&6%d&f needs to learn to swim"
       - "dog paddling wasn't enough for &6%d&f"
       - "&2water&f was the end of poor &6%d&f"
+    magic:
+      - "&6%d&f found out that they weren't actually a wizard"
     void:
       - "The &0void&f has claimed &6%d&f"
     unknown:
