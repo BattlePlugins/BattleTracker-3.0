@@ -113,7 +113,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>mc.alk.battlecore</pattern>
-                                    <shadedPattern>org.battleplugins.alib.battlecore</shadedPattern>
+                                    <shadedPattern>org.battleplugins.tracker.alib.battlecore</shadedPattern>
                                 </relocation>
                             </relocations>
                             <minimizeJar>true</minimizeJar>
