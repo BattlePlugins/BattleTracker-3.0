@@ -1,5 +1,6 @@
 package org.battleplugins.tracker.sponge.listener;
 
+import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.MCPlatform;
 import mc.alk.mc.MCPlayer;
 import mc.alk.mc.chat.MessageBuilder;
@@ -11,6 +12,7 @@ import org.battleplugins.tracker.tracking.recap.Recap;
 import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 import org.spongepowered.api.data.manipulator.mutable.entity.TameableData;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
@@ -23,6 +25,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -91,7 +94,8 @@ public class PvPListener {
         if (tracker.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
             return;
 
-        updateStats(killed, killer);
+        updateStats(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId().toString()),
+                tracker.getPlatform().getOfflinePlayer(killer.getUniqueId().toString()));
 
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
         if (pvpTracker.getDeathMessageManager().shouldOverrideDefaultMessages())
@@ -101,22 +105,42 @@ public class PvPListener {
         pvpTracker.getRecapManager().getDeathRecaps().get(killed.getName()).setVisible(true);
     }
 
-    public void updateStats(Player killed, Player killer) {
+    public void updateStats(MCOfflinePlayer killed, MCOfflinePlayer killer) {
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        Record killerRecord = pvpTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
-        Record killedRecord = pvpTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+
+        Record killerRecord = pvpTracker.getRecord(killer);
+        Record killedRecord = pvpTracker.getRecord(killed);
 
         if (killerRecord.isTracking())
-            pvpTracker.incrementValue(StatType.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+            pvpTracker.incrementValue(StatType.KILLS, killer);
 
         if (killedRecord.isTracking())
-            pvpTracker.incrementValue(StatType.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+            pvpTracker.incrementValue(StatType.DEATHS, killed);
 
         pvpTracker.updateRating(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()), false);
 
         if (killerRecord.getStat(StatType.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
             String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
             MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
+        }
+
+        VersusTally versusTally = pvpTracker.getVersusTally(killer, killed);
+        if (versusTally == null) {
+            versusTally = new VersusTally(pvpTracker, killer, killed, new HashMap<>());
+            pvpTracker.getVersusTallies().add(versusTally);
+        }
+
+        // The format is killer : killed : stat1 : stat2 ....
+        // If the killer is in place of the killed, we need to swap the values
+
+        boolean addToKills = true;
+        if (versusTally.getId2().equals(killer.getUniqueId().toString()))
+            addToKills = false;
+
+        if (addToKills) {
+            versusTally.getStats().put(StatType.KILLS.getInternalName(), versusTally.getStats().getOrDefault(StatType.KILLS.getInternalName(), 0f) + 1);
+        } else {
+            versusTally.getStats().put(StatType.DEATHS.getInternalName(), versusTally.getStats().getOrDefault(StatType.DEATHS.getInternalName(), 0f) + 1);
         }
     }
 

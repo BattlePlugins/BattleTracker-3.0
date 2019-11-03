@@ -114,7 +114,7 @@ public final class BattleTracker extends MCPlugin {
             }
 
             if (trackPvP) {
-                Tracker tracker = new Tracker(this, PVP_INTERFACE, configManager.getPvPConfig(), defaultCalculator, new HashMap<>());
+                Tracker tracker = new Tracker(this, PVP_INTERFACE, configManager.getPvPConfig(), defaultCalculator);
                 trackerManager.addInterface(PVP_INTERFACE, tracker);
 
                 MCCommand pvpCommand = new MCCommand(configManager.getPvPConfig().getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
@@ -122,7 +122,7 @@ public final class BattleTracker extends MCPlugin {
             }
 
             if (trackPvE) {
-                Tracker tracker = new Tracker(this, PVE_INTERFACE, configManager.getPvEConfig(), defaultCalculator, new HashMap<>());
+                Tracker tracker = new Tracker(this, PVE_INTERFACE, configManager.getPvEConfig(), defaultCalculator);
                 trackerManager.addInterface(PVE_INTERFACE, tracker);
 
                 MCCommand pveCommand = new MCCommand(configManager.getPvEConfig().getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());

@@ -10,6 +10,7 @@ import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.tracking.stat.record.PlayerRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,24 +34,25 @@ public class Tracker implements TrackerInterface {
     protected RatingCalculator calculator;
 
     protected Map<UUID, Record> records;
+    protected List<VersusTally> versusTallies;
 
     protected SQLInstance sql;
 
-    public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator, Map<UUID, Record> records) {
-        this(plugin, name, config, calculator, records, new ArrayList<>());
+    public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator) {
+        this(plugin, name, config, calculator, null);
     }
 
-    public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator, Map<UUID, Record> records, List<String> columns) {
+    public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator, SQLInstance sqlInstance) {
         this.name = name;
         this.recapManager = new RecapManager(plugin);
         this.messageManager = new DeathMessageManager(plugin, this, config);
         this.calculator = calculator;
-        this.records = records;
-
-        if (!columns.isEmpty())
-            this.sql = new SQLInstance(this, columns);
-        else
-            this.sql = new SQLInstance(this);
+        this.records = new HashMap<>();
+        this.versusTallies = new ArrayList<>();
+        if (sqlInstance == null) {
+            sqlInstance = new SQLInstance(this);
+        }
+        this.sql = sqlInstance;
     }
 
     @Override
@@ -76,6 +78,43 @@ public class Tracker implements TrackerInterface {
     @Override
     public Map<UUID, Record> getRecords() {
         return records;
+    }
+
+    @Override
+    public boolean hasVersusTally(MCOfflinePlayer player) {
+        for (VersusTally tally : versusTallies) {
+            if (tally.getId1().equals(player.getUniqueId().toString()))
+                return true;
+
+            if (tally.getId2().equals(player.getUniqueId().toString()))
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public VersusTally getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
+        for (VersusTally tally : versusTallies) {
+            if (tally.getId1().equals(player1.getUniqueId().toString()) &&
+                    tally.getId2().equals(player2.getUniqueId().toString())) {
+
+                return tally;
+            }
+
+            if (tally.getId2().equals(player1.getUniqueId().toString()) &&
+                    tally.getId1().equals(player2.getUniqueId().toString())) {
+
+                return tally;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<VersusTally> getVersusTallies() {
+        return versusTallies;
     }
 
     @Override
@@ -216,11 +255,11 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void save(MCOfflinePlayer player) {
-        sql.save(records.get(player.getUniqueId()));
+        sql.save(player.getUniqueId());
     }
 
     @Override
     public void saveAll() {
-        sql.saveAll(records.values().toArray(new Record[records.size()]));
+        sql.saveAll();
     }
 }

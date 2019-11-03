@@ -287,7 +287,6 @@ public class DeathMessageManager {
         return message;
     }
 
-    // TODO: Implement recap option
     private void attachHoverEvent(MessageBuilder messageBuilder, MCPlayer player) {
         if (!useHoverMessages)
             return;

@@ -6,7 +6,9 @@ import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.tracking.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -56,6 +58,30 @@ public interface TrackerInterface {
      * @return a map of all the records
      */
     Map<UUID, Record> getRecords();
+
+    /**
+     * Returns if a player has a versus tally in the tracker
+     *
+     * @param player the player to check
+     * @return if a player has a versus tally in the tracker
+     */
+    boolean hasVersusTally(MCOfflinePlayer player);
+
+    /**
+     * Returns the versus tally for the given OfflinePlayers
+     *
+     * @param player1 the first OfflinePlayer to get the versus tally from
+     * @param player2 the second OfflinePlayer to get the versus tally from
+     * @return the versus tally for the given OfflinePlayers
+     */
+    VersusTally getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2);
+
+    /**
+     * Returns a list of all the versus tallies
+     *
+     * @return a list of all the versus tallies
+     */
+    List<VersusTally> getVersusTallies();
 
     /**
      * Increments a value with the given stat type

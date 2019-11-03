@@ -33,10 +33,10 @@ special:
 
 messages:
   prefix: "&5[Tracker]&f "
-  xBetween: "&cx must be between 1 and %s"
-  recordNotFound: "&cA record for player &6%player_name%&c couldn't be found"
-  playerNotFound: "&cThe player %player_name% was not found"
-  noRecordsInTable: "&cThere are no records in the &6%s&c table"
+  recordNotFound: "&cA record for player &6%player_name%&c couldn't be found!"
+  tallyNotFound: "&cA tally couldn't be found with the given name!"
+  playerNotFound: "&cThe player %player_name% was not found!"
+  noRecordsInTable: "&cThere are no records in the &6%s&c table!"
   recordsReset: "&aReset %player_name%'s records %tracker% data successfully!"
   statNotInTracker: "&cThis stat type does not exist in this tracker!"
   setStatValue: "&aSet %player_name%'s %stat% value to %value%!"
@@ -45,4 +45,7 @@ messages:
   noRecapForPlayer: "&cThere is not a death recap available for this player!"
   leaderboardHeader: "&c============= &e%tracker% Leaderboards &c============="
   leaderboardText: "&6#%ranking% &e%player_name% &b%rating% &cKills: &6%kills% &cDeaths: &6%deaths%"
+  versusHeader: "&c============= &eVersus Tally &c============="
+  versusText: "&6%player_name_1% &7- &b%rating_1% &evs &6%player_name_2% &7- &b%rating_2%"
+  versusCompare: "&6%player_name_1% &ehas killed &6%player_name_2% &b%kills% &etimes and been killed &b%deaths% &etimes by them!"
   rankingText: "&6%player_name% &7- &b%rating% &e(Max Rating: %max_rating%) &cKills: &6%kills% &cDeaths: &6%deaths% &cKDR: &6%kd_ratio%"

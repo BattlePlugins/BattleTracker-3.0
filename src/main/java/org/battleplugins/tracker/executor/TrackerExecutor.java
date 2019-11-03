@@ -12,8 +12,10 @@ import org.battleplugins.tracker.tracking.recap.Recap;
 import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 import org.battleplugins.tracker.util.Util;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 
 /**
@@ -71,13 +73,12 @@ public class TrackerExecutor extends CustomCommandExecutor {
             return;
         }
 
-        // Replace this seperately since everything else is parsed as an int, only temporary for now
-        // TODO: Address this later
+        DecimalFormat format = new DecimalFormat("0.##");
         String message = messageManager.getFormattedMessage(player, "rankingText");
-        message = message.replace("%kd_ratio%", String.valueOf(record.getStat(StatType.KD_RATIO)));
+        message = message.replace("%kd_ratio%", format.format(record.getStat(StatType.KD_RATIO)));
 
         for (StatType type : StatType.values()) {
-            message = message.replace("%" + type.getInternalName() + "%", String.valueOf((int) record.getStat(type)));
+            message = message.replace("%" + type.getInternalName() + "%", format.format(record.getStat(type)));
         }
 
         sender.sendMessage(message);
@@ -139,5 +140,58 @@ public class TrackerExecutor extends CustomCommandExecutor {
             case "inventory":
                 trackerInterface.getRecapManager().sendInventoryRecap(player, recap);
         }
+    }
+
+    @MCCommand(cmds = {"vs", "versus"}, perm = "battletracker.versus")
+    public void versusCommandSelf(MCPlayer sender, MCOfflinePlayer player2) {
+        versusCommand(sender, sender, player2);
+    }
+
+    @MCCommand(cmds = {"vs", "versus"}, perm = "battletracker.versus")
+    public void versusCommand(MCCommandSender sender, MCOfflinePlayer player1, MCOfflinePlayer player2) {
+        MessageManager messageManager = tracker.getMessageManager();
+        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
+        VersusTally tally = trackerInterface.getVersusTally(player1, player2);
+        if (tally == null) {
+            sender.sendMessage(messageManager.getFormattedMessage("tallyNotFound"));
+            return;
+        }
+
+        DecimalFormat format = new DecimalFormat("0.##");
+        Record record1 = trackerInterface.getRecord(player1);
+        Record record2 = trackerInterface.getRecord(player2);
+
+        sender.sendMessage(MessageController.colorChat(messageManager.getMessage("versusHeader")));
+        String versusMessage = MessageController.colorChat(messageManager.getMessage("versusText"));
+        versusMessage = versusMessage.replace("%player_name_1%", player1.getName());
+        versusMessage = versusMessage.replace("%player_name_2%", player2.getName());
+
+        for (Map.Entry<String, Float> statEntry : record1.getStats().entrySet()) {
+            versusMessage = versusMessage.replace("%" + statEntry.getKey() + "_1%", format.format(statEntry.getValue()));
+        }
+
+        for (Map.Entry<String, Float> statEntry : record2.getStats().entrySet()) {
+            versusMessage = versusMessage.replace("%" + statEntry.getKey() + "_2%", format.format(statEntry.getValue()));
+        }
+
+        String versusCompare = MessageController.colorChat(messageManager.getMessage("versusCompare"));
+        int kills = tally.getStats().get(StatType.KILLS.getInternalName()).intValue();
+        int deaths = tally.getStats().get(StatType.DEATHS.getInternalName()).intValue();
+
+        // Since versus tallies are only stored one way, we need to flip the value
+        // in the scenario that the "1st" player instead the 2nd player
+        if (tally.getId2().equals(player1.getUniqueId().toString())) {
+            versusCompare = versusCompare.replace("%player_name_1%", player2.getName());
+            versusCompare = versusCompare.replace("%player_name_2%", player1.getName());
+        } else {
+            versusCompare = versusCompare.replace("%player_name_1%", player1.getName());
+            versusCompare = versusCompare.replace("%player_name_2%", player2.getName());
+        }
+
+        versusCompare = versusCompare.replace("%kills%", String.valueOf(kills));
+        versusCompare = versusCompare.replace("%deaths%", String.valueOf(deaths));
+
+        sender.sendMessage(versusMessage);
+        sender.sendMessage(versusCompare);
     }
 }
