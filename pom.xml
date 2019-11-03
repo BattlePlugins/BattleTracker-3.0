@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <source>https://github.com/BattlePlugins/BattleTracker</source>
-        <download>http://dev.bukkit.org/bukkit-plugins/battletracker2/</download>
+        <download>https://dev.bukkit.org/projects/battletracker/</download>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -113,7 +113,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>mc.alk.battlecore</pattern>
-                                    <shadedPattern>org.battleplugins.alib.battlecore</shadedPattern>
+                                    <shadedPattern>org.battleplugins.tracker.alib.battlecore</shadedPattern>
                                 </relocation>
                             </relocations>
                             <minimizeJar>true</minimizeJar>
