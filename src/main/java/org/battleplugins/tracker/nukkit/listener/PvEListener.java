@@ -20,7 +20,7 @@ import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.record.DummyRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.util.UUID;
 
@@ -56,14 +56,14 @@ public class PvEListener implements Listener {
                 return;
 
             type = "entityDeaths";
-            killer = Util.getFormattedEntityName(damager.getSaveId(), false).toLowerCase().replace(" ", "");
+            killer = TrackerUtil.getFormattedEntityName(damager.getSaveId(), false).toLowerCase().replace(" ", "");
 
             if (damager instanceof EntityProjectile) {
                 EntityProjectile proj = (EntityProjectile) damager;
                 if (proj.shootingEntity instanceof Player)
                     return;
 
-                killer = Util.getFormattedEntityName(damager.getSaveId(), false).toLowerCase().replace(" ", "");
+                killer = TrackerUtil.getFormattedEntityName(damager.getSaveId(), false).toLowerCase().replace(" ", "");
             }
 
             if (damager instanceof EntityTameable && ((EntityTameable) damager).isTamed())

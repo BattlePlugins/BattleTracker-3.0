@@ -1,18 +1,13 @@
 package org.battleplugins.tracker.bukkit.listener;
 
-import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCPlatform;
 import mc.alk.mc.MCPlayer;
-import mc.alk.mc.chat.MessageBuilder;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.bukkit.util.CompatUtil;
 import org.battleplugins.tracker.tracking.recap.DamageInfo;
 import org.battleplugins.tracker.tracking.recap.Recap;
 import org.battleplugins.tracker.tracking.recap.RecapManager;
-import org.battleplugins.tracker.tracking.stat.StatType;
-import org.battleplugins.tracker.tracking.stat.record.Record;
-import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
+import org.battleplugins.tracker.util.TrackerUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Entity;
@@ -27,8 +22,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.HashMap;
 
 /**
  * Main listener for PvP tracking in Bukkit.
@@ -92,7 +85,7 @@ public class PvPListener implements Listener {
         if (tracker.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
             return;
 
-        updateStats(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()),
+        TrackerUtil.updatePvPStats(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()),
                 tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
 
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
@@ -101,45 +94,6 @@ public class PvPListener implements Listener {
 
         pvpTracker.getDeathMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().name().toLowerCase());
         pvpTracker.getRecapManager().getDeathRecaps().get(killed.getName()).setVisible(true);
-    }
-
-    public void updateStats(MCOfflinePlayer killed, MCOfflinePlayer killer) {
-        TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-
-        Record killerRecord = pvpTracker.getRecord(killer);
-        Record killedRecord = pvpTracker.getRecord(killed);
-
-        if (killerRecord.isTracking())
-            pvpTracker.incrementValue(StatType.KILLS, killer);
-
-        if (killedRecord.isTracking())
-            pvpTracker.incrementValue(StatType.DEATHS, killed);
-
-        pvpTracker.updateRating(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()), false);
-
-        if (killerRecord.getStat(StatType.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
-            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
-            MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
-        }
-
-        VersusTally versusTally = pvpTracker.getVersusTally(killer, killed);
-        if (versusTally == null) {
-            versusTally = new VersusTally(pvpTracker, killer, killed, new HashMap<>());
-            pvpTracker.getVersusTallies().add(versusTally);
-        }
-
-        // The format is killer : killed : stat1 : stat2 ....
-        // If the killer is in place of the killed, we need to swap the values
-
-        boolean addToKills = true;
-        if (versusTally.getId2().equals(killer.getUniqueId().toString()))
-            addToKills = false;
-
-        if (addToKills) {
-            versusTally.getStats().put(StatType.KILLS.getInternalName(), versusTally.getStats().getOrDefault(StatType.KILLS.getInternalName(), 0f) + 1);
-        } else {
-            versusTally.getStats().put(StatType.DEATHS.getInternalName(), versusTally.getStats().getOrDefault(StatType.DEATHS.getInternalName(), 0f) + 1);
-        }
     }
 
     /**

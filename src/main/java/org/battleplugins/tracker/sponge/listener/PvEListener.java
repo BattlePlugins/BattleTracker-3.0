@@ -9,7 +9,7 @@ import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.record.DummyRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -17,7 +17,6 @@ import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
@@ -61,14 +60,14 @@ public class PvEListener {
                 return;
 
             type = "entityDeaths";
-            killer = Util.getFormattedEntityName(damager.getType().getName(), false).toLowerCase().replace(" ", "");
+            killer = TrackerUtil.getFormattedEntityName(damager.getType().getName(), false).toLowerCase().replace(" ", "");
 
             if (damager instanceof Projectile) {
                 Projectile proj = (Projectile) damager;
                 if (proj.getShooter() instanceof Player)
                     return;
 
-                killer = Util.getFormattedEntityName(damager.getType().getName(), false).toLowerCase().replace(" ", "");
+                killer = TrackerUtil.getFormattedEntityName(damager.getType().getName(), false).toLowerCase().replace(" ", "");
             }
 
             // Sponge has no support for tameable entities..

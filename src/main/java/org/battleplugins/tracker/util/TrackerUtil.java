@@ -1,7 +1,14 @@
 package org.battleplugins.tracker.util;
 
+import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
+import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.record.Record;
+import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
+
+import mc.alk.mc.MCOfflinePlayer;
+import mc.alk.mc.MCPlatform;
+import mc.alk.mc.chat.MessageBuilder;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,7 +21,7 @@ import java.util.UUID;
  *
  * @author Redned
  */
-public class Util {
+public class TrackerUtil {
 
     /**
      * Returns the formatted entity name from the given string
@@ -103,33 +110,70 @@ public class Util {
     }
 
     /**
-     * Returns a map of sorted records sorted by the rating. A limit
-     * option is included to prevent lag if on a non-asynchonous thread.
-     * Set to -1 to get all (not recommended unless you know what you're doing).
+     * Returns a map of sorted records sorted by the rating
      *
      * Key: the Record
      * Value: the rating
      *
      * @param trackerInterface the tracker interface
      * @param limit a limit of how many elements can be in the map
-     * @return a map of sorted records
+     * @return a map of sorted records sorted by the rating
      */
     public static Map<Record, Float> getSortedRecords(TrackerInterface trackerInterface, int limit) {
         Map<UUID, Record> records = trackerInterface.getRecords();
         Map<Record, Float> unsortedRecords = new HashMap<>();
 
-        int i = 0;
         for (Map.Entry<UUID, Record> record : records.entrySet()) {
             unsortedRecords.put(record.getValue(), record.getValue().getRating());
-
-            if (i >= limit && limit != -1)
-                break;
-
-            i++;
         }
 
         Map<Record, Float> sortedRecords = new LinkedHashMap<>();
-        unsortedRecords.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedRecords.put(x.getKey(), x.getValue()));
+        unsortedRecords.entrySet().stream().limit(limit).sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedRecords.put(x.getKey(), x.getValue()));
         return sortedRecords;
+    }
+
+    /**
+     * Updates the PvP stats for the given players
+     *
+     * @param killed the player killed
+     * @param killer the killer
+     */
+    public static void updatePvPStats(MCOfflinePlayer killed, MCOfflinePlayer killer) {
+        BattleTracker tracker = BattleTracker.getInstance();
+        TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
+
+        Record killerRecord = pvpTracker.getRecord(killer);
+        Record killedRecord = pvpTracker.getRecord(killed);
+
+        if (killerRecord.isTracking())
+            pvpTracker.incrementValue(StatType.KILLS, killer);
+
+        if (killedRecord.isTracking())
+            pvpTracker.incrementValue(StatType.DEATHS, killed);
+
+        pvpTracker.updateRating(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()), false);
+
+        if (killerRecord.getStat(StatType.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
+            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
+            MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
+        }
+
+        VersusTally versusTally = pvpTracker.getVersusTally(killer, killed);
+        if (versusTally == null) {
+            versusTally = new VersusTally(pvpTracker, killer, killed, new HashMap<>());
+            pvpTracker.getVersusTallies().add(versusTally);
+        }
+
+        // The format is killer : killed : stat1 : stat2 ....
+        // If the killer is in place of the killed, we need to swap the values
+        boolean addToKills = true;
+        if (versusTally.getId2().equals(killer.getUniqueId().toString()))
+            addToKills = false;
+
+        if (addToKills) {
+            versusTally.getStats().put(StatType.KILLS.getInternalName(), versusTally.getStats().getOrDefault(StatType.KILLS.getInternalName(), 0f) + 1);
+        } else {
+            versusTally.getStats().put(StatType.DEATHS.getInternalName(), versusTally.getStats().getOrDefault(StatType.DEATHS.getInternalName(), 0f) + 1);
+        }
     }
 }

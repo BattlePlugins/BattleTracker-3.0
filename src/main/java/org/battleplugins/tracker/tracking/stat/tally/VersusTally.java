@@ -1,17 +1,14 @@
 package org.battleplugins.tracker.tracking.stat.tally;
 
 import org.battleplugins.tracker.tracking.TrackerInterface;
-import org.battleplugins.tracker.tracking.stat.record.Record;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import mc.alk.mc.MCOfflinePlayer;
 
-
 /**
- * A record storing information specifically
- * against another player.
+ * A tally storing versus information about
+ * two players.
  *
  * @author Redned
  */

@@ -118,33 +118,6 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public void incrementValue(StatType statType, MCOfflinePlayer player) {
-        incrementValue(statType.getInternalName(), player);
-    }
-
-    @Override
-    public void incrementValue(String statType, MCOfflinePlayer player) {
-        Record record = records.get(player.getUniqueId());
-        record.setValue(statType, record.getStat(statType) + 1);
-    }
-
-    @Override
-    public void decrementValue(StatType statType, MCOfflinePlayer player) {
-        decrementValue(statType.getInternalName(), player);
-    }
-
-    @Override
-    public void decrementValue(String statType, MCOfflinePlayer player) {
-        Record record = records.get(player.getUniqueId());
-        record.setValue(statType, record.getStat(statType) - 1);
-    }
-
-    @Override
-    public void setValue(StatType statType, float value, MCOfflinePlayer player) {
-        setValue(statType.getInternalName(), value, player);
-    }
-
-    @Override
     public void setValue(String statType, float value, MCOfflinePlayer player) {
         Record record = records.get(player.getUniqueId());
         record.setValue(statType, value);
@@ -187,28 +160,6 @@ public class Tracker implements TrackerInterface {
 
         if (killerStreak > killerMaxStreak)
             setValue(StatType.MAX_STREAK, killerStreak, killer);
-    }
-
-    @Override
-    public void enableTracking(MCOfflinePlayer player) {
-        Record record = records.get(player.getUniqueId());
-        record.setTracking(true);
-    }
-
-    @Override
-    public void disableTracking(MCOfflinePlayer player) {
-        Record record = records.get(player.getUniqueId());
-        record.setTracking(false);
-    }
-
-    @Override
-    public void enableMessages(MCOfflinePlayer player) {
-        records.get(player.getUniqueId()).setSendMessages(true);
-    }
-
-    @Override
-    public void disableMessages(MCOfflinePlayer player) {
-        records.get(player.getUniqueId()).setSendMessages(false);
     }
 
     @Override

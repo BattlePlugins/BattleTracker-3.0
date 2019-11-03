@@ -65,7 +65,7 @@ public class SignUtil {
         SignManager signManager = BattleTracker.getInstance().getSignManager();
         for (int i = 0; i < signManager.getLeaderboardFormat().length; i++) {
             String line = signManager.getLeaderboardFormat()[i];
-            String formattedLine = Util.replacePlaceholders(line, replacements);
+            String formattedLine = TrackerUtil.replacePlaceholders(line, replacements);
 
             // One line is enough
             if (ChatColor.stripColor(formattedLine).equalsIgnoreCase(ChatColor.stripColor(lines[i])))

@@ -20,7 +20,7 @@ import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.sign.LeaderboardSign;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.SignUtil;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.util.Map;
 
@@ -130,7 +130,7 @@ public class TrackerListener implements Listener {
         Record record = tracker.getTrackerManager().getInterface(leaderboardSign.getTrackerName()).getRecord(player);
         String[] lines = tracker.getSignManager().getPersonalFormat().clone();
         for (String line : lines) {
-            Util.replaceRecordValues(line, record);
+            TrackerUtil.replaceRecordValues(line, record);
         }
 
         MCSign sign = (MCSign) location.getWorld().getBlockAt(location);

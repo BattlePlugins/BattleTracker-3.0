@@ -89,7 +89,9 @@ public interface TrackerInterface {
      * @param statType the stat type to increment the value for
      * @param player the player to increment the value for
      */
-    void incrementValue(StatType statType, MCOfflinePlayer player);
+    default void incrementValue(StatType statType, MCOfflinePlayer player) {
+        incrementValue(statType.getInternalName(), player);
+    }
 
     /**
      * Increments a value with the given stat type
@@ -97,7 +99,9 @@ public interface TrackerInterface {
      * @param statType the stat type (String) to increment the value for
      * @param player the player to increment the value for
      */
-    void incrementValue(String statType, MCOfflinePlayer player);
+    default void incrementValue(String statType, MCOfflinePlayer player) {
+        getRecord(player).setValue(statType, getRecord(player).getStat(statType) + 1);
+    }
 
     /**
      * Decrements a value with the given stat type
@@ -105,7 +109,9 @@ public interface TrackerInterface {
      * @param statType the stat type to decrement the value for
      * @param player the player to decrement the value for
      */
-    void decrementValue(StatType statType, MCOfflinePlayer player);
+    default void decrementValue(StatType statType, MCOfflinePlayer player) {
+        decrementValue(statType.getInternalName(), player);
+    }
 
     /**
      * Decrements a value with the given stat type
@@ -113,7 +119,9 @@ public interface TrackerInterface {
      * @param statType the stat type (String) to decrement the value for
      * @param player the player to decrement the value for
      */
-    void decrementValue(String statType, MCOfflinePlayer player);
+    default void decrementValue(String statType, MCOfflinePlayer player) {
+        getRecord(player).setValue(statType, getRecord(player).getStat(statType) - 1);
+    }
 
     /**
      * Sets a value with the given stat type
@@ -122,7 +130,9 @@ public interface TrackerInterface {
      * @param value the value to set
      * @param player the player to set the value for
      */
-    void setValue(StatType statType, float value, MCOfflinePlayer player);
+    default void setValue(StatType statType, float value, MCOfflinePlayer player) {
+        setValue(statType.getInternalName(), value, player);
+    }
 
     /**
      * Sets a value with the given stat type
@@ -147,28 +157,36 @@ public interface TrackerInterface {
      *
      * @param player the player to enable tracking for
      */
-    void enableTracking(MCOfflinePlayer player);
+    default void enableTracking(MCOfflinePlayer player) {
+        getRecord(player).setTracking(true);
+    }
 
     /**
      * Disables tracking for the specified player
      *
      * @param player the player to disable tracking for
      */
-    void disableTracking(MCOfflinePlayer player);
+    default void disableTracking(MCOfflinePlayer player) {
+        getRecord(player).setTracking(false);
+    }
 
     /**
      * Enables messages for the specified player
      *
      * @param player the player to enable messages for
      */
-    void enableMessages(MCOfflinePlayer player);
+    default void enableMessages(MCOfflinePlayer player) {
+        getRecord(player).setSendMessages(true);
+    }
 
     /**
      * Disables messages for the specified player
      *
      * @param player the player to disable messages for
      */
-    void disableMessages(MCOfflinePlayer player);
+    default void disableMessages(MCOfflinePlayer player) {
+        getRecord(player).setSendMessages(false);
+    }
 
     /**
      * Adds a record for the specified player to the tracker from the

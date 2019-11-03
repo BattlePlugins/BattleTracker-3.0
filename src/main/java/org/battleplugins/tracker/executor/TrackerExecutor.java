@@ -13,7 +13,7 @@ import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
     public void topCommand(MCCommandSender sender, int amount) {
         MessageManager messageManager = tracker.getMessageManager();
         sender.sendMessage(MessageController.colorChat(messageManager.getMessage("leaderboardHeader").replace("%tracker%", interfaceName)));
-        Map<Record, Float> sortedRecords = Util.getSortedRecords(tracker.getTrackerManager().getInterface(interfaceName), amount);
+        Map<Record, Float> sortedRecords = TrackerUtil.getSortedRecords(tracker.getTrackerManager().getInterface(interfaceName), amount);
 
         int i = 1;
         for (Map.Entry<Record, Float> recordEntry : sortedRecords.entrySet()) {

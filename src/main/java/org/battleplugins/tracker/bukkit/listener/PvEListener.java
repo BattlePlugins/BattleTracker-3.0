@@ -9,7 +9,7 @@ import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.record.DummyRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -56,14 +56,14 @@ public class PvEListener implements Listener {
                 return;
 
             type = "entityDeaths";
-            killer = Util.getFormattedEntityName(damager.getType().name(), false).toLowerCase().replace(" ", "");
+            killer = TrackerUtil.getFormattedEntityName(damager.getType().name(), false).toLowerCase().replace(" ", "");
 
             if (damager instanceof Projectile) {
                 Projectile proj = (Projectile) damager;
                 if (proj.getShooter() instanceof Player)
                     return;
 
-                killer = Util.getFormattedEntityName(damager.getType().name(), false).toLowerCase().replace(" ", "");
+                killer = TrackerUtil.getFormattedEntityName(damager.getType().name(), false).toLowerCase().replace(" ", "");
             }
 
             if (damager instanceof Tameable && ((Tameable) damager).isTamed())

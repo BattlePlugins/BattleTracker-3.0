@@ -14,7 +14,7 @@ import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.recap.DamageInfo;
 import org.battleplugins.tracker.tracking.recap.Recap;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -349,7 +349,7 @@ public class DeathMessageManager {
 
         for (int i = damageInfos.size() - max; i < damageInfos.size(); i++) {
             DamageInfo damageInfo = damageInfos.get(i);
-            hoverMessage += "\n" + ChatColor.RED + " ♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + ChatColor.AQUA + Util.capitalizeFirst(damageInfo.getCause().replace("_", " "));
+            hoverMessage += "\n" + ChatColor.RED + " ♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + ChatColor.AQUA + TrackerUtil.capitalizeFirst(damageInfo.getCause().replace("_", " "));
         }
 
         return hoverMessage;

@@ -25,11 +25,10 @@ import org.battleplugins.tracker.tracking.stat.calculator.EloCalculator;
 import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.util.DependencyUtil;
 import org.battleplugins.tracker.util.DependencyUtil.DownloadResult;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Overall main class for the BattleTracker plugin.
@@ -55,7 +54,7 @@ public final class BattleTracker extends MCPlugin {
     public void onEnable() {
         instance = this;
 
-        getLogger().info("You are running " + TrackerInfo.NAME + " on " + Util.capitalizeFirst(getPlatform().getAPIType().name()) + "!");
+        getLogger().info("You are running " + TrackerInfo.NAME + " on " + TrackerUtil.capitalizeFirst(getPlatform().getAPIType().name()) + "!");
         DependencyUtil.setLibFolder(new File(getDataFolder(), "libraries"));
         DependencyUtil.downloadDepedencies().whenComplete((result, action) -> {
             if (result != DownloadResult.SUCCESS) {

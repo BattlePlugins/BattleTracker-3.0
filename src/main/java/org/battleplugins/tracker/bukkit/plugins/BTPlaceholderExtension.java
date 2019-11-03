@@ -4,7 +4,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.record.Record;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class BTPlaceholderExtension extends PlaceholderExpansion {
             if (!record.getStats().containsKey(stat))
                 return "";
 
-            Map<Record, Float> sortedRecords = Util.getSortedRecords(trackerInterface, -1);
+            Map<Record, Float> sortedRecords = TrackerUtil.getSortedRecords(trackerInterface, -1);
             List<Record> records = new ArrayList<>(sortedRecords.keySet());
             return String.valueOf(records.get(ranking).getStat(stat));
         }

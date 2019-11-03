@@ -11,7 +11,7 @@ import mc.alk.mc.block.MCSign;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.SignUtil;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public class SignManager {
         int extraLines = 0;
         String[] lines = tracker.getSignManager().getLeaderboardFormat();
         for (int i = 0; i < lines.length; i++) {
-            lines[i] = Util.replacePlaceholders(lines[i], replacements);
+            lines[i] = TrackerUtil.replacePlaceholders(lines[i], replacements);
             sign.setLine(i, lines[i]);
             if (lines[i].contains("%leaderboard_format%"))
                 normalSignLines += 1;
@@ -76,7 +76,7 @@ public class SignManager {
         List<MCSign> signsBelow = SignUtil.getSignsBelow(signs.get(sign.getLocation()));
         extraLines = signsBelow.size() * 4;
 
-        Map<Record, Float> recordsMap = Util.getSortedRecords(tracker.getTrackerManager().getInterface(trackerName), extraLines + normalSignLines);
+        Map<Record, Float> recordsMap = TrackerUtil.getSortedRecords(tracker.getTrackerManager().getInterface(trackerName), extraLines + normalSignLines);
         if (recordsMap.isEmpty())
             return;
 
@@ -99,7 +99,7 @@ public class SignManager {
             formattedLine = formattedLine.replace("%player_name%", records.get(recordIndex).getName());
             formattedLine = formattedLine.replace("%value%", String.valueOf(records.get(recordIndex).getStat(statType)));
 
-            Util.replaceRecordValues(formattedLine, records.get(recordIndex));
+            TrackerUtil.replaceRecordValues(formattedLine, records.get(recordIndex));
             sign.setLine(i, MessageController.colorChat(formattedLine));
 
             recordIndex++;
@@ -115,7 +115,7 @@ public class SignManager {
                 String line = lines[i];
                 String formattedLine = line.replace("%ranking%", String.valueOf(recordIndex + 1));
 
-                Util.replaceRecordValues(formattedLine, records.get(recordIndex));
+                TrackerUtil.replaceRecordValues(formattedLine, records.get(recordIndex));
                 sign.setLine(i, MessageController.colorChat(formattedLine));
             }
 

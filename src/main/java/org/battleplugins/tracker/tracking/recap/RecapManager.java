@@ -7,7 +7,7 @@ import mc.alk.mc.inventory.ItemBuilder;
 import mc.alk.mc.inventory.MCInventory;
 import mc.alk.mc.inventory.MCItemStack;
 import org.battleplugins.tracker.BattleTracker;
-import org.battleplugins.tracker.util.Util;
+import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class RecapManager {
             DamageInfo damageInfo = damageInfos.get(i);
             String timeAgo = "(" + TimeUtil.convertToShortString(System.currentTimeMillis() - damageInfo.getLogTime()).trim() + ")";
 
-            lore.add(ChatColor.RED + "♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + timeAgo + " " + ChatColor.AQUA + Util.capitalizeFirst(damageInfo.getCause().replace("_", " ")));
+            lore.add(ChatColor.RED + "♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + timeAgo + " " + ChatColor.AQUA + TrackerUtil.capitalizeFirst(damageInfo.getCause().replace("_", " ")));
         }
 
         return ItemBuilder.builder()
