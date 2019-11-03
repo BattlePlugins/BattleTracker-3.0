@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.sign;
 
+import lombok.Getter;
+
 import mc.alk.mc.MCLocation;
 
 /**
@@ -7,44 +9,34 @@ import mc.alk.mc.MCLocation;
  *
  * @author Redned
  */
+@Getter
 public class LeaderboardSign {
 
+    /**
+     * The location of the sign
+     *
+     * @return the location of the sign
+     */
     private MCLocation location;
 
+    /**
+     * The stat type displayed on the sign
+     *
+     * @return the stat type displayed on the sign
+     */
     private String statType;
+
+    /**
+     * The tracker name to retrieve information from
+     * when displaying information on the sign
+     *
+     * @return the tracker name to retrieve information from
+     */
     private String trackerName;
 
     public LeaderboardSign(MCLocation location, String statType, String trackerName) {
         this.location = location;
         this.statType = statType;
         this.trackerName = trackerName;
-    }
-
-    /**
-     * Returns the location of the sign
-     *
-     * @return the location of the sign
-     */
-    public MCLocation getLocation() {
-        return location;
-    }
-
-    /**
-     * Returns the stat type displayed on the sign
-     *
-     * @return the stat type displayed on the sign
-     */
-    public String getStatType() {
-        return statType;
-    }
-
-    /**
-     * Returns the tracker name to retrieve information from
-     * when displaying information on the sign
-     *
-     * @return the tracker name to retrieve information from
-     */
-    public String getTrackerName() {
-        return trackerName;
     }
 }

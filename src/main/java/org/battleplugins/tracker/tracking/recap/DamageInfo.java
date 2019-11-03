@@ -1,46 +1,38 @@
 package org.battleplugins.tracker.tracking.recap;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 /**
  * Stores more information about a specific damage.
  *
  * @author Redned
  */
+@Getter
+@RequiredArgsConstructor
 public class DamageInfo {
 
-    private String cause;
-    private double damage;
-    private long logTime;
-
-    public DamageInfo(String cause, double damage) {
-        this.cause = cause;
-        this.damage = damage;
-        this.logTime = System.currentTimeMillis();
-    }
-
     /**
-     * Returns the cause of this damage
+     * The cause of this damage
      *
      * @return the cause of this damage
      */
-    public String getCause() {
-        return cause;
-    }
+    @NonNull
+    private String cause;
 
     /**
-     * Returns the amount of damage dealt
+     * The amount of damage dealt
      *
      * @return the amount of damage dealt
      */
-    public double getDamage() {
-        return damage;
-    }
+    @NonNull
+    private double damage;
 
     /**
-     * Returns when this damage info was logged
+     * When this damage info was logged
      *
      * @return when this damage info was logged
      */
-    public long getLogTime() {
-        return logTime;
-    }
+    private long logTime = System.currentTimeMillis();
 }

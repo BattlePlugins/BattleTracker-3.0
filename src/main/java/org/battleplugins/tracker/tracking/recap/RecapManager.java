@@ -9,6 +9,10 @@ import mc.alk.mc.inventory.MCItemStack;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.util.TrackerUtil;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,27 +28,22 @@ import java.util.stream.Collectors;
  *
  * @author Redned
  */
+@RequiredArgsConstructor
 public class RecapManager {
 
+    @NonNull
     private BattleTracker tracker;
-    private Map<String, Recap> recaps;
-
-    public RecapManager(BattleTracker tracker) {
-        this.tracker = tracker;
-        this.recaps = Collections.synchronizedMap(new ConcurrentHashMap<>());
-    }
 
     /**
-     * Returns a map of all the "dead" recaps.
+     * A map of all the "dead" recaps.
      *
      * String: the name of the player
      * Value: the remap value
      *
      * @return a map of all the current recaps
      */
-    public Map<String, Recap> getDeathRecaps() {
-        return recaps;
-    }
+    @Getter
+    private Map<String, Recap> deathRecaps = Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     /**
      * Sends the armor recap click event to the specified player

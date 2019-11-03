@@ -1,5 +1,9 @@
 package org.battleplugins.tracker.tracking.message;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.controllers.MessageController;
 import mc.alk.mc.ChatColor;
@@ -29,22 +33,71 @@ import java.util.stream.Collectors;
  *
  * @author Redned
  */
+@Getter
 public class DeathMessageManager {
 
+    @Getter(AccessLevel.NONE)
     private BattleTracker tracker;
+
+    @Getter(AccessLevel.NONE)
     private TrackerInterface trackerInterface;
 
+    /**
+     * If the message manager is enabled
+     *
+     * @param enabled if the message manager is enabled
+     * @return if the message manager is enabled
+     */
+    @Setter
     private boolean enabled;
+
+    /**
+     * The prefix to use in death messages
+     *
+     * @return the prefix to use in death messages
+     */
     private String prefix;
 
-    // Options
-    private boolean overrideDefaultMessages;
-    private boolean useHoverMessages;
-    private boolean useClickMessages;
+    /**
+     * If default death messages should be overridden
+     *
+     * @return if default death messages should be overridden
+     */
+    private boolean defaultMessagesOverriden;
 
+    /**
+     * If hover messages are enabled
+     *
+     * @return if hover messages are enabled
+     */
+    private boolean hoverMessagesEnabled;
+
+    /**
+     * If click messages are enabled
+     *
+     * @return if click messages are enabled
+     */
+    private boolean clickMessagesEnabled;
+
+    /**
+     * The hover content option
+     *
+     * @return the hover content option
+     */
     private String hoverContent;
+
+    /**
+     * Returns the click content option
+     *
+     * @return the click content option
+     */
     private String clickContent;
 
+    /**
+     * The radius in which to send messages
+     *
+     * @return the radius in which to send messages
+     */
     private int msgRadius;
 
     private Map<String, List<String>> itemMessages;
@@ -66,9 +119,9 @@ public class DeathMessageManager {
     public void loadDataFromConfig(Configuration config) {
         this.enabled = config.getBoolean("messages.enabled", true);
         this.prefix = MessageController.colorChat(config.getString("prefix", "[Tracker]"));
-        this.overrideDefaultMessages = config.getBoolean("options.overrideDefaultMessages", true);
-        this.useHoverMessages = config.getBoolean("options.useHoverMessages", true);
-        this.useClickMessages = config.getBoolean("options.useClickMessages", true);
+        this.defaultMessagesOverriden = config.getBoolean("options.overrideDefaultMessages", true);
+        this.hoverMessagesEnabled = config.getBoolean("options.useHoverMessages", true);
+        this.clickMessagesEnabled = config.getBoolean("options.useClickMessages", true);
 
         this.hoverContent = config.getString("options.hoverContent", "all");
         this.clickContent = config.getString("options.clickContent", "all");
@@ -99,60 +152,6 @@ public class DeathMessageManager {
 
             itemMessages.put(str, config.getStringList("messages." + str));
         }
-    }
-
-    /**
-     * Returns if the message manager is enabled
-     *
-     * @return if the message manager is enabled
-     */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * Sets if the message manager is enabled
-     *
-     * @param enabled if the message manager is enabled
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    /**
-     * Returns if default death messages should be overridden
-     *
-     * @return if default death messages should be overridden
-     */
-    public boolean shouldOverrideDefaultMessages() {
-        return overrideDefaultMessages;
-    }
-
-    /**
-     * Sets if default death messages should be overridden
-     *
-     * @param overrideDefaultMessages if default death messages should be overridden
-     */
-    public void setOverrideDefaultMessages(boolean overrideDefaultMessages) {
-        this.overrideDefaultMessages = overrideDefaultMessages;
-    }
-
-    /**
-     * Returns the hover content option
-     *
-     * @return the hover content option
-     */
-    public String getHoverContent() {
-        return hoverContent;
-    }
-
-    /**
-     * Returns the click content option
-     *
-     * @return the click content option
-     */
-    public String getClickContent() {
-        return clickContent;
     }
 
     /**
@@ -288,7 +287,7 @@ public class DeathMessageManager {
     }
 
     private void attachHoverEvent(MessageBuilder messageBuilder, MCPlayer player) {
-        if (!useHoverMessages)
+        if (!hoverMessagesEnabled)
             return;
 
         Recap recap = trackerInterface.getRecapManager().getDeathRecaps().get(player.getName());
@@ -316,7 +315,7 @@ public class DeathMessageManager {
     }
 
     private void attachClickEvent(MessageBuilder messageBuilder, MCPlayer player) {
-        if (!useClickMessages || clickContent.equalsIgnoreCase("none"))
+        if (!clickMessagesEnabled || clickContent.equalsIgnoreCase("none"))
             return;
 
         messageBuilder.setClickAction(ClickAction.RUN_COMMAND);

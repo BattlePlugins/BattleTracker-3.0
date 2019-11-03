@@ -15,14 +15,14 @@ import org.battleplugins.tracker.executor.TrackerExecutor;
 import org.battleplugins.tracker.tracking.Tracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.TrackerManager;
+import org.battleplugins.tracker.tracking.stat.calculator.EloCalculator;
+import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.nukkit.NukkitCodeHandler;
 import org.battleplugins.tracker.sign.SignManager;
 import org.battleplugins.tracker.sign.SignUpdateTask;
 import org.battleplugins.tracker.sponge.SpongeCodeHandler;
 import org.battleplugins.tracker.sql.SQLInstance;
-import org.battleplugins.tracker.tracking.stat.calculator.EloCalculator;
-import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.util.DependencyUtil;
 import org.battleplugins.tracker.util.DependencyUtil.DownloadResult;
 import org.battleplugins.tracker.util.TrackerUtil;
@@ -30,11 +30,14 @@ import org.battleplugins.tracker.util.TrackerUtil;
 import java.io.File;
 import java.util.ArrayList;
 
+import lombok.Getter;
+
 /**
  * Overall main class for the BattleTracker plugin.
  *
  * @author Zach443, Redned
  */
+@Getter
 @PluginProperties(id = "bt", authors = "BattlePlugins", name = TrackerInfo.NAME, version = TrackerInfo.VERSION, description = TrackerInfo.DESCRIPTION, url = TrackerInfo.URL)
 public final class BattleTracker extends MCPlugin {
 
@@ -43,11 +46,39 @@ public final class BattleTracker extends MCPlugin {
 
     private static BattleTracker instance;
 
+    /**
+     * The ConfigManager for BattleTracker
+     *
+     * @return the ConfigManager for BattleTracker
+     */
     private ConfigManager configManager;
+
+    /**
+     * The TrackerManager instance
+     *
+     * @return the TrackerManager instance
+     */
     private TrackerManager trackerManager;
+
+    /**
+     * The MessageManager for BattleTracker
+     *
+     * @return the MessageManager for BattleTracker
+     */
     private MessageManager messageManager;
+
+    /**
+     * The SignManager instance
+     *
+     * @return the SignManager instance
+     */
     private SignManager signManager;
 
+    /**
+     * The default rating calculator
+     *
+     * @return the default rating calculator
+     */
     private RatingCalculator defaultCalculator;
 
     @Override
@@ -76,8 +107,8 @@ public final class BattleTracker extends MCPlugin {
             boolean trackPvP = configManager.getPvPConfig().getBoolean("enabled", true);
             boolean trackPvE = configManager.getPvEConfig().getBoolean("enabled", true);
 
-            trackerManager.setTrackPvP(trackPvP);
-            trackerManager.setTrackPvE(trackPvE);
+            trackerManager.setTrackingPvP(trackPvP);
+            trackerManager.setTrackingPvE(trackPvE);
 
             PVP_INTERFACE = configManager.getPvPConfig().getString("name");
             PVE_INTERFACE = configManager.getPvEConfig().getString("name");
@@ -167,14 +198,6 @@ public final class BattleTracker extends MCPlugin {
         }
     }
 
-    /**
-     * Returns the configuration manager
-     *
-     * @return the configuration manager
-     */
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
 
     /**
      * Returns the config for BattleTracker
@@ -183,42 +206,6 @@ public final class BattleTracker extends MCPlugin {
      */
     public Configuration getConfig() {
         return configManager.getConfig();
-    }
-
-    /**
-     * Returns the TrackerManager instance
-     *
-     * @return the TrackerManager instance
-     */
-    public TrackerManager getTrackerManager() {
-        return trackerManager;
-    }
-
-    /**
-     * Returns the MessageManager instance
-     *
-     * @return the MessageManager instance
-     */
-    public MessageManager getMessageManager() {
-        return messageManager;
-    }
-
-    /**
-     * Returns the SignManager instance
-     *
-     * @return the SignManager instance
-     */
-    public SignManager getSignManager() {
-        return signManager;
-    }
-
-    /**
-     * Returns the default rating calculator
-     *
-     * @return the default rating calculator
-     */
-    public RatingCalculator getDefaultCalculator() {
-        return defaultCalculator;
     }
 
     /**

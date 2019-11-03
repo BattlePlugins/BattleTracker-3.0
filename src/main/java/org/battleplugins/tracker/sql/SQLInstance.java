@@ -5,6 +5,7 @@ import mc.alk.battlecore.util.Log;
 import mc.alk.mc.scheduler.Scheduler;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.StatTypes;
 import org.battleplugins.tracker.tracking.stat.record.PlayerRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
@@ -51,8 +52,8 @@ public class SQLInstance extends SQLSerializer {
     private List<String> versusColumns;
 
     public SQLInstance(TrackerInterface tracker) {
-        this(tracker, Stream.of(StatType.values()).filter(StatType::isTracking).map(StatType::getInternalName).collect(Collectors.toList()),
-                Arrays.asList(StatType.KILLS.getInternalName(), StatType.DEATHS.getInternalName(), StatType.TIES.getInternalName()));
+        this(tracker, Stream.of(StatTypes.values().toArray(new StatType[0])).filter(StatType::isTracked).map(StatType::getInternalName).collect(Collectors.toList()),
+                Arrays.asList(StatTypes.KILLS.getInternalName(), StatTypes.DEATHS.getInternalName(), StatTypes.TIES.getInternalName()));
     }
 
     public SQLInstance(TrackerInterface tracker, List<String> overallColumns, List<String> versusColumns) {
@@ -90,14 +91,12 @@ public class SQLInstance extends SQLSerializer {
             // TODO: Don't put all records in cache and add a way to flush
             RSCon overallRsCon = executeQuery("SELECT * FROM " + overallTable);
             createRecords(overallRsCon).whenComplete((records, exception) -> Scheduler.scheduleAsynchrounousTask(() ->
-                    records.forEach(record -> tracker.getRecords().put(UUID.fromString(record.getID()), record))));
+                    records.forEach(record -> tracker.getRecords().put(UUID.fromString(record.getId()), record))));
 
             // TODO: Don't put all records in cache and add a way to flush
             RSCon versusRsCon = executeQuery("SELECT * FROM " + versusTable);
             createVersusTallies(versusRsCon).whenComplete((tallies, exception ) -> Scheduler.scheduleAsynchrounousTask(() ->
-                    tallies.forEach(tally -> {
-                        tracker.getVersusTallies().add(tally);
-                    })));
+                    tallies.forEach(tally -> tracker.getVersusTallies().add(tally))));
         } catch (Exception ex) {
             Log.err("Failed to generate info from tables!");
             ex.printStackTrace();
@@ -244,7 +243,7 @@ public class SQLInstance extends SQLSerializer {
             // +2 in array for name and id
             String[] overallObjectArray = new String[overallColumns.size() + 2];
             overallObjectArray[0] = record.getName();
-            overallObjectArray[1] = record.getID();
+            overallObjectArray[1] = record.getId();
             for (int i = 0; i < overallColumns.size(); i++) {
                 String overallColumn = overallColumns.get(i);
                 overallObjectArray[i + 2] = record.getStats().get(overallColumn).toString();

@@ -11,6 +11,7 @@ import org.battleplugins.tracker.message.MessageManager;
 import org.battleplugins.tracker.tracking.recap.Recap;
 import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.StatTypes;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 import org.battleplugins.tracker.util.TrackerUtil;
@@ -49,8 +50,8 @@ public class TrackerExecutor extends CustomCommandExecutor {
             String message = messageManager.getMessage("leaderboardText");
             message = message.replace("%ranking%", String.valueOf(i));
             message = message.replace("%rating%", String.valueOf((int) recordEntry.getKey().getRating()));
-            message = message.replace("%kills%", String.valueOf((int) recordEntry.getKey().getStat(StatType.KILLS)));
-            message = message.replace("%deaths%", String.valueOf((int) recordEntry.getKey().getStat(StatType.DEATHS)));
+            message = message.replace("%kills%", String.valueOf((int) recordEntry.getKey().getStat(StatTypes.KILLS)));
+            message = message.replace("%deaths%", String.valueOf((int) recordEntry.getKey().getStat(StatTypes.DEATHS)));
             message = message.replace("%player_name%", recordEntry.getKey().getName());
             message = message.replace("%tracker%", interfaceName);
             sender.sendMessage(MessageController.colorChat(message));
@@ -75,9 +76,9 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
         DecimalFormat format = new DecimalFormat("0.##");
         String message = messageManager.getFormattedMessage(player, "rankingText");
-        message = message.replace("%kd_ratio%", format.format(record.getStat(StatType.KD_RATIO)));
+        message = message.replace("%kd_ratio%", format.format(record.getStat(StatTypes.KD_RATIO)));
 
-        for (StatType type : StatType.values()) {
+        for (StatType type : StatTypes.values()) {
             message = message.replace("%" + type.getInternalName() + "%", format.format(record.getStat(type)));
         }
 
@@ -175,8 +176,8 @@ public class TrackerExecutor extends CustomCommandExecutor {
         }
 
         String versusCompare = MessageController.colorChat(messageManager.getMessage("versusCompare"));
-        int kills = tally.getStats().get(StatType.KILLS.getInternalName()).intValue();
-        int deaths = tally.getStats().get(StatType.DEATHS.getInternalName()).intValue();
+        int kills = tally.getStats().get(StatTypes.KILLS.getInternalName()).intValue();
+        int deaths = tally.getStats().get(StatTypes.DEATHS.getInternalName()).intValue();
 
         // Since versus tallies are only stored one way, we need to flip the value
         // in the scenario that the "1st" player instead the 2nd player

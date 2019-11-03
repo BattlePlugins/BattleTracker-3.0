@@ -1,12 +1,15 @@
 package org.battleplugins.tracker.tracking;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.mc.MCOfflinePlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.tracking.message.DeathMessageManager;
 import org.battleplugins.tracker.tracking.recap.RecapManager;
-import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.StatTypes;
 import org.battleplugins.tracker.tracking.stat.calculator.RatingCalculator;
 import org.battleplugins.tracker.tracking.stat.record.PlayerRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
@@ -25,17 +28,19 @@ import java.util.UUID;
  *
  * @author Redned
  */
+@Getter
 public class Tracker implements TrackerInterface {
 
     protected String name;
 
-    protected DeathMessageManager messageManager;
+    protected DeathMessageManager deathMessageManager;
     protected RecapManager recapManager;
-    protected RatingCalculator calculator;
+    protected RatingCalculator ratingCalculator;
 
     protected Map<UUID, Record> records;
     protected List<VersusTally> versusTallies;
 
+    @Getter(AccessLevel.NONE)
     protected SQLInstance sql;
 
     public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator) {
@@ -45,19 +50,14 @@ public class Tracker implements TrackerInterface {
     public Tracker(BattleTracker plugin, String name, Configuration config, RatingCalculator calculator, SQLInstance sqlInstance) {
         this.name = name;
         this.recapManager = new RecapManager(plugin);
-        this.messageManager = new DeathMessageManager(plugin, this, config);
-        this.calculator = calculator;
+        this.deathMessageManager = new DeathMessageManager(plugin, this, config);
+        this.ratingCalculator = calculator;
         this.records = new HashMap<>();
         this.versusTallies = new ArrayList<>();
         if (sqlInstance == null) {
             sqlInstance = new SQLInstance(this);
         }
         this.sql = sqlInstance;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -73,11 +73,6 @@ public class Tracker implements TrackerInterface {
     @Override
     public Record getRecord(MCOfflinePlayer player) {
         return records.get(player.getUniqueId());
-    }
-
-    @Override
-    public Map<UUID, Record> getRecords() {
-        return records;
     }
 
     @Override
@@ -113,11 +108,6 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public List<VersusTally> getVersusTallies() {
-        return versusTallies;
-    }
-
-    @Override
     public void setValue(String statType, float value, MCOfflinePlayer player) {
         Record record = records.get(player.getUniqueId());
         record.setValue(statType, value);
@@ -127,39 +117,39 @@ public class Tracker implements TrackerInterface {
     public void updateRating(MCOfflinePlayer killer, MCOfflinePlayer killed, boolean tie) {
         Record killerRecord = getRecord(killer);
         Record killedRecord = getRecord(killed);
-        calculator.updateRating(killerRecord, killedRecord, tie);
+        ratingCalculator.updateRating(killerRecord, killedRecord, tie);
 
         float killerRating = killerRecord.getRating();
-        float killerMaxRating = killerRecord.getStat(StatType.MAX_RATING);
+        float killerMaxRating = killerRecord.getStat(StatTypes.MAX_RATING);
 
-        setValue(StatType.RATING, killerRecord.getRating(), killer);
-        setValue(StatType.RATING, killedRecord.getRating(), killed);
+        setValue(StatTypes.RATING, killerRecord.getRating(), killer);
+        setValue(StatTypes.RATING, killedRecord.getRating(), killed);
 
         if (killerRating > killerMaxRating)
-            setValue(StatType.MAX_RATING, killerRating, killer);
+            setValue(StatTypes.MAX_RATING, killerRating, killer);
 
         if (tie) {
-            incrementValue(StatType.TIES, killer);
-            incrementValue(StatType.TIES, killed);
+            incrementValue(StatTypes.TIES, killer);
+            incrementValue(StatTypes.TIES, killed);
         }
 
-        setValue(StatType.KD_RATIO, killerRecord.getStat(StatType.KILLS) / killerRecord.getStat(StatType.DEATHS), killer);
-        setValue(StatType.KD_RATIO, killedRecord.getStat(StatType.KILLS) / killedRecord.getStat(StatType.DEATHS), killed);
+        setValue(StatTypes.KD_RATIO, killerRecord.getStat(StatTypes.KILLS) / killerRecord.getStat(StatTypes.DEATHS), killer);
+        setValue(StatTypes.KD_RATIO, killedRecord.getStat(StatTypes.KILLS) / killedRecord.getStat(StatTypes.DEATHS), killed);
 
-        float killerKdr = killerRecord.getStat(StatType.KD_RATIO);
-        float killerMaxKdr = killerRecord.getStat(StatType.MAX_KD_RATIO);
+        float killerKdr = killerRecord.getStat(StatTypes.KD_RATIO);
+        float killerMaxKdr = killerRecord.getStat(StatTypes.MAX_KD_RATIO);
 
         if (killerKdr > killerMaxKdr)
-            setValue(StatType.MAX_KD_RATIO, killerKdr, killer);
+            setValue(StatTypes.MAX_KD_RATIO, killerKdr, killer);
 
-        setValue(StatType.STREAK, 0, killed);
-        incrementValue(StatType.STREAK, killer);
+        setValue(StatTypes.STREAK, 0, killed);
+        incrementValue(StatTypes.STREAK, killer);
 
-        float killerStreak = killerRecord.getStat(StatType.STREAK);
-        float killerMaxStreak = killerRecord.getStat(StatType.MAX_STREAK);
+        float killerStreak = killerRecord.getStat(StatTypes.STREAK);
+        float killerMaxStreak = killerRecord.getStat(StatTypes.MAX_STREAK);
 
         if (killerStreak > killerMaxStreak)
-            setValue(StatType.MAX_STREAK, killerStreak, killer);
+            setValue(StatTypes.MAX_STREAK, killerStreak, killer);
     }
 
     @Override
@@ -170,13 +160,12 @@ public class Tracker implements TrackerInterface {
         }
 
         Record record = new PlayerRecord(this, player.getUniqueId().toString(), player.getName(), columns);
-        record.setRating(calculator.getDefaultRating());
         createNewRecord(player, record);
     }
 
     @Override
     public void createNewRecord(MCOfflinePlayer player, Record record) {
-        record.setRating(calculator.getDefaultRating());
+        record.setRating(ratingCalculator.getDefaultRating());
         records.put(player.getUniqueId(), record);
 
         save(player);
@@ -187,21 +176,6 @@ public class Tracker implements TrackerInterface {
         records.remove(player.getUniqueId());
 
         save(player);
-    }
-
-    @Override
-    public DeathMessageManager getDeathMessageManager() {
-        return messageManager;
-    }
-
-    @Override
-    public RecapManager getRecapManager() {
-        return recapManager;
-    }
-
-    @Override
-    public RatingCalculator getRatingCalculator() {
-        return calculator;
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.recap.DamageInfo;
 import org.battleplugins.tracker.tracking.recap.Recap;
 import org.battleplugins.tracker.tracking.recap.RecapManager;
-import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.StatTypes;
 import org.battleplugins.tracker.tracking.stat.record.DummyRecord;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.TrackerUtil;
@@ -81,13 +81,13 @@ public class PvEListener {
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
         Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
         pveTracker.getRatingCalculator().updateRating(fakeRecord, record, false);
 
-        if (pveTracker.getDeathMessageManager().shouldOverrideDefaultMessages())
+        if (pveTracker.getDeathMessageManager().isDefaultMessagesOverriden())
             event.setMessageCancelled(true);
 
         if (type.equals("entityDeaths")) {
@@ -122,7 +122,7 @@ public class PvEListener {
         TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
         Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatType.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer.getType().getName().toLowerCase());
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());

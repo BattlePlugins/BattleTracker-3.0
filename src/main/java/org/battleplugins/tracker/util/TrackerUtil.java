@@ -2,7 +2,7 @@ package org.battleplugins.tracker.util;
 
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
-import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.StatTypes;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 
@@ -146,15 +146,15 @@ public class TrackerUtil {
         Record killedRecord = pvpTracker.getRecord(killed);
 
         if (killerRecord.isTracking())
-            pvpTracker.incrementValue(StatType.KILLS, killer);
+            pvpTracker.incrementValue(StatTypes.KILLS, killer);
 
         if (killedRecord.isTracking())
-            pvpTracker.incrementValue(StatType.DEATHS, killed);
+            pvpTracker.incrementValue(StatTypes.DEATHS, killed);
 
         pvpTracker.updateRating(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()), false);
 
-        if (killerRecord.getStat(StatType.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
-            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatType.STREAK)));
+        if (killerRecord.getStat(StatTypes.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
+            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatTypes.STREAK)));
             MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
         }
 
@@ -171,9 +171,9 @@ public class TrackerUtil {
             addToKills = false;
 
         if (addToKills) {
-            versusTally.getStats().put(StatType.KILLS.getInternalName(), versusTally.getStats().getOrDefault(StatType.KILLS.getInternalName(), 0f) + 1);
+            versusTally.getStats().put(StatTypes.KILLS.getInternalName(), versusTally.getStats().getOrDefault(StatTypes.KILLS.getInternalName(), 0f) + 1);
         } else {
-            versusTally.getStats().put(StatType.DEATHS.getInternalName(), versusTally.getStats().getOrDefault(StatType.DEATHS.getInternalName(), 0f) + 1);
+            versusTally.getStats().put(StatTypes.DEATHS.getInternalName(), versusTally.getStats().getOrDefault(StatTypes.DEATHS.getInternalName(), 0f) + 1);
         }
     }
 }

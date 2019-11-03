@@ -92,7 +92,7 @@ public class PvPListener {
                 tracker.getPlatform().getOfflinePlayer(killer.getUniqueId().toString()));
 
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
-        if (pvpTracker.getDeathMessageManager().shouldOverrideDefaultMessages())
+        if (pvpTracker.getDeathMessageManager().isDefaultMessagesOverriden())
             event.setMessageCancelled(true);
 
         pvpTracker.getDeathMessageManager().sendItemMessage(killer.getName(), killed.getName(), weapon.getType().getName().toLowerCase());

@@ -6,6 +6,9 @@ import mc.alk.mc.inventory.MCInventory;
 import mc.alk.mc.inventory.MCPlayerInventory;
 import org.battleplugins.tracker.BattleTracker;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,15 +20,51 @@ import java.util.List;
  *
  * @author Redned
  */
+@Getter
 public class Recap {
 
+    /**
+     * A list of the last damages dealt
+
+     * @return a list of the last damages dealt
+     */
     private List<DamageInfo> lastDamages;
+
+    /**
+     * The inventory associated with this recap
+     *
+     * @return the inventory associated with this recap
+     */
     private MCInventory inventory;
+
+    /**
+     * The player name associated with this recap
+     *
+     * @return the player name associated with this recap
+     */
     private String playerName;
 
+    /**
+     * The amount of health the player originally started with
+     *
+     * @return the amount of health the player originally started with
+     */
     private double startingHealth;
+
+    /**
+     * The time that the player in this record died
+     *
+     * @return the time that the player in this record died
+     */
     private long deathTime;
 
+    /**
+     * If this recap is visible in the recap command
+     *
+     * @param visible if this recap is visible in the recap command
+     * @return if this recap is visible in the recap command
+     */
+    @Setter
     private boolean visible;
 
     public Recap(MCPlayer player) {
@@ -39,71 +78,6 @@ public class Recap {
         this.visible = false;
 
         this.inventory = constructInventoryView(inventory);
-    }
-
-    /**
-     * Returns the player name associated with this recap
-     *
-     * @return the player name associated with this recap
-     */
-    public String getPlayerName() {
-        return playerName;
-    }
-
-
-    /**
-     * Returns the inventory associated with this recap
-     *
-     * @return the inventory associated with this recap
-     */
-    public MCInventory getInventory() {
-        return inventory;
-    }
-
-    /**
-     * Returns a list of the last damages dealt
-
-     * @return a list of the last damages dealt
-     */
-    public List<DamageInfo> getLastDamages() {
-        return lastDamages;
-    }
-
-    /**
-     * Returns the time that the player in this record died
-     *
-     * @return the time that the player in this record died
-     */
-    public long getDeathTime() {
-        return deathTime;
-    }
-
-    /**
-     * Returns the amount of health the player originally started with
-     *
-     * @return the amount of health the player originally started with
-     */
-    public double getStartingHealth() {
-        return startingHealth;
-    }
-
-    /**
-     * Returns if this recap is visible in the recap command
-     *
-     * @return if this recap is visible in the recap command
-     */
-    public boolean isVisible() {
-        return visible;
-    }
-
-    /**
-     * Sets if this recap is visible in the recap command
-     *
-     * @param visible if this recap is visible in the recap command
-     */
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-        this.deathTime = System.currentTimeMillis();
     }
 
     private MCInventory constructInventoryView(MCPlayerInventory playerInventory) {

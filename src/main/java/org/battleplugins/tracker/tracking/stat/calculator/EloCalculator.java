@@ -1,5 +1,8 @@
 package org.battleplugins.tracker.tracking.stat.calculator;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.battleplugins.tracker.tracking.stat.record.Record;
 
 /**
@@ -7,29 +10,28 @@ import org.battleplugins.tracker.tracking.stat.record.Record;
  *
  * @author alkarin_v, Redned
  */
+@Getter
+@Setter
 public class EloCalculator implements RatingCalculator {
 
-    private float defaultElo;
+    private float defaultRating;
+
+    /**
+     * The spread of the rating
+     *
+     * @param spread the spread
+     * @return the spread
+     */
     private float spread;
 
     public EloCalculator(float defaultElo, float spread) {
-        this.defaultElo = defaultElo;
+        this.defaultRating = defaultElo;
         this.spread = spread;
     }
 
     @Override
     public String getName() {
         return "elo";
-    }
-
-    @Override
-    public float getDefaultRating() {
-        return defaultElo;
-    }
-
-    @Override
-    public void setDefaultRating(float defaultRating) {
-        this.defaultElo = defaultRating;
     }
 
     @Override
@@ -84,23 +86,5 @@ public class EloCalculator implements RatingCalculator {
             return 10;
         }
         return 6;
-    }
-
-    /**
-     * Returns the spread
-     *
-     * @return the spread
-     */
-    public float getSpread() {
-        return spread;
-    }
-
-    /**
-     * Sets the spread
-     *
-     * @param spread the spread
-     */
-    public void setSpread(float spread) {
-        this.spread = spread;
     }
 }

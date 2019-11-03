@@ -1,5 +1,8 @@
 package org.battleplugins.tracker.sign;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.configuration.ConfigurationSection;
 import mc.alk.battlecore.controllers.MessageController;
@@ -23,18 +26,55 @@ import java.util.Map;
  *
  * @author Redned
  */
+@Getter
 public class SignManager {
 
+    @Getter(AccessLevel.NONE)
     private BattleTracker tracker;
 
+    /**
+     * If signs below should be updated
+     *
+     * @return if signs below should be updated
+     */
     private boolean updateSignsBelow;
+
+    /**
+     * If personal signs are enabled
+     *
+     * @return if personal signs are enabled
+     */
     private boolean personalSignsEnabled;
 
+    /**
+     * The listing format for leaderboard signs
+     *
+     * @return the listing format for leaderboard signs
+     */
     private String listingFormat;
 
+    /**
+     * The sign format for leaderboard signs
+     *
+     * @return the sign format for leaderboard signs
+     */
     private String[] leaderboardFormat;
+
+    /**
+     * The sign format for personal signs
+     *
+     * @return the sign format for personal signs
+     */
     private String[] personalFormat;
 
+    /**
+     * A map of all the signs
+     *
+     * Key: the location of the sign
+     * Value: the tracker sign
+     *
+     * @return a map of all the signs
+     */
     private Map<MCLocation, LeaderboardSign> signs;
 
     public SignManager(BattleTracker tracker) {
@@ -65,7 +105,7 @@ public class SignManager {
 
         int normalSignLines = 0;
         int extraLines = 0;
-        String[] lines = tracker.getSignManager().getLeaderboardFormat();
+        String[] lines = leaderboardFormat;
         for (int i = 0; i < lines.length; i++) {
             lines[i] = TrackerUtil.replacePlaceholders(lines[i], replacements);
             sign.setLine(i, lines[i]);
@@ -124,51 +164,12 @@ public class SignManager {
     }
 
     /**
-     * Returns the sign format for leaderboard signs
-     *
-     * @return the sign format for leaderboard signs
-     */
-    public String[] getLeaderboardFormat() {
-        return leaderboardFormat;
-    }
-
-    /**
-     * Returns the sign format for personal signs
-     *
-     * @return the sign format for personal signs
-     */
-    public String[] getPersonalFormat() {
-        return personalFormat;
-    }
-
-    /**
-     * Returns the listing format for leaderboard signs
-     *
-     * @return the listing format for leaderboard signs
-     */
-    public String getListingFormat() {
-        return listingFormat;
-    }
-
-    /**
      * Adds a sign to the leaderboard signs
      *
      * @param sign the leaderboard sign to add
      */
     public void addSign(LeaderboardSign sign) {
         signs.put(sign.getLocation(), sign);
-    }
-
-    /**
-     * Returns a map of all the signs
-     *
-     * Key: the location of the sign
-     * Value: the tracker sign
-     *
-     * @return a map of all the signs
-     */
-    public Map<MCLocation, LeaderboardSign> getSigns() {
-        return signs;
     }
 
     /**

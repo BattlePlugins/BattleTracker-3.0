@@ -1,7 +1,15 @@
 package org.battleplugins.tracker.tracking.stat.record;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.StatType;
+import org.battleplugins.tracker.tracking.stat.StatTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,30 +20,64 @@ import java.util.Map;
  *
  * @author Redned
  */
+@Getter
+@Setter
+@RequiredArgsConstructor
 public abstract class Record {
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @NonNull
     protected TrackerInterface tracker;
 
+    /**
+     * The ID of the record
+     *
+     * @param id the ID of the record
+     * @return the ID of the record
+     */
+    @NonNull
     protected String id;
+
+    /**
+     * The name of the record
+     *
+     * @param name the name of the record
+     * @return the name of the record
+     */
+    @NonNull
     protected String name;
 
+    /**
+     * A map of all the stats
+     *
+     * Key: the stat type
+     * Value: the stat value
+     *
+     * @return a map of all the stats
+     */
+    @Setter(AccessLevel.NONE)
+    @NonNull
     protected Map<String, Float> stats;
 
-    protected boolean tracking;
-    protected boolean sendMessages;
+    /**
+     * Returns if this record should be tracked
+     *
+     * @param tracking if this record should be tracked
+     * @return if this record should be tracked
+     */
+    private boolean tracking = true;
+
+    /**
+     * Returns if tracker messages should be sent for this record
+     *
+     * @param sendingMessages if tracker messages should be sent for this record
+     * @return if tracker messages should be sent for this record
+     */
+    private boolean sendingMessages = true;
 
     public Record(TrackerInterface tracker, String id, String name) {
         this(tracker, id, name, new HashMap<>());
-    }
-
-    public Record(TrackerInterface tracker, String id, String name, Map<String, Float> stats) {
-        this.tracker = tracker;
-
-        this.id = id;
-        this.name = name;
-        this.stats = stats;
-        this.tracking = true;
-        this.sendMessages = true;
     }
 
     /**
@@ -82,60 +124,12 @@ public abstract class Record {
     }
 
     /**
-     * Returns a map of all the stats
-     *
-     * Key: the stat type
-     * Value: the stat value
-     *
-     * @return a map of all the stats
-     */
-    public Map<String, Float> getStats() {
-        return stats;
-    }
-
-    /**
-     * Returns the ID of the record
-     *
-     * @return the ID of the record
-     */
-    public String getID() {
-        return id;
-    }
-
-    /**
-     * Sets the ID of the record
-     *
-     * @param id the ID of the record
-     */
-    public void setID(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Returns the name of the record
-     *
-     * @return the name of the record
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of the record
-     *
-     * @param name the name of the record
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Returns the rating of the record
      *
      * @return the rating of the record
      */
     public float getRating() {
-        return stats.get(StatType.RATING.getInternalName());
+        return stats.get(StatTypes.RATING.getInternalName());
     }
 
     /**
@@ -144,42 +138,6 @@ public abstract class Record {
      * @param rating the rating of the record
      */
     public void setRating(float rating) {
-        stats.put(StatType.RATING.getInternalName(), rating);
-    }
-
-    /**
-     * Returns if this record should be tracked
-     *
-     * @return if this record should be tracked
-     */
-    public boolean isTracking() {
-        return tracking;
-    }
-
-    /**
-     * Sets if this record should be tracked
-     *
-     * @param tracking if this record should be tracked
-     */
-    public void setTracking(boolean tracking) {
-        this.tracking = tracking;
-    }
-
-    /**
-     * Returns if tracker messages should be sent for this record
-     *
-     * @return if tracker messages should be sent for this record
-     */
-    public boolean isSendingMessages() {
-        return sendMessages;
-    }
-
-    /**
-     * Sets if tracker messages should be sent for this record
-     *
-     * @param sendMessages if tracker messages should be sent for this record
-     */
-    public void setSendMessages(boolean sendMessages) {
-        this.sendMessages = sendMessages;
+        stats.put(StatTypes.RATING.getInternalName(), rating);
     }
 }

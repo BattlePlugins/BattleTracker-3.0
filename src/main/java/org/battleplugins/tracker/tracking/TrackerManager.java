@@ -1,5 +1,9 @@
 package org.battleplugins.tracker.tracking;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.battleplugins.tracker.BattleTracker;
 
 import java.util.Collections;
@@ -14,17 +18,33 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Redned
  */
+@Getter
+@Setter
 public class TrackerManager {
 
-    private boolean trackPvP;
-    private boolean trackPvE;
+    /**
+     * If PvP is tracked
+     *
+     * @param trackingPvP if PvP should be tracked
+     * @return if PvP is tracked
+     */
+    private boolean trackingPvP;
 
+    /**
+     * If PvE is tracked
+     *
+     * @param trackingPvE if PvE should be tracked
+     * @return if PvE is tracked
+     */
+    private boolean trackingPvE;
+
+    @Setter(AccessLevel.NONE)
     private Map<String, TrackerInterface> interfaces;
 
     public TrackerManager() {
         interfaces = Collections.synchronizedMap(new ConcurrentHashMap<>());
-        trackPvP = true;
-        trackPvE = true;
+        trackingPvP = true;
+        trackingPvE = true;
     }
 
     /**
@@ -86,42 +106,6 @@ public class TrackerManager {
     }
 
     /**
-     * Returns if PvP is tracked
-     *
-     * @return if PvP is tracked
-     */
-    public boolean isTrackingPvP() {
-        return trackPvP;
-    }
-
-    /**
-     * Sets if PvP should be tracked
-     *
-     * @param trackPvP if PvP should be tracked
-     */
-    public void setTrackPvP(boolean trackPvP) {
-        this.trackPvP = trackPvP;
-    }
-
-    /**
-     * Returns if PvE is tracked
-     *
-     * @return if PvE is tracked
-     */
-    public boolean isTrackingPvE() {
-        return trackPvE;
-    }
-
-    /**
-     * Sets if PvE should be tracked
-     *
-     * @param trackPvE if PvE should be tracked
-     */
-    public void setTrackPvE(boolean trackPvE) {
-        this.trackPvE = trackPvE;
-    }
-
-    /**
      * Returns a map of the tracker interfaces.
      *
      * Key: the name of the interface
@@ -130,6 +114,6 @@ public class TrackerManager {
      * @return a map of the tracker interfaces.
      */
     public Map<String, TrackerInterface> getInterfaces() {
-        return interfaces;
+        return Collections.unmodifiableMap(interfaces);
     }
 }

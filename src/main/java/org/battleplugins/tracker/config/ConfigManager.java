@@ -1,5 +1,8 @@
 package org.battleplugins.tracker.config;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.util.FileUtil;
 import mc.alk.battlecore.util.Log;
@@ -14,17 +17,52 @@ import java.io.InputStream;
  *
  * @author Redned
  */
+@Getter
 public class ConfigManager {
 
+    @Getter(AccessLevel.NONE)
     private BattleTracker tracker;
 
+    /**
+     * The main config.yml for BattleTracker
+     *
+     * @return the main config.yml
+     */
     private Configuration config;
+
+    /**
+     * The messages.yml config file for BattleTracker
+     *
+     * @return the messages.yml config file
+     */
     private Configuration messagesConfig;
+
+    /**
+     * The signs.yml config file for BattleTracker
+     *
+     * @return the signs.yml config file
+     */
     private Configuration signsConfig;
 
-    private Configuration pvpConfig;
-    private Configuration pveConfig;
+    /**
+     * The pvp.yml config file for BattleTracker
+     *
+     * @return the pvp.yml config file
+     */
+    private Configuration pvPConfig;
 
+    /**
+     * The pve.yml config file for BattleTracker
+     *
+     * @return the pve.yml config file
+     */
+    private Configuration pvEConfig;
+
+    /**
+     * The signs.yml save file for BattleTracker
+     *
+     * @return the signs.yml save file
+     */
     private Configuration signSaves;
 
     public ConfigManager(BattleTracker tracker) {
@@ -55,8 +93,8 @@ public class ConfigManager {
         messagesConfig = loadConfig(tracker.getDataFolder(), "", "messages.yml");
         signsConfig = loadConfig(tracker.getDataFolder(), "", "signs.yml");
 
-        pvpConfig = loadConfig(trackerFolder, "tracking/", "pvp.yml");
-        pveConfig = loadConfig(trackerFolder, "tracking/", "pve.yml");
+        pvPConfig = loadConfig(trackerFolder, "tracking/", "pvp.yml");
+        pvEConfig = loadConfig(trackerFolder, "tracking/", "pve.yml");
 
         signSaves = loadConfig(savesFolder, "saves/", "signs.yml");
     }
@@ -97,8 +135,8 @@ public class ConfigManager {
         reloadConfig(config);
         reloadConfig(messagesConfig);
         reloadConfig(signsConfig);
-        reloadConfig(pvpConfig);
-        reloadConfig(pveConfig);
+        reloadConfig(pvPConfig);
+        reloadConfig(pvEConfig);
         reloadConfig(signSaves);
     }
 
@@ -109,8 +147,8 @@ public class ConfigManager {
         config.save();
         messagesConfig.save();
         signsConfig.save();
-        pvpConfig.save();
-        pveConfig.save();
+        pvPConfig.save();
+        pvEConfig.save();
         signSaves.save();
     }
 
@@ -122,59 +160,5 @@ public class ConfigManager {
     public void reloadConfig(Configuration config) {
         config.save();
         config.reload();
-    }
-
-    /**
-     * Returns the main config.yml for BattleTracker
-     *
-     * @return the main config.yml
-     */
-    public Configuration getConfig() {
-        return config;
-    }
-
-    /**
-     * Returns the messages.yml config file for BattleTracker
-     *
-     * @return the messages.yml config file
-     */
-    public Configuration getMessagesConfig() {
-        return messagesConfig;
-    }
-
-    /**
-     * Returns the signs.yml config file for BattleTracker
-     *
-     * @return the signs.yml config file
-     */
-    public Configuration getSignsConfig() {
-        return signsConfig;
-    }
-
-    /**
-     * Returns the pvp.yml config file for BattleTracker
-     *
-     * @return the pvp.yml config file
-     */
-    public Configuration getPvPConfig() {
-        return pvpConfig;
-    }
-
-    /**
-     * Returns the pve.yml config file for BattleTracker
-     *
-     * @return the pve.yml config file
-     */
-    public Configuration getPvEConfig() {
-        return pveConfig;
-    }
-
-    /**
-     * Returns the signs.yml save file for BattleTracker
-     *
-     * @return the signs.yml save file
-     */
-    public Configuration getSignSaves() {
-        return signSaves;
     }
 }

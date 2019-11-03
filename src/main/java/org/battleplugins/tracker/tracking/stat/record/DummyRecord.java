@@ -2,7 +2,6 @@ package org.battleplugins.tracker.tracking.stat.record;
 
 import org.battleplugins.tracker.tracking.TrackerInterface;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -14,7 +13,7 @@ import java.util.Map;
 public class DummyRecord extends Record {
 
     public DummyRecord(TrackerInterface tracker, String id, String name) {
-        this(tracker, id, name, new HashMap<>());
+        super(tracker, id, name);
     }
 
     public DummyRecord(TrackerInterface tracker, String id, String name, Map<String, Float> stats) {

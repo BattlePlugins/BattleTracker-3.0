@@ -8,26 +8,21 @@ import mc.alk.mc.MCPlayer;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Getter;
+
 /**
  * Main message manager for BattleTracker.
  *
  * @author Redned
  */
+@Getter
 public class MessageManager {
 
-    private Map<String, String> messages;
-    private Map<String, String> rampageMessages;
-    private Map<String, String> streakMessages;
-
-    public MessageManager() {
-        this.messages = new HashMap<>();
-        this.rampageMessages = new HashMap<>();
-        this.streakMessages = new HashMap<>();
-    }
+    private Map<String, String> messages = new HashMap<>();
+    private Map<String, String> rampageMessages = new HashMap<>();
+    private Map<String, String> streakMessages = new HashMap<>();
 
     public MessageManager(String path, String specialPath, Configuration config) {
-        this();
-
         for (String str : config.getSection(path).getKeys(false)) {
             messages.put(str, config.getString(path + "." + str));
         }

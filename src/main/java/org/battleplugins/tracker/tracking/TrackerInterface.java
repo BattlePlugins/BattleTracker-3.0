@@ -176,7 +176,7 @@ public interface TrackerInterface {
      * @param player the player to enable messages for
      */
     default void enableMessages(MCOfflinePlayer player) {
-        getRecord(player).setSendMessages(true);
+        getRecord(player).setSendingMessages(true);
     }
 
     /**
@@ -185,7 +185,7 @@ public interface TrackerInterface {
      * @param player the player to disable messages for
      */
     default void disableMessages(MCOfflinePlayer player) {
-        getRecord(player).setSendMessages(false);
+        getRecord(player).setSendingMessages(false);
     }
 
     /**
