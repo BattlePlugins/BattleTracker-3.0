@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.bukkit;
 
+import lombok.AllArgsConstructor;
+
 import mc.alk.mc.plugin.platform.PlatformCodeHandler;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.bukkit.listener.PvEListener;
@@ -14,29 +16,26 @@ import org.bukkit.plugin.Plugin;
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class BukkitCodeHandler extends PlatformCodeHandler {
 
-    private BattleTracker tracker;
-
-    public BukkitCodeHandler(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     @Override
     public void onEnable() {
-        Plugin plugin = (Plugin) tracker.getPlatformPlugin();
-        if (tracker.getTrackerManager().isTrackingPvE()) {
-            Bukkit.getServer().getPluginManager().registerEvents(new PvEListener(tracker), plugin);
+        Plugin plugin = (Plugin) this.plugin.getPlatformPlugin();
+        if (this.plugin.getTrackerManager().isTrackingPvE()) {
+            Bukkit.getServer().getPluginManager().registerEvents(new PvEListener(this.plugin), plugin);
         }
 
-        if (tracker.getTrackerManager().isTrackingPvP()) {
-            Bukkit.getServer().getPluginManager().registerEvents(new PvPListener(tracker), plugin);
+        if (this.plugin.getTrackerManager().isTrackingPvP()) {
+            Bukkit.getServer().getPluginManager().registerEvents(new PvPListener(this.plugin), plugin);
         }
 
-        Bukkit.getServer().getPluginManager().registerEvents(new TrackerListener(tracker), plugin);
+        Bukkit.getServer().getPluginManager().registerEvents(new TrackerListener(this.plugin), plugin);
 
         if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new BTPlaceholderExtension(tracker).register();
+            new BTPlaceholderExtension(this.plugin).register();
         }
     }
 }

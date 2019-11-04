@@ -27,6 +27,7 @@ public class StatType {
      *
      * @return if the stat type should be tracked
      */
+    @Builder.Default
     private boolean tracked = true;
 
     public StatType(String internalName, String name, boolean tracked) {

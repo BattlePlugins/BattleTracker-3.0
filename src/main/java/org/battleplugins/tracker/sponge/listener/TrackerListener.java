@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.sponge.listener;
 
+import lombok.AllArgsConstructor;
+
 import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.MCPlayer;
 import mc.alk.mc.block.MCSign;
@@ -29,13 +31,10 @@ import java.util.Optional;
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class TrackerListener {
 
-    private BattleTracker tracker;
-
-    public TrackerListener(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     /**
      * Event called when player joins
@@ -44,15 +43,15 @@ public class TrackerListener {
      */
     @Listener
     public void onJoin(ClientConnectionEvent.Join event) {
-        TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
-        TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
+        TrackerInterface pvpInterface = plugin.getTrackerManager().getPvPInterface();
+        TrackerInterface pveInterface = plugin.getTrackerManager().getPvEInterface();
 
-        MCOfflinePlayer offlinePlayer = tracker.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId());
-        if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
+        MCOfflinePlayer offlinePlayer = plugin.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId());
+        if (!pvpInterface.hasRecord(offlinePlayer) && plugin.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(offlinePlayer);
         }
 
-        if (!pveInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvE()) {
+        if (!pveInterface.hasRecord(offlinePlayer) && plugin.getTrackerManager().isTrackingPvE()) {
             pveInterface.createNewRecord(offlinePlayer);
         }
     }
@@ -64,11 +63,11 @@ public class TrackerListener {
      */
     @Listener
     public void onQuit(ClientConnectionEvent.Disconnect event) {
-        for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
-            interfaces.getValue().save(tracker.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId()));
+        for (Map.Entry<String, TrackerInterface> interfaces : plugin.getTrackerManager().getInterfaces().entrySet()) {
+            interfaces.getValue().save(plugin.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId()));
         }
 
-        for (TrackerInterface trackerInterface : tracker.getTrackerManager().getInterfaces().values()) {
+        for (TrackerInterface trackerInterface : plugin.getTrackerManager().getInterfaces().values()) {
             if (!trackerInterface.getRecapManager().getDeathRecaps().containsKey(event.getTargetEntity().getName()))
                 continue;
 
@@ -96,7 +95,7 @@ public class TrackerListener {
             lines[i] = Text.of(event.getText().get(i)).toPlain();
         }
 
-        MCPlayer player = tracker.getPlatform().getPlayer(source.get().getName());
+        MCPlayer player = plugin.getPlatform().getPlayer(source.get().getName());
         MCSign sign = new SpongeSign(event.getTargetTile());
         if (!SignUtil.isLeaderboardSign(lines))
             return;
@@ -112,7 +111,7 @@ public class TrackerListener {
 
             spongePlayer.getLocation().getExtent().setBlockType(event.getTargetTile().getLocation().getPosition().toInt(), BlockTypes.AIR);
             spongePlayer.getLocation().getExtent().spawnEntity(item);
-            player.sendMessage(tracker.getMessageManager().getFormattedMessage("cantCreateSign"));
+            player.sendMessage(plugin.getMessageManager().getFormattedMessage("cantCreateSign"));
             return;
         }
 
@@ -120,13 +119,13 @@ public class TrackerListener {
         String trackerName = SignUtil.getTrackerName(lines);
 
         LeaderboardSign leaderboardSign = new LeaderboardSign(sign.getLocation(), statType, trackerName);
-        tracker.getSignManager().addSign(leaderboardSign);
+        plugin.getSignManager().addSign(leaderboardSign);
 
-        tracker.getPlatform().scheduleSyncTask(tracker, () -> {
+        plugin.getPlatform().scheduleSyncTask(plugin, () -> {
             MCSign reobtainedSign = sign.getWorld().toType(sign.getWorld().getBlockAt(sign.getLocation()), MCSign.class);
-            tracker.getSignManager().refreshSignContent(reobtainedSign);
+            plugin.getSignManager().refreshSignContent(reobtainedSign);
         }, 2000);
-        player.sendMessage(tracker.getMessageManager().getFormattedMessage("createdNewSign"));
+        player.sendMessage(plugin.getMessageManager().getFormattedMessage("createdNewSign"));
     }
 
     /**

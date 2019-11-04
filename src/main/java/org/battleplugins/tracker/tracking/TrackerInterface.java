@@ -10,6 +10,7 @@ import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -47,7 +48,7 @@ public interface TrackerInterface {
      * @param player the OfflinePlayer to get the record from
      * @return the record for the given OfflinePlayer
      */
-    Record getRecord(MCOfflinePlayer player);
+    Optional<Record> getRecord(MCOfflinePlayer player);
 
     /**
      * Returns a map of all the records
@@ -74,8 +75,27 @@ public interface TrackerInterface {
      * @param player2 the second OfflinePlayer to get the versus tally from
      * @return the versus tally for the given OfflinePlayers
      */
-    VersusTally getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2);
+    Optional<VersusTally> getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2);
 
+    /**
+     * Creates a new versus tally for the given OfflinePlayers
+     *
+     * @param player1 the first OfflinePlayer in the versus tally
+     * @param player2 the second OfflinePlayer in the versus tally
+     * @return the new versus tally for the given OfflinePlayers
+     */
+    VersusTally createNewVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2);
+
+    /**
+     * Returns or creates a versus tally for the given OfflinePlayers
+     *
+     * @param player1 the first OfflinePlayer to get the versus tally from
+     * @param player2 the second OfflinePlayer to get the versus tally from
+     * @return the versus tally for the given OfflinePlayers or create a new one
+     */
+    default VersusTally getOrCreateVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
+        return getVersusTally(player1, player2).orElse(createNewVersusTally(player1, player2));
+    }
     /**
      * Returns a list of all the versus tallies
      *
@@ -100,7 +120,11 @@ public interface TrackerInterface {
      * @param player the player to increment the value for
      */
     default void incrementValue(String statType, MCOfflinePlayer player) {
-        getRecord(player).setValue(statType, getRecord(player).getStat(statType) + 1);
+        Optional<Record> opRecord = getRecord(player);
+        if (!opRecord.isPresent())
+            return;
+
+        opRecord.get().setValue(statType, opRecord.get().getStat(statType) + 1);
     }
 
     /**
@@ -120,7 +144,11 @@ public interface TrackerInterface {
      * @param player the player to decrement the value for
      */
     default void decrementValue(String statType, MCOfflinePlayer player) {
-        getRecord(player).setValue(statType, getRecord(player).getStat(statType) - 1);
+        Optional<Record> opRecord = getRecord(player);
+        if (!opRecord.isPresent())
+            return;
+
+        opRecord.get().setValue(statType, opRecord.get().getStat(statType) - 1);
     }
 
     /**
@@ -158,7 +186,11 @@ public interface TrackerInterface {
      * @param player the player to enable tracking for
      */
     default void enableTracking(MCOfflinePlayer player) {
-        getRecord(player).setTracking(true);
+        Optional<Record> opRecord = getRecord(player);
+        if (!opRecord.isPresent())
+            return;
+
+        opRecord.get().setTracking(true);
     }
 
     /**
@@ -167,7 +199,11 @@ public interface TrackerInterface {
      * @param player the player to disable tracking for
      */
     default void disableTracking(MCOfflinePlayer player) {
-        getRecord(player).setTracking(false);
+        Optional<Record> opRecord = getRecord(player);
+        if (!opRecord.isPresent())
+            return;
+
+        opRecord.get().setTracking(false);
     }
 
     /**
@@ -176,7 +212,11 @@ public interface TrackerInterface {
      * @param player the player to enable messages for
      */
     default void enableMessages(MCOfflinePlayer player) {
-        getRecord(player).setSendingMessages(true);
+        Optional<Record> opRecord = getRecord(player);
+        if (!opRecord.isPresent())
+            return;
+
+        opRecord.get().setSendingMessages(true);
     }
 
     /**
@@ -185,7 +225,11 @@ public interface TrackerInterface {
      * @param player the player to disable messages for
      */
     default void disableMessages(MCOfflinePlayer player) {
-        getRecord(player).setSendingMessages(false);
+        Optional<Record> opRecord = getRecord(player);
+        if (!opRecord.isPresent())
+            return;
+
+        opRecord.get().setSendingMessages(false);
     }
 
     /**
@@ -193,16 +237,29 @@ public interface TrackerInterface {
      * default SQL columns.
      *
      * @param player the player to create the record for
+     * @return the new record created
      */
-    void createNewRecord(MCOfflinePlayer player);
+    Record createNewRecord(MCOfflinePlayer player);
 
     /**
      * Adds a record for the specified player to the tracker
      *
      * @param player the player to create the record for
      * @param record the record to add
+     * @return the new record created
      */
-    void createNewRecord(MCOfflinePlayer player, Record record);
+    Record createNewRecord(MCOfflinePlayer player, Record record);
+
+    /**
+     * Returns the record for the given player or creates
+     * a new one of one was unable to be found
+     *
+     * @param player the player to get/create the record for
+     * @return the record for the given player or create a new one
+     */
+    default Record getOrCreateRecord(MCOfflinePlayer player) {
+        return getRecord(player).orElse(createNewRecord(player));
+    }
 
     /**
      * Removes the record for the specified player

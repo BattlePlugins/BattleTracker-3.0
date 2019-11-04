@@ -1,5 +1,6 @@
 package org.battleplugins.tracker.tracking.stat.calculator;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import org.battleplugins.tracker.tracking.stat.record.Record;
  */
 @Getter
 @Setter
+@AllArgsConstructor
 public class EloCalculator implements RatingCalculator {
 
     private float defaultRating;
@@ -23,11 +25,6 @@ public class EloCalculator implements RatingCalculator {
      * @return the spread
      */
     private float spread;
-
-    public EloCalculator(float defaultElo, float spread) {
-        this.defaultRating = defaultElo;
-        this.spread = spread;
-    }
 
     @Override
     public String getName() {

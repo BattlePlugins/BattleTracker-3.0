@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.sponge;
 
+import lombok.AllArgsConstructor;
+
 import mc.alk.mc.plugin.platform.PlatformCodeHandler;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.sponge.listener.PvEListener;
@@ -12,24 +14,21 @@ import org.spongepowered.api.Sponge;
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class SpongeCodeHandler extends PlatformCodeHandler {
 
-    private BattleTracker tracker;
-
-    public SpongeCodeHandler(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     @Override
     public void onEnable() {
-        if (tracker.getTrackerManager().isTrackingPvE()) {
-            Sponge.getEventManager().registerListeners(tracker.getPlatformPlugin(), new PvEListener(tracker));
+        if (plugin.getTrackerManager().isTrackingPvE()) {
+            Sponge.getEventManager().registerListeners(plugin.getPlatformPlugin(), new PvEListener(plugin));
         }
 
-        if (tracker.getTrackerManager().isTrackingPvP()) {
-            Sponge.getEventManager().registerListeners(tracker.getPlatformPlugin(), new PvPListener(tracker));
+        if (plugin.getTrackerManager().isTrackingPvP()) {
+            Sponge.getEventManager().registerListeners(plugin.getPlatformPlugin(), new PvPListener(plugin));
         }
 
-        Sponge.getEventManager().registerListeners(tracker.getPlatformPlugin(), new TrackerListener(tracker));
+        Sponge.getEventManager().registerListeners(plugin.getPlatformPlugin(), new TrackerListener(plugin));
     }
 }

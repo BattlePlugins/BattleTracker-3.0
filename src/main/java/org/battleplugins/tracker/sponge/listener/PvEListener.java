@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.sponge.listener;
 
+import lombok.AllArgsConstructor;
+
 import mc.alk.mc.MCPlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
@@ -30,13 +32,10 @@ import java.util.UUID;
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class PvEListener {
 
-    private BattleTracker tracker;
-
-    public PvEListener(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     /**
      * Event called when a player dies
@@ -78,10 +77,10 @@ public class PvEListener {
             }
         }
 
-        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+        TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
+        Record record = pveTracker.getOrCreateRecord(plugin.getPlatform().getOfflinePlayer(killed.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatTypes.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.DEATHS, plugin.getPlatform().getOfflinePlayer(killed.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -119,10 +118,10 @@ public class PvEListener {
             return;
 
         Player killer = (Player) source.getSource();
-        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+        TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
+        Record record = pveTracker.getOrCreateRecord(plugin.getPlatform().getOfflinePlayer(killer.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatTypes.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.KILLS, plugin.getPlatform().getOfflinePlayer(killer.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer.getType().getName().toLowerCase());
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -140,8 +139,8 @@ public class PvEListener {
             return;
 
         Player spongePlayer = (Player) event.getTargetEntity();
-        MCPlayer player = tracker.getPlatform().getPlayer(spongePlayer.getName());
-        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
+        MCPlayer player = plugin.getPlatform().getPlayer(spongePlayer.getName());
+        TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
 
         RecapManager recapManager = pveTracker.getRecapManager();
         Recap recap = recapManager.getDeathRecaps().computeIfAbsent(player.getName(), (value) -> new Recap(player));

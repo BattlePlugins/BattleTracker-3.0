@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.nukkit.listener;
 
+import lombok.AllArgsConstructor;
+
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.passive.EntityTameable;
@@ -25,13 +27,10 @@ import org.battleplugins.tracker.util.TrackerUtil;
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class PvPListener implements Listener {
 
-    private BattleTracker tracker;
-
-    public PvPListener(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     /**
      * Event called when one player is killed by another
@@ -74,13 +73,13 @@ public class PvPListener implements Listener {
 
         // Check the killers world just incase for some reason the
         // killed player was teleported to another world
-        if (tracker.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getLevel().getName()))
+        if (plugin.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getLevel().getName()))
             return;
 
-        TrackerUtil.updatePvPStats(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId().toString()),
-                tracker.getPlatform().getOfflinePlayer(killer.getUniqueId().toString()));
+        TrackerUtil.updatePvPStats(plugin.getPlatform().getOfflinePlayer(killed.getUniqueId().toString()),
+                plugin.getPlatform().getOfflinePlayer(killer.getUniqueId().toString()));
 
-        TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
+        TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
         if (pvpTracker.getDeathMessageManager().isDefaultMessagesOverriden())
             event.setDeathMessage("");
 
@@ -98,8 +97,8 @@ public class PvPListener implements Listener {
         if (!(event.getEntity() instanceof Player) || !(getTrueDamager(event) instanceof Player))
             return;
 
-        MCPlayer player = tracker.getPlatform().getPlayer(event.getEntity().getName());
-        TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
+        MCPlayer player = plugin.getPlatform().getPlayer(event.getEntity().getName());
+        TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
 
         RecapManager recapManager = pvpTracker.getRecapManager();
         Recap recap = recapManager.getDeathRecaps().computeIfAbsent(player.getName(), (value) -> new Recap(player));

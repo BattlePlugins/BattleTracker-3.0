@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Main SQL config instance for Trackers.
+ * Main SQL instance for Trackers.
  *
  * @author alkarinv, Redned
  */

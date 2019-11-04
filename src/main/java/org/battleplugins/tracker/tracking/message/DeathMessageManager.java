@@ -37,10 +37,10 @@ import java.util.stream.Collectors;
 public class DeathMessageManager {
 
     @Getter(AccessLevel.NONE)
-    private BattleTracker tracker;
+    private BattleTracker plugin;
 
     @Getter(AccessLevel.NONE)
-    private TrackerInterface trackerInterface;
+    private TrackerInterface tracker;
 
     /**
      * If the message manager is enabled
@@ -104,9 +104,9 @@ public class DeathMessageManager {
     private Map<String, List<String>> entityMessages;
     private Map<String, List<String>> causeMessages;
 
-    public DeathMessageManager(BattleTracker tracker, TrackerInterface trackerInterface, Configuration config) {
+    public DeathMessageManager(BattleTracker plugin, TrackerInterface tracker, Configuration config) {
+        this.plugin = plugin;
         this.tracker = tracker;
-        this.trackerInterface = trackerInterface;
 
         loadDataFromConfig(config);
     }
@@ -174,7 +174,7 @@ public class DeathMessageManager {
         if (items == null)
             return;
 
-        MCPlayer killed = tracker.getPlatform().getPlayer(killedName);
+        MCPlayer killed = plugin.getPlatform().getPlayer(killedName);
         if (killed == null)
             return;
 
@@ -210,7 +210,7 @@ public class DeathMessageManager {
         if (entities == null)
             return;
 
-        MCPlayer killed = tracker.getPlatform().getPlayer(killedName);
+        MCPlayer killed = plugin.getPlatform().getPlayer(killedName);
         if (killed == null)
             return;
 
@@ -246,7 +246,7 @@ public class DeathMessageManager {
         if (causes == null)
             return;
 
-        MCPlayer killed = tracker.getPlatform().getPlayer(killedName);
+        MCPlayer killed = plugin.getPlatform().getPlayer(killedName);
         if (killed == null)
             return;
 
@@ -290,7 +290,7 @@ public class DeathMessageManager {
         if (!hoverMessagesEnabled)
             return;
 
-        Recap recap = trackerInterface.getRecapManager().getDeathRecaps().get(player.getName());
+        Recap recap = tracker.getRecapManager().getDeathRecaps().get(player.getName());
         String hoverMessage = "";
         switch (hoverContent) {
             case "all":
@@ -319,7 +319,7 @@ public class DeathMessageManager {
             return;
 
         messageBuilder.setClickAction(ClickAction.RUN_COMMAND);
-        messageBuilder.setClickValue("/" + trackerInterface.getName() + " recap " + player.getName());
+        messageBuilder.setClickValue("/" + tracker.getName() + " recap " + player.getName());
     }
 
     private void sendDeathMessage(MCPlayer source, Message message) {

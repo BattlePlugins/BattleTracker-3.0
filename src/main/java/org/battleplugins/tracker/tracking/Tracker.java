@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -71,8 +72,8 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public Record getRecord(MCOfflinePlayer player) {
-        return records.get(player.getUniqueId());
+    public Optional<Record> getRecord(MCOfflinePlayer player) {
+        return Optional.ofNullable(records.get(player.getUniqueId()));
     }
 
     @Override
@@ -89,22 +90,29 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public VersusTally getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
+    public Optional<VersusTally> getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
         for (VersusTally tally : versusTallies) {
             if (tally.getId1().equals(player1.getUniqueId().toString()) &&
                     tally.getId2().equals(player2.getUniqueId().toString())) {
 
-                return tally;
+                return Optional.of(tally);
             }
 
             if (tally.getId2().equals(player1.getUniqueId().toString()) &&
                     tally.getId1().equals(player2.getUniqueId().toString())) {
 
-                return tally;
+                return Optional.of(tally);
             }
         }
 
-        return null;
+        return Optional.empty();
+    }
+
+    @Override
+    public VersusTally createNewVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
+        VersusTally versusTally = new VersusTally(this, player1, player2, new HashMap<>());
+        versusTallies.add(versusTally);
+        return versusTally;
     }
 
     @Override
@@ -115,8 +123,8 @@ public class Tracker implements TrackerInterface {
 
     @Override
     public void updateRating(MCOfflinePlayer killer, MCOfflinePlayer killed, boolean tie) {
-        Record killerRecord = getRecord(killer);
-        Record killedRecord = getRecord(killed);
+        Record killerRecord = getOrCreateRecord(killer);
+        Record killedRecord = getOrCreateRecord(killed);
         ratingCalculator.updateRating(killerRecord, killedRecord, tie);
 
         float killerRating = killerRecord.getRating();
@@ -153,22 +161,21 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public void createNewRecord(MCOfflinePlayer player) {
+    public Record createNewRecord(MCOfflinePlayer player) {
         Map<String, Float> columns = new HashMap<>();
         for (String column : sql.getOverallColumns()) {
             columns.put(column, 0f);
         }
 
         Record record = new PlayerRecord(this, player.getUniqueId().toString(), player.getName(), columns);
-        createNewRecord(player, record);
+        return createNewRecord(player, record);
     }
 
     @Override
-    public void createNewRecord(MCOfflinePlayer player, Record record) {
+    public Record createNewRecord(MCOfflinePlayer player, Record record) {
         record.setRating(ratingCalculator.getDefaultRating());
         records.put(player.getUniqueId(), record);
-
-        save(player);
+        return record;
     }
 
     @Override

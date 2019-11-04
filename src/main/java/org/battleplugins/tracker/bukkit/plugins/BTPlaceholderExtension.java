@@ -1,6 +1,9 @@
 package org.battleplugins.tracker.bukkit.plugins;
 
+import lombok.AllArgsConstructor;
+
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.record.Record;
@@ -11,13 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@AllArgsConstructor
 public class BTPlaceholderExtension extends PlaceholderExpansion {
 
-    private BattleTracker tracker;
-
-    public BTPlaceholderExtension(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     @Override
     public String getIdentifier() {
@@ -31,7 +31,7 @@ public class BTPlaceholderExtension extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return tracker.getDescription().getVersion();
+        return plugin.getDescription().getVersion();
     }
 
     @Override
@@ -43,11 +43,11 @@ public class BTPlaceholderExtension extends PlaceholderExpansion {
         String interfaceName = split[0];
 
         // The interface is not tracked or does not exist
-        if (!tracker.getTrackerManager().hasInterface(interfaceName))
+        if (!plugin.getTrackerManager().hasInterface(interfaceName))
             return "";
 
-        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
-        Record record = trackerInterface.getRecord(tracker.getPlatform().getPlayer(player.getUniqueId()));
+        TrackerInterface trackerInterface = plugin.getTrackerManager().getInterface(interfaceName).get();
+        Record record = trackerInterface.getOrCreateRecord(plugin.getPlatform().getPlayer(player.getUniqueId()));
 
         // Gets leaderboard stats (ex: %bt_pvp_top_kills_1%)
         if (split[1].equalsIgnoreCase("top")) {

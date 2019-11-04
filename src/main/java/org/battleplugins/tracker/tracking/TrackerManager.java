@@ -8,6 +8,7 @@ import org.battleplugins.tracker.BattleTracker;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -54,8 +55,8 @@ public class TrackerManager {
      * @param interfaceName the name of the tracker interface
      * @return the tracker interface with the given name
      */
-    public TrackerInterface getInterface(String interfaceName) {
-        return interfaces.get(interfaceName);
+    public Optional<TrackerInterface> getInterface(String interfaceName) {
+        return Optional.ofNullable(interfaces.get(interfaceName));
     }
 
     /**

@@ -21,7 +21,7 @@ import java.io.InputStream;
 public class ConfigManager {
 
     @Getter(AccessLevel.NONE)
-    private BattleTracker tracker;
+    private BattleTracker plugin;
 
     /**
      * The main config.yml for BattleTracker
@@ -65,8 +65,8 @@ public class ConfigManager {
      */
     private Configuration signSaves;
 
-    public ConfigManager(BattleTracker tracker) {
-        this.tracker = tracker;
+    public ConfigManager(BattleTracker plugin) {
+        this.plugin = plugin;
 
         loadConfigs();
     }
@@ -75,23 +75,23 @@ public class ConfigManager {
      * Loads all the configs necessary for BattleTracker
      */
     public void loadConfigs() {
-        if (!tracker.getDataFolder().exists()) {
-            tracker.getDataFolder().mkdir();
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdir();
         }
 
-        File trackerFolder = new File(tracker.getDataFolder(), "tracking");
+        File trackerFolder = new File(plugin.getDataFolder(), "tracking");
         if (!trackerFolder.exists()) {
             trackerFolder.mkdir();
         }
 
-        File savesFolder = new File(tracker.getDataFolder(), "saves");
+        File savesFolder = new File(plugin.getDataFolder(), "saves");
         if (!savesFolder.exists()) {
             savesFolder.mkdir();
         }
 
-        config = loadConfig(tracker.getDataFolder(), "", "config.yml");
-        messagesConfig = loadConfig(tracker.getDataFolder(), "", "messages.yml");
-        signsConfig = loadConfig(tracker.getDataFolder(), "", "signs.yml");
+        config = loadConfig(plugin.getDataFolder(), "", "config.yml");
+        messagesConfig = loadConfig(plugin.getDataFolder(), "", "messages.yml");
+        signsConfig = loadConfig(plugin.getDataFolder(), "", "signs.yml");
 
         pvPConfig = loadConfig(trackerFolder, "tracking/", "pvp.yml");
         pvEConfig = loadConfig(trackerFolder, "tracking/", "pve.yml");
@@ -112,12 +112,12 @@ public class ConfigManager {
         File configFile = new File(directory, resource);
         if (!configFile.exists()) {
             try {
-                InputStream stream = tracker.getClass().getResourceAsStream("/" + resourceDir + resource);
+                InputStream stream = plugin.getClass().getResourceAsStream("/" + resourceDir + resource);
                 if (stream == null) {
                     configFile.createNewFile();
                     Log.debug("Did not find " + resource + " in the jar, so creating an empty file instead.");
                 } else {
-                    FileUtil.writeFile(configFile, tracker.getClass().getResourceAsStream("/" + resourceDir + resource));
+                    FileUtil.writeFile(configFile, plugin.getClass().getResourceAsStream("/" + resourceDir + resource));
                 }
             } catch (IOException ex) {
                 Log.err("Could not create " + resource + " config file!");

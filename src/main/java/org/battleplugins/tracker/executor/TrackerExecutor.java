@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.executor;
 
+import lombok.AllArgsConstructor;
+
 import mc.alk.battlecore.controllers.MessageController;
 import mc.alk.battlecore.executor.CustomCommandExecutor;
 import mc.alk.mc.MCOfflinePlayer;
@@ -18,21 +20,18 @@ import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.text.DecimalFormat;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Main executor for trackers.
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class TrackerExecutor extends CustomCommandExecutor {
 
-    private BattleTracker tracker;
-    private String interfaceName;
-
-    public TrackerExecutor(BattleTracker tracker, String interfaceName) {
-        this.tracker = tracker;
-        this.interfaceName = interfaceName;
-    }
+    private BattleTracker plugin;
+    private TrackerInterface tracker;
 
     @MCCommand(cmds = "top")
     public void topCommand(MCCommandSender sender) {
@@ -41,9 +40,9 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = "top")
     public void topCommand(MCCommandSender sender, int amount) {
-        MessageManager messageManager = tracker.getMessageManager();
-        sender.sendMessage(MessageController.colorChat(messageManager.getMessage("leaderboardHeader").replace("%tracker%", interfaceName)));
-        Map<Record, Float> sortedRecords = TrackerUtil.getSortedRecords(tracker.getTrackerManager().getInterface(interfaceName), amount);
+        MessageManager messageManager = plugin.getMessageManager();
+        sender.sendMessage(MessageController.colorChat(messageManager.getMessage("leaderboardHeader").replace("%tracker%", tracker.getName())));
+        Map<Record, Float> sortedRecords = TrackerUtil.getSortedRecords(tracker, amount);
 
         int i = 1;
         for (Map.Entry<Record, Float> recordEntry : sortedRecords.entrySet()) {
@@ -53,7 +52,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
             message = message.replace("%kills%", String.valueOf((int) recordEntry.getKey().getStat(StatTypes.KILLS)));
             message = message.replace("%deaths%", String.valueOf((int) recordEntry.getKey().getStat(StatTypes.DEATHS)));
             message = message.replace("%player_name%", recordEntry.getKey().getName());
-            message = message.replace("%tracker%", interfaceName);
+            message = message.replace("%tracker%", tracker.getName());
             sender.sendMessage(MessageController.colorChat(message));
 
             // limit at 100 to prevent lag and spam
@@ -66,14 +65,14 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = "rank")
     public void rankCommand(MCCommandSender sender, MCOfflinePlayer player) {
-        MessageManager messageManager = tracker.getMessageManager();
-        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
-        Record record = trackerInterface.getRecord(player);
-        if (record == null) {
+        MessageManager messageManager = plugin.getMessageManager();
+        Optional<Record> opRecord = tracker.getRecord(player);
+        if (!opRecord.isPresent()) {
             sender.sendMessage(messageManager.getFormattedMessage(player, "recordNotFound"));
             return;
         }
 
+        Record record = opRecord.get();
         DecimalFormat format = new DecimalFormat("0.##");
         String message = messageManager.getFormattedMessage(player, "rankingText");
         message = message.replace("%kd_ratio%", format.format(record.getStat(StatTypes.KD_RATIO)));
@@ -87,41 +86,39 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = "reset", perm = "battletracker.reset")
     public void resetCommand(MCCommandSender sender, MCOfflinePlayer player) {
-        MessageManager messageManager = tracker.getMessageManager();
-        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
-        if (!trackerInterface.hasRecord(player)) {
+        MessageManager messageManager = plugin.getMessageManager();
+        if (!tracker.hasRecord(player)) {
             sender.sendMessage(messageManager.getFormattedMessage(player, "recordNotFound"));
             return;
         }
 
-        trackerInterface.createNewRecord(player);
-        sender.sendMessage(messageManager.getFormattedMessage(player, "recordsReset").replace("%tracker%", trackerInterface.getName()));
+        tracker.createNewRecord(player);
+        sender.sendMessage(messageManager.getFormattedMessage(player, "recordsReset").replace("%tracker%", tracker.getName()));
     }
 
     @MCCommand(cmds = "set", perm = "battletracker.set")
     public void setCommand(MCCommandSender sender, MCOfflinePlayer player, String statType, float value) {
-        MessageManager messageManager = tracker.getMessageManager();
-        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
-        Record record = trackerInterface.getRecord(player);
-        if (record == null) {
+        MessageManager messageManager = plugin.getMessageManager();
+        Optional<Record> opRecord = tracker.getRecord(player);
+        if (!opRecord.isPresent()) {
             sender.sendMessage(messageManager.getFormattedMessage(player, "recordNotFound"));
             return;
         }
 
+        Record record = opRecord.get();
         if (!record.getStats().containsKey(statType.toLowerCase())) {
             sender.sendMessage(messageManager.getFormattedMessage("statNotInTracker"));
             return;
         }
 
-        trackerInterface.setValue(statType, value, player);
+        tracker.setValue(statType, value, player);
         sender.sendMessage(messageManager.getFormattedMessage(player, "setStatValue").replace("%stat%", statType.toLowerCase()).replace("%value%", String.valueOf(value)));
     }
 
     @MCCommand(cmds = "recap", perm = "battletracker.recap")
     public void recapCommand(MCPlayer player, String name) {
-        MessageManager messageManager = tracker.getMessageManager();
-        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
-        RecapManager recapManager = trackerInterface.getRecapManager();
+        MessageManager messageManager = plugin.getMessageManager();
+        RecapManager recapManager = tracker.getRecapManager();
 
         if (!recapManager.getDeathRecaps().containsKey(name)) {
             player.sendMessage(messageManager.getFormattedMessage("noRecapForPlayer"));
@@ -134,12 +131,12 @@ public class TrackerExecutor extends CustomCommandExecutor {
             return;
         }
 
-        switch (trackerInterface.getDeathMessageManager().getClickContent()) {
+        switch (tracker.getDeathMessageManager().getClickContent()) {
             case "armor":
-                trackerInterface.getRecapManager().sendArmorRecap(player, recap);
+                tracker.getRecapManager().sendArmorRecap(player, recap);
                 break;
             case "inventory":
-                trackerInterface.getRecapManager().sendInventoryRecap(player, recap);
+                tracker.getRecapManager().sendInventoryRecap(player, recap);
         }
     }
 
@@ -150,17 +147,16 @@ public class TrackerExecutor extends CustomCommandExecutor {
 
     @MCCommand(cmds = {"vs", "versus"}, perm = "battletracker.versus")
     public void versusCommand(MCCommandSender sender, MCOfflinePlayer player1, MCOfflinePlayer player2) {
-        MessageManager messageManager = tracker.getMessageManager();
-        TrackerInterface trackerInterface = tracker.getTrackerManager().getInterface(interfaceName);
-        VersusTally tally = trackerInterface.getVersusTally(player1, player2);
-        if (tally == null) {
+        MessageManager messageManager = plugin.getMessageManager();
+        Optional<VersusTally> opTally = tracker.getVersusTally(player1, player2);
+        if (!opTally.isPresent()) {
             sender.sendMessage(messageManager.getFormattedMessage("tallyNotFound"));
             return;
         }
 
         DecimalFormat format = new DecimalFormat("0.##");
-        Record record1 = trackerInterface.getRecord(player1);
-        Record record2 = trackerInterface.getRecord(player2);
+        Record record1 = tracker.getOrCreateRecord(player1);
+        Record record2 = tracker.getOrCreateRecord(player2);
 
         sender.sendMessage(MessageController.colorChat(messageManager.getMessage("versusHeader")));
         String versusMessage = MessageController.colorChat(messageManager.getMessage("versusText"));
@@ -175,6 +171,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
             versusMessage = versusMessage.replace("%" + statEntry.getKey() + "_2%", format.format(statEntry.getValue()));
         }
 
+        VersusTally tally = opTally.get();
         String versusCompare = MessageController.colorChat(messageManager.getMessage("versusCompare"));
         int kills = tally.getStats().get(StatTypes.KILLS.getInternalName()).intValue();
         int deaths = tally.getStats().get(StatTypes.DEATHS.getInternalName()).intValue();

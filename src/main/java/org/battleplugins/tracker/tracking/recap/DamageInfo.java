@@ -19,15 +19,14 @@ public class DamageInfo {
      * @return the cause of this damage
      */
     @NonNull
-    private String cause;
+    private final String cause;
 
     /**
      * The amount of damage dealt
      *
      * @return the amount of damage dealt
      */
-    @NonNull
-    private double damage;
+    private final double damage;
 
     /**
      * When this damage info was logged

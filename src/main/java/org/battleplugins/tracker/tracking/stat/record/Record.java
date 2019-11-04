@@ -57,8 +57,7 @@ public abstract class Record {
      * @return a map of all the stats
      */
     @Setter(AccessLevel.NONE)
-    @NonNull
-    protected Map<String, Float> stats;
+    protected final Map<String, Float> stats;
 
     /**
      * Returns if this record should be tracked

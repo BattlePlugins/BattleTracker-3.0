@@ -1,5 +1,6 @@
 package org.battleplugins.tracker.util;
 
+import mc.alk.battlecore.util.Log;
 import mc.alk.mc.ChatColor;
 import mc.alk.mc.MCWorld;
 import mc.alk.mc.block.MCSign;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Sign utility class for BattleTracker.
@@ -108,7 +110,13 @@ public class SignUtil {
         if (trackerName == null || trackerName.isEmpty())
             return "";
 
-        TrackerInterface tracker = BattleTracker.getInstance().getTrackerManager().getInterface(trackerName);
+        Optional<TrackerInterface> opTracker = BattleTracker.getInstance().getTrackerManager().getInterface(trackerName);
+        if (!opTracker.isPresent())  {
+            Log.debug("A tracker could not be found for " + trackerName + "!");
+            return "";
+        }
+
+        TrackerInterface tracker = opTracker.get();
         for (String line : lines) {
             for (String loopedStatType : tracker.getRecords().entrySet()
                     .iterator().next().getValue().getStats().keySet()) {

@@ -1,5 +1,8 @@
 package org.battleplugins.tracker.bukkit.listener;
 
+import lombok.AllArgsConstructor;
+
+import mc.alk.battlecore.util.Log;
 import mc.alk.bukkit.block.BukkitSign;
 import mc.alk.mc.MCLocation;
 import mc.alk.mc.MCOfflinePlayer;
@@ -24,19 +27,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Miscellaneous listener for BattleTracker in Bukkit.
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class TrackerListener implements Listener {
 
-    private BattleTracker tracker;
-
-    public TrackerListener(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     /**
      * Event called when player joins
@@ -45,15 +46,15 @@ public class TrackerListener implements Listener {
      */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        TrackerInterface pvpInterface = tracker.getTrackerManager().getPvPInterface();
-        TrackerInterface pveInterface = tracker.getTrackerManager().getPvEInterface();
+        TrackerInterface pvpInterface = plugin.getTrackerManager().getPvPInterface();
+        TrackerInterface pveInterface = plugin.getTrackerManager().getPvEInterface();
 
-        MCOfflinePlayer offlinePlayer = tracker.getPlatform().getOfflinePlayer(event.getPlayer().getUniqueId());
-        if (!pvpInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvP()) {
+        MCOfflinePlayer offlinePlayer = plugin.getPlatform().getOfflinePlayer(event.getPlayer().getUniqueId());
+        if (!pvpInterface.hasRecord(offlinePlayer) && plugin.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(offlinePlayer);
         }
 
-        if (!pveInterface.hasRecord(offlinePlayer) && tracker.getTrackerManager().isTrackingPvE()) {
+        if (!pveInterface.hasRecord(offlinePlayer) && plugin.getTrackerManager().isTrackingPvE()) {
             pveInterface.createNewRecord(offlinePlayer);
         }
     }
@@ -65,11 +66,11 @@ public class TrackerListener implements Listener {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        for (Map.Entry<String, TrackerInterface> interfaces : tracker.getTrackerManager().getInterfaces().entrySet()) {
-            interfaces.getValue().save(tracker.getPlatform().getOfflinePlayer(event.getPlayer().getUniqueId()));
+        for (Map.Entry<String, TrackerInterface> interfaces : plugin.getTrackerManager().getInterfaces().entrySet()) {
+            interfaces.getValue().save(plugin.getPlatform().getOfflinePlayer(event.getPlayer().getUniqueId()));
         }
 
-        for (TrackerInterface trackerInterface : tracker.getTrackerManager().getInterfaces().values()) {
+        for (TrackerInterface trackerInterface : plugin.getTrackerManager().getInterfaces().values()) {
             if (!trackerInterface.getRecapManager().getDeathRecaps().containsKey(event.getPlayer().getName()))
                 continue;
 
@@ -84,7 +85,7 @@ public class TrackerListener implements Listener {
      */
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        MCPlayer player = tracker.getPlatform().getPlayer(event.getPlayer().getName());
+        MCPlayer player = plugin.getPlatform().getPlayer(event.getPlayer().getName());
         MCSign sign = new BukkitSign((Sign) event.getBlock().getState());
         if (!SignUtil.isLeaderboardSign(event.getLines()))
             return;
@@ -93,7 +94,7 @@ public class TrackerListener implements Listener {
             event.setCancelled(true); // cancel anyway
             event.getBlock().setType(Material.AIR);
             event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getBlock().getType(), 1));
-            player.sendMessage(tracker.getMessageManager().getFormattedMessage("cantCreateSign"));
+            player.sendMessage(plugin.getMessageManager().getFormattedMessage("cantCreateSign"));
             return;
         }
 
@@ -101,13 +102,13 @@ public class TrackerListener implements Listener {
         String trackerName = SignUtil.getTrackerName(event.getLines());
 
         LeaderboardSign leaderboardSign = new LeaderboardSign(sign.getLocation(), statType, trackerName);
-        tracker.getSignManager().addSign(leaderboardSign);
+        plugin.getSignManager().addSign(leaderboardSign);
 
-        tracker.getPlatform().scheduleSyncTask(tracker, () -> {
+        plugin.getPlatform().scheduleSyncTask(plugin, () -> {
             MCSign reobtainedSign = sign.getWorld().toType(sign.getWorld().getBlockAt(sign.getLocation()), MCSign.class);
-            tracker.getSignManager().refreshSignContent(reobtainedSign);
+            plugin.getSignManager().refreshSignContent(reobtainedSign);
         }, 2000);
-        player.sendMessage(tracker.getMessageManager().getFormattedMessage("createdNewSign"));
+        player.sendMessage(plugin.getMessageManager().getFormattedMessage("createdNewSign"));
     }
 
     /**
@@ -117,18 +118,24 @@ public class TrackerListener implements Listener {
      */
     @EventHandler
     public void onSignClick(PlayerInteractEvent event) {
-        MCPlayer player = tracker.getPlatform().getPlayer(event.getPlayer().getName());
+        MCPlayer player = plugin.getPlatform().getPlayer(event.getPlayer().getName());
         if (event.getClickedBlock() == null || event.getClickedBlock().getType() == Material.AIR)
             return;
 
         Location bukkitLocation = event.getClickedBlock().getLocation();
-        MCLocation location = tracker.getPlatform().getLocation(bukkitLocation.getWorld().getName(), bukkitLocation.getX(), bukkitLocation.getY(), bukkitLocation.getZ());
-        LeaderboardSign leaderboardSign = tracker.getSignManager().getSigns().get(location);
+        MCLocation location = plugin.getPlatform().getLocation(bukkitLocation.getWorld().getName(), bukkitLocation.getX(), bukkitLocation.getY(), bukkitLocation.getZ());
+        LeaderboardSign leaderboardSign = plugin.getSignManager().getSigns().get(location);
         if (leaderboardSign == null)
             return; // not a BattleTracker sign
 
-        Record record = tracker.getTrackerManager().getInterface(leaderboardSign.getTrackerName()).getRecord(player);
-        String[] lines = tracker.getSignManager().getPersonalFormat().clone();
+        Optional<TrackerInterface> opTracker = plugin.getTrackerManager().getInterface(leaderboardSign.getTrackerName());
+        if (!opTracker.isPresent())  {
+            Log.debug("A tracker could not be found for " + leaderboardSign.getTrackerName() + "!");
+            return;
+        }
+
+        Record record = opTracker.get().getOrCreateRecord(player);
+        String[] lines = plugin.getSignManager().getPersonalFormat().clone();
         for (String line : lines) {
             TrackerUtil.replaceRecordValues(line, record);
         }

@@ -1,16 +1,15 @@
 package org.battleplugins.tracker.sign;
 
+import lombok.AllArgsConstructor;
+
 import mc.alk.battlecore.util.Log;
 import mc.alk.mc.MCWorld;
 import mc.alk.mc.block.MCSign;
 
+@AllArgsConstructor
 public class SignUpdateTask implements Runnable {
 
     private SignManager signManager;
-
-    public SignUpdateTask(SignManager signManager) {
-        this.signManager = signManager;
-    }
 
     @Override
     public void run() {

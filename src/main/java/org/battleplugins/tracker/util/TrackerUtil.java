@@ -142,8 +142,8 @@ public class TrackerUtil {
         BattleTracker tracker = BattleTracker.getInstance();
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
 
-        Record killerRecord = pvpTracker.getRecord(killer);
-        Record killedRecord = pvpTracker.getRecord(killed);
+        Record killerRecord = pvpTracker.getOrCreateRecord(killer);
+        Record killedRecord = pvpTracker.getOrCreateRecord(killed);
 
         if (killerRecord.isTracking())
             pvpTracker.incrementValue(StatTypes.KILLS, killer);
@@ -158,11 +158,7 @@ public class TrackerUtil {
             MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
         }
 
-        VersusTally versusTally = pvpTracker.getVersusTally(killer, killed);
-        if (versusTally == null) {
-            versusTally = new VersusTally(pvpTracker, killer, killed, new HashMap<>());
-            pvpTracker.getVersusTallies().add(versusTally);
-        }
+        VersusTally versusTally = pvpTracker.getOrCreateVersusTally(killer, killed);
 
         // The format is killer : killed : stat1 : stat2 ....
         // If the killer is in place of the killed, we need to swap the values

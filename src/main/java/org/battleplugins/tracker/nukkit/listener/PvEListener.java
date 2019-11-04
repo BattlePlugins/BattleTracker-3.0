@@ -1,5 +1,7 @@
 package org.battleplugins.tracker.nukkit.listener;
 
+import lombok.AllArgsConstructor;
+
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.passive.EntityTameable;
@@ -11,6 +13,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDeathEvent;
 import cn.nukkit.event.player.PlayerDeathEvent;
+
 import mc.alk.mc.MCPlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
@@ -29,13 +32,10 @@ import java.util.UUID;
  *
  * @author Redned
  */
+@AllArgsConstructor
 public class PvEListener implements Listener {
 
-    private BattleTracker tracker;
-
-    public PvEListener(BattleTracker tracker) {
-        this.tracker = tracker;
-    }
+    private BattleTracker plugin;
 
     /**
      * Event called when a player dies
@@ -73,10 +73,10 @@ public class PvEListener implements Listener {
             killer = lastDamageCause.getCause().name().toLowerCase().replace("_", "");
         }
 
-        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+        TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
+        Record record = pveTracker.getOrCreateRecord(plugin.getPlatform().getOfflinePlayer(killed.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatTypes.DEATHS, tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.DEATHS, plugin.getPlatform().getOfflinePlayer(killed.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -113,10 +113,10 @@ public class PvEListener implements Listener {
             return;
 
         Player killer = (Player) lastDamageCause.getDamager();
-        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getRecord(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+        TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
+        Record record = pveTracker.getOrCreateRecord(plugin.getPlatform().getOfflinePlayer(killer.getUniqueId()));
         if (record.isTracking())
-            pveTracker.incrementValue(StatTypes.KILLS, tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.KILLS, plugin.getPlatform().getOfflinePlayer(killer.getUniqueId()));
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killed.getSaveId().toLowerCase());
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -133,8 +133,8 @@ public class PvEListener implements Listener {
         if (!(event.getEntity() instanceof Player))
             return;
 
-        MCPlayer player = tracker.getPlatform().getPlayer(event.getEntity().getName());
-        TrackerInterface pveTracker = tracker.getTrackerManager().getPvEInterface();
+        MCPlayer player = plugin.getPlatform().getPlayer(event.getEntity().getName());
+        TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
 
         RecapManager recapManager = pveTracker.getRecapManager();
         Recap recap = recapManager.getDeathRecaps().computeIfAbsent(player.getName(), (value) -> new Recap(player));

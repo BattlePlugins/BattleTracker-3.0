@@ -12,6 +12,7 @@ import mc.alk.mc.MCLocation;
 import mc.alk.mc.block.MCBlock;
 import mc.alk.mc.block.MCSign;
 import org.battleplugins.tracker.BattleTracker;
+import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.util.SignUtil;
 import org.battleplugins.tracker.util.TrackerUtil;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Manager for signs in BattleTracker.
@@ -30,7 +32,7 @@ import java.util.Map;
 public class SignManager {
 
     @Getter(AccessLevel.NONE)
-    private BattleTracker tracker;
+    private BattleTracker plugin;
 
     /**
      * If signs below should be updated
@@ -77,12 +79,12 @@ public class SignManager {
      */
     private Map<MCLocation, LeaderboardSign> signs;
 
-    public SignManager(BattleTracker tracker) {
-        this.tracker = tracker;
+    public SignManager(BattleTracker plugin) {
+        this.plugin = plugin;
         this.signs = new HashMap<>();
 
-        loadDataFromConfig("signs", tracker.getConfigManager().getSignsConfig());
-        loadDataFromSaves("signs", tracker.getConfigManager().getSignSaves());
+        loadDataFromConfig("signs", plugin.getConfigManager().getSignsConfig());
+        loadDataFromSaves("signs", plugin.getConfigManager().getSignSaves());
     }
 
     /**
@@ -116,7 +118,13 @@ public class SignManager {
         List<MCSign> signsBelow = SignUtil.getSignsBelow(signs.get(sign.getLocation()));
         extraLines = signsBelow.size() * 4;
 
-        Map<Record, Float> recordsMap = TrackerUtil.getSortedRecords(tracker.getTrackerManager().getInterface(trackerName), extraLines + normalSignLines);
+        Optional<TrackerInterface> opTracker = plugin.getTrackerManager().getInterface(trackerName);
+        if (!opTracker.isPresent())  {
+            Log.debug("A tracker could not be found for " + trackerName + "!");
+            return;
+        }
+
+        Map<Record, Float> recordsMap = TrackerUtil.getSortedRecords(opTracker.get(), extraLines + normalSignLines);
         if (recordsMap.isEmpty())
             return;
 

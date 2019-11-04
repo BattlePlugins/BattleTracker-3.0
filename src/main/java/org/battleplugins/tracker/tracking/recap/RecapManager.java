@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class RecapManager {
 
     @NonNull
-    private BattleTracker tracker;
+    private BattleTracker plugin;
 
     /**
      * A map of all the "dead" recaps.
@@ -54,7 +54,7 @@ public class RecapManager {
     public void sendArmorRecap(MCPlayer player, Recap recap) {
         MCItemStack empty = ItemBuilder.builder().setType("bone").build();
         MCInventory recapInventory = recap.getInventory();
-        MCInventory inventory = tracker.getPlatform().createInventory(tracker, 54, recap.getPlayerName() + "'s Recap");
+        MCInventory inventory = plugin.getPlatform().createInventory(plugin, 54, recap.getPlayerName() + "'s Recap");
         inventory.setItem(13, Optional.of(recapInventory.getItem(45).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
         inventory.setItem(22, Optional.of(recapInventory.getItem(46).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
         inventory.setItem(31, Optional.of(recapInventory.getItem(47).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));

@@ -1,5 +1,6 @@
 package org.battleplugins.tracker.sign;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import mc.alk.mc.MCLocation;
@@ -10,6 +11,7 @@ import mc.alk.mc.MCLocation;
  * @author Redned
  */
 @Getter
+@AllArgsConstructor
 public class LeaderboardSign {
 
     /**
@@ -33,10 +35,4 @@ public class LeaderboardSign {
      * @return the tracker name to retrieve information from
      */
     private String trackerName;
-
-    public LeaderboardSign(MCLocation location, String statType, String trackerName) {
-        this.location = location;
-        this.statType = statType;
-        this.trackerName = trackerName;
-    }
 }

@@ -1,5 +1,7 @@
 package org.battleplugins.tracker;
 
+import lombok.Getter;
+
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.configuration.ConfigurationSection;
 import mc.alk.battlecore.util.Log;
@@ -29,8 +31,6 @@ import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import lombok.Getter;
 
 /**
  * Overall main class for the BattleTracker plugin.
@@ -148,7 +148,7 @@ public final class BattleTracker extends MCPlugin {
                 trackerManager.addInterface(PVP_INTERFACE, tracker);
 
                 MCCommand pvpCommand = new MCCommand(configManager.getPvPConfig().getString("options.command", "pvp"), "Main " + PVP_INTERFACE + " executor.", "battletracker.pvp", new ArrayList<>());
-                registerCommand(pvpCommand, new TrackerExecutor(this, PVP_INTERFACE));
+                registerCommand(pvpCommand, new TrackerExecutor(this, tracker));
             }
 
             if (trackPvE) {
@@ -156,7 +156,7 @@ public final class BattleTracker extends MCPlugin {
                 trackerManager.addInterface(PVE_INTERFACE, tracker);
 
                 MCCommand pveCommand = new MCCommand(configManager.getPvEConfig().getString("options.command", "pve"), "Main " + PVE_INTERFACE + " executor.", "battletracker.pve", new ArrayList<>());
-                registerCommand(pveCommand, new TrackerExecutor(this, PVE_INTERFACE));
+                registerCommand(pveCommand, new TrackerExecutor(this, tracker));
             }
 
             APIType api = getPlatform().getAPIType();
@@ -197,7 +197,6 @@ public final class BattleTracker extends MCPlugin {
             ex.printStackTrace();
         }
     }
-
 
     /**
      * Returns the config for BattleTracker
