@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * @author Zach443, Redned
  */
 @Getter
-@PluginProperties(id = "bt", authors = "BattlePlugins", name = TrackerInfo.NAME, version = TrackerInfo.VERSION, description = TrackerInfo.DESCRIPTION, url = TrackerInfo.URL)
+@PluginProperties(id = "battletracker", authors = "BattlePlugins", name = TrackerInfo.NAME, version = TrackerInfo.VERSION, description = TrackerInfo.DESCRIPTION, url = TrackerInfo.URL)
 public final class BattleTracker extends MCPlugin {
 
     public static String PVP_INTERFACE = "PvP";
