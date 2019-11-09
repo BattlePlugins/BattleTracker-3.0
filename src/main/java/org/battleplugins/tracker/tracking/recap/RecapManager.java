@@ -3,7 +3,6 @@ package org.battleplugins.tracker.tracking.recap;
 import mc.alk.battlecore.util.TimeUtil;
 import mc.alk.mc.ChatColor;
 import mc.alk.mc.MCPlayer;
-import mc.alk.mc.inventory.ItemBuilder;
 import mc.alk.mc.inventory.MCInventory;
 import mc.alk.mc.inventory.MCItemStack;
 import org.battleplugins.tracker.BattleTracker;
@@ -52,7 +51,7 @@ public class RecapManager {
      * @param recap the recap of the player who died
      */
     public void sendArmorRecap(MCPlayer player, Recap recap) {
-        MCItemStack empty = ItemBuilder.builder().setType("bone").build();
+        MCItemStack empty = MCItemStack.builder().type("bone").build();
         MCInventory recapInventory = recap.getInventory();
         MCInventory inventory = plugin.getPlatform().createInventory(plugin, 54, recap.getPlayerName() + "'s Recap");
         inventory.setItem(13, Optional.of(recapInventory.getItem(45).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
@@ -101,11 +100,11 @@ public class RecapManager {
             lore.add(ChatColor.RED + "♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + timeAgo + " " + ChatColor.AQUA + TrackerUtil.capitalizeFirst(damageInfo.getCause().replace("_", " ")));
         }
 
-        return ItemBuilder.builder()
-                .setType("book")
-                .setQuantity(1)
-                .setDisplayName(ChatColor.GOLD + "Recap Information:")
-                .setLore(lore)
+        return MCItemStack.builder()
+                .type("book")
+                .quantity(1)
+                .displayName(ChatColor.GOLD + "Recap Information:")
+                .lore(lore)
                 .build();
     }
 }

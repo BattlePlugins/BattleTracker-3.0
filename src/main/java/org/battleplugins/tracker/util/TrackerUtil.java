@@ -8,7 +8,7 @@ import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
 
 import mc.alk.mc.MCOfflinePlayer;
 import mc.alk.mc.MCPlatform;
-import mc.alk.mc.chat.MessageBuilder;
+import mc.alk.mc.chat.Message;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -155,7 +155,7 @@ public class TrackerUtil {
 
         if (killerRecord.getStat(StatTypes.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
             String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatTypes.STREAK)));
-            MCPlatform.broadcastMessage(MessageBuilder.builder().setMessage(streakMessage).build());
+            MCPlatform.broadcastMessage(Message.builder().message(streakMessage).build());
         }
 
         VersusTally versusTally = pvpTracker.getOrCreateVersusTally(killer, killed);

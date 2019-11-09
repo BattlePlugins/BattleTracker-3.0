@@ -12,7 +12,6 @@ import mc.alk.mc.MCPlayer;
 import mc.alk.mc.chat.ClickAction;
 import mc.alk.mc.chat.HoverAction;
 import mc.alk.mc.chat.Message;
-import mc.alk.mc.chat.MessageBuilder;
 import mc.alk.mc.entity.MCEntity;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
@@ -183,7 +182,7 @@ public class DeathMessageManager {
         message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
-        MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
+        Message.Builder messageBuilder = Message.builder().message(prefix + message);
         attachHoverEvent(messageBuilder, killed);
         attachClickEvent(messageBuilder, killed);
 
@@ -219,7 +218,7 @@ public class DeathMessageManager {
         message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
-        MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
+        Message.Builder messageBuilder = Message.builder().message(prefix + message);
         attachHoverEvent(messageBuilder, killed);
         attachClickEvent(messageBuilder, killed);
 
@@ -255,7 +254,7 @@ public class DeathMessageManager {
         message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
-        MessageBuilder messageBuilder = new MessageBuilder(prefix + message);
+        Message.Builder messageBuilder = Message.builder().message(prefix + message);
         attachHoverEvent(messageBuilder, killed);
         attachClickEvent(messageBuilder, killed);
 
@@ -286,7 +285,7 @@ public class DeathMessageManager {
         return message;
     }
 
-    private void attachHoverEvent(MessageBuilder messageBuilder, MCPlayer player) {
+    private void attachHoverEvent(Message.Builder messageBuilder, MCPlayer player) {
         if (!hoverMessagesEnabled)
             return;
 
@@ -310,16 +309,16 @@ public class DeathMessageManager {
         if (hoverMessage.isEmpty())
             return;
 
-        messageBuilder.setHoverAction(HoverAction.SHOW_TEXT);
-        messageBuilder.setHoverMessage(hoverMessage);
+        messageBuilder.hoverAction(HoverAction.SHOW_TEXT);
+        messageBuilder.hoverMessage(hoverMessage);
     }
 
-    private void attachClickEvent(MessageBuilder messageBuilder, MCPlayer player) {
+    private void attachClickEvent(Message.Builder messageBuilder, MCPlayer player) {
         if (!clickMessagesEnabled || clickContent.equalsIgnoreCase("none"))
             return;
 
-        messageBuilder.setClickAction(ClickAction.RUN_COMMAND);
-        messageBuilder.setClickValue("/" + tracker.getName() + " recap " + player.getName());
+        messageBuilder.clickAction(ClickAction.RUN_COMMAND);
+        messageBuilder.clickValue("/" + tracker.getName() + " recap " + player.getName());
     }
 
     private void sendDeathMessage(MCPlayer source, Message message) {
