@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
 
-import mc.alk.mc.plugin.platform.PlatformCodeHandler;
+import mc.alk.battlecore.nukkit.platform.BattleNukkitCodeHandler;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.nukkit.listener.TrackerListener;
 import org.battleplugins.tracker.nukkit.listener.PvEListener;
@@ -17,12 +17,14 @@ import org.battleplugins.tracker.nukkit.listener.PvPListener;
  * @author Redned
  */
 @AllArgsConstructor
-public class NukkitCodeHandler extends PlatformCodeHandler {
+public class NukkitCodeHandler extends BattleNukkitCodeHandler {
 
     private BattleTracker plugin;
 
     @Override
     public void onEnable() {
+        super.onEnable();
+
         Plugin plugin = (Plugin) this.plugin.getPlatformPlugin();
         if (this.plugin.getTrackerManager().isTrackingPvE()) {
             Server.getInstance().getPluginManager().registerEvents(new PvEListener(this.plugin), plugin);

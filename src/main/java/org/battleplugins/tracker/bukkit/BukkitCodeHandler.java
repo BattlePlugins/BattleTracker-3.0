@@ -2,7 +2,7 @@ package org.battleplugins.tracker.bukkit;
 
 import lombok.AllArgsConstructor;
 
-import mc.alk.mc.plugin.platform.PlatformCodeHandler;
+import mc.alk.battlecore.bukkit.platform.BattleBukkitCodeHandler;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.bukkit.listener.PvEListener;
 import org.battleplugins.tracker.bukkit.listener.PvPListener;
@@ -17,12 +17,14 @@ import org.bukkit.plugin.Plugin;
  * @author Redned
  */
 @AllArgsConstructor
-public class BukkitCodeHandler extends PlatformCodeHandler {
+public class BukkitCodeHandler extends BattleBukkitCodeHandler {
 
     private BattleTracker plugin;
 
     @Override
     public void onEnable() {
+        super.onEnable();
+
         Plugin plugin = (Plugin) this.plugin.getPlatformPlugin();
         if (this.plugin.getTrackerManager().isTrackingPvE()) {
             Bukkit.getServer().getPluginManager().registerEvents(new PvEListener(this.plugin), plugin);
