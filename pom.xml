@@ -121,6 +121,10 @@
                                     <pattern>mc.alk.battlecore</pattern>
                                     <shadedPattern>org.battleplugins.tracker.alib.battlecore</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons</pattern>
+                                    <shadedPattern>org.battleplugins.tracker.alib.apache-commons</shadedPattern>
+                                </relocation>
                             </relocations>
                             <minimizeJar>true</minimizeJar>
                             <filters>
