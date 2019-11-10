@@ -5,6 +5,7 @@
 # Support: https://discord.gg/tMVPVJf
 # GitHub: https://github.com/BattlePlugins/BattleTracker
 # -----------------
+configVersion: 2.0.0
 
 ## If signs should be used.
 useSigns: true
