@@ -113,7 +113,7 @@ public final class BattleTracker extends MCPlugin {
             PVP_INTERFACE = configManager.getPvPConfig().getString("name");
             PVE_INTERFACE = configManager.getPvEConfig().getString("name");
 
-            ConfigurationSection section = configManager.getConfig().getSection("database");
+            ConfigurationSection section = getConfig().getSection("database");
 
             String type = section.getString("type", "sqlite");
             String prefix = section.getString("prefix", "bt_");
@@ -135,9 +135,9 @@ public final class BattleTracker extends MCPlugin {
             else
                 SQLInstance.URL = url;
 
-            switch (configManager.getConfig().getString("rating.calculator")) {
+            switch (getConfig().getString("rating.calculator")) {
                 case "elo":
-                    this.defaultCalculator = new EloCalculator(configManager.getConfig().getFloat("rating.options.elo.default", 1250), configManager.getConfig().getFloat("rating.options.elo.spread", 400));
+                    this.defaultCalculator = new EloCalculator(getConfig().getFloat("rating.options.elo.default", 1250), getConfig().getFloat("rating.options.elo.spread", 400));
                     break;
                 default:
                     this.defaultCalculator = new EloCalculator(1250, 400);
@@ -170,7 +170,7 @@ public final class BattleTracker extends MCPlugin {
                 platformCode.put(APIType.SPONGE, new SpongeCodeHandler(this));
 
             Log.setPlugin(this);
-            Log.setDebug(configManager.getConfig().getBoolean("debugMode", false));
+            Log.setDebug(getConfig().getBoolean("debugMode", false));
 
             getPlatform().scheduleRepeatingTask(this, new SignUpdateTask(signManager), 60000); // 1 minute
         });
