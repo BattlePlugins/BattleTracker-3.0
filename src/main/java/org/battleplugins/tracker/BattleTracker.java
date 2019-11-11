@@ -2,13 +2,13 @@ package org.battleplugins.tracker;
 
 import lombok.Getter;
 
+import mc.alk.battlecore.BattlePlugin;
 import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.configuration.ConfigurationSection;
 import mc.alk.battlecore.util.Log;
 import mc.alk.mc.APIType;
 import mc.alk.mc.MCPlatform;
 import mc.alk.mc.command.MCCommand;
-import mc.alk.mc.plugin.MCPlugin;
 import mc.alk.mc.plugin.MCServicePriority;
 import mc.alk.mc.plugin.PluginProperties;
 import org.battleplugins.tracker.bukkit.BukkitCodeHandler;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
  */
 @Getter
 @PluginProperties(id = "battletracker", authors = "BattlePlugins", name = TrackerInfo.NAME, version = TrackerInfo.VERSION, description = TrackerInfo.DESCRIPTION, url = TrackerInfo.URL)
-public final class BattleTracker extends MCPlugin {
+public final class BattleTracker extends BattlePlugin {
 
     public static String PVP_INTERFACE = "PvP";
     public static String PVE_INTERFACE = "PvE";
@@ -84,6 +84,8 @@ public final class BattleTracker extends MCPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        super.onEnable();
 
         getLogger().info("You are running " + TrackerInfo.NAME + " on " + TrackerUtil.capitalizeFirst(getPlatform().getAPIType().name()) + "!");
         DependencyUtil.setLibFolder(new File(getDataFolder(), "libraries"));
@@ -169,7 +171,6 @@ public final class BattleTracker extends MCPlugin {
             if (api == APIType.SPONGE)
                 platformCode.put(APIType.SPONGE, new SpongeCodeHandler(this));
 
-            Log.setPlugin(this);
             Log.setDebug(getConfig().getBoolean("debugMode", false));
 
             getPlatform().scheduleRepeatingTask(this, new SignUpdateTask(signManager), 60000); // 1 minute
@@ -178,6 +179,8 @@ public final class BattleTracker extends MCPlugin {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         try {
             signManager.saveSigns("signs", configManager.getSignSaves());
         } catch (Exception ex) {
