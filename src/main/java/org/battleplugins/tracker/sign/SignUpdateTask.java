@@ -3,8 +3,11 @@ package org.battleplugins.tracker.sign;
 import lombok.AllArgsConstructor;
 
 import mc.alk.battlecore.util.Log;
-import mc.alk.mc.MCWorld;
-import mc.alk.mc.block.MCSign;
+import org.battleplugins.api.world.World;
+import org.battleplugins.api.world.block.entity.BlockEntity;
+import org.battleplugins.api.world.block.entity.Sign;
+
+import java.util.Optional;
 
 @AllArgsConstructor
 public class SignUpdateTask implements Runnable {
@@ -14,12 +17,13 @@ public class SignUpdateTask implements Runnable {
     @Override
     public void run() {
         for (LeaderboardSign sign : signManager.getSigns().values()) {
-            MCWorld world = sign.getLocation().getWorld();
-            if (!world.isType(world.getBlockAt(sign.getLocation()), MCSign.class)) {
+            World world = sign.getLocation().getWorld();
+            Optional<BlockEntity> blockEntity = world.getBlockEntityAt(sign.getLocation());
+            if (!blockEntity.isPresent() || !world.isType(blockEntity.get(), Sign.class)) {
                 Log.debug("Block at " + sign.getLocation() + " is not a sign!");
                 continue;
             }
-            MCSign mcsign = world.toType(world.getBlockAt(sign.getLocation()), MCSign.class);
+            Sign mcsign = world.toType(blockEntity.get(), Sign.class);
             signManager.refreshSignContent(mcsign);
         }
     }

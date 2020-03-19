@@ -2,7 +2,6 @@ package org.battleplugins.tracker.bukkit.listener;
 
 import lombok.AllArgsConstructor;
 
-import mc.alk.mc.MCPlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.recap.DamageInfo;
@@ -73,9 +72,9 @@ public class PvEListener implements Listener {
         }
 
         TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getOrCreateRecord(plugin.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+        Record record = pveTracker.getOrCreateRecord(plugin.getServer().getOfflinePlayer(killed.getUniqueId()).get());
         if (record.isTracking())
-            pveTracker.incrementValue(StatTypes.DEATHS, plugin.getPlatform().getOfflinePlayer(killed.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.DEATHS, plugin.getServer().getOfflinePlayer(killed.getUniqueId()).get());
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer);
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -113,9 +112,9 @@ public class PvEListener implements Listener {
 
         Player killer = (Player) lastDamageCause.getDamager();
         TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
-        Record record = pveTracker.getOrCreateRecord(plugin.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+        Record record = pveTracker.getOrCreateRecord(plugin.getServer().getOfflinePlayer(killer.getUniqueId()).get());
         if (record.isTracking())
-            pveTracker.incrementValue(StatTypes.KILLS, plugin.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+            pveTracker.incrementValue(StatTypes.KILLS, plugin.getServer().getOfflinePlayer(killer.getUniqueId()).get());
 
         Record fakeRecord = new DummyRecord(pveTracker, UUID.randomUUID().toString(), killer.getType().name().toLowerCase());
         fakeRecord.setRating(pveTracker.getRatingCalculator().getDefaultRating());
@@ -132,7 +131,7 @@ public class PvEListener implements Listener {
         if (!(event.getEntity() instanceof Player))
             return;
 
-        MCPlayer player = plugin.getPlatform().getPlayer(event.getEntity().getName());
+        org.battleplugins.api.entity.living.player.Player player = plugin.getServer().getPlayer(event.getEntity().getName()).get();
         TrackerInterface pveTracker = plugin.getTrackerManager().getPvEInterface();
 
         RecapManager recapManager = pveTracker.getRecapManager();

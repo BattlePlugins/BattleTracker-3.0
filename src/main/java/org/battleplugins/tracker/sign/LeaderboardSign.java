@@ -2,8 +2,7 @@ package org.battleplugins.tracker.sign;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import mc.alk.mc.MCLocation;
+import org.battleplugins.api.world.Location;
 
 /**
  * Holds information about tracker signs.
@@ -19,7 +18,7 @@ public class LeaderboardSign {
      *
      * @return the location of the sign
      */
-    private MCLocation location;
+    private Location location;
 
     /**
      * The stat type displayed on the sign

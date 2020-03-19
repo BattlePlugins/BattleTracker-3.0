@@ -1,8 +1,7 @@
 package org.battleplugins.tracker.sponge;
 
-import lombok.AllArgsConstructor;
-
 import mc.alk.battlecore.sponge.platform.BattleSpongeCodeHandler;
+
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.sponge.listener.PvEListener;
 import org.battleplugins.tracker.sponge.listener.PvPListener;
@@ -14,10 +13,15 @@ import org.spongepowered.api.Sponge;
  *
  * @author Redned
  */
-@AllArgsConstructor
 public class SpongeCodeHandler extends BattleSpongeCodeHandler {
 
     private BattleTracker plugin;
+
+    public SpongeCodeHandler(BattleTracker plugin) {
+        super(plugin);
+
+        this.plugin = plugin;
+    }
 
     @Override
     public void onEnable() {

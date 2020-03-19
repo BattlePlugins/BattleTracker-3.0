@@ -1,14 +1,14 @@
 package org.battleplugins.tracker.message;
 
-import mc.alk.battlecore.configuration.Configuration;
-import mc.alk.battlecore.controllers.MessageController;
-import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCPlayer;
+import mc.alk.battlecore.message.MessageController;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import lombok.Getter;
+import org.battleplugins.api.configuration.Configuration;
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
+import org.battleplugins.api.entity.living.player.Player;
 
 /**
  * Main message manager for BattleTracker.
@@ -23,16 +23,16 @@ public class MessageManager {
     private Map<String, String> streakMessages = new HashMap<>();
 
     public MessageManager(String path, String specialPath, Configuration config) {
-        for (String str : config.getSection(path).getKeys(false)) {
-            messages.put(str, config.getString(path + "." + str));
+        for (String str : config.getNode(path).getCollectionValue(String.class)) {
+            messages.put(str, config.getNode(path + "." + str).getValue(String.class));
         }
 
-        for (String str : config.getSection(specialPath + ".rampage").getKeys(false)) {
-            rampageMessages.put(str, config.getString(specialPath + ".rampage." + str));
+        for (String str : config.getNode(specialPath + ".rampage").getCollectionValue(String.class)) {
+            rampageMessages.put(str, config.getNode(specialPath + ".rampage." + str).getValue(String.class));
         }
 
-        for (String str : config.getSection(specialPath + ".streak").getKeys(false)) {
-            streakMessages.put(str, config.getString(specialPath + ".streak." + str));
+        for (String str : config.getNode(specialPath + ".streak").getCollectionValue(String.class)) {
+            streakMessages.put(str, config.getNode(specialPath + ".streak." + str).getValue(String.class));
         }
     }
 
@@ -74,7 +74,7 @@ public class MessageManager {
      * @param key the name (key) of the message in the config
      * @return a message with the given key/path
      */
-    public String getStreakMessage(MCOfflinePlayer player, String key) {
+    public String getStreakMessage(OfflinePlayer player, String key) {
         String streakMessage = streakMessages.get(key);
         if (streakMessage == null)
             streakMessage = streakMessages.get("default");
@@ -92,7 +92,7 @@ public class MessageManager {
      * @param key the name (key) of the message in the config
      * @return a message with the given key/path
      */
-    public String getFormattedStreakMessage(MCOfflinePlayer player, String key) {
+    public String getFormattedStreakMessage(OfflinePlayer player, String key) {
         String streakMessage = streakMessages.get(key);
         if (streakMessage == null)
             streakMessage = streakMessages.get("default");
@@ -130,7 +130,7 @@ public class MessageManager {
      * @param key the name (key) of the message in the config
      * @return a message with the given key/path
      */
-    public String getMessage(MCOfflinePlayer player, String key) {
+    public String getMessage(OfflinePlayer player, String key) {
         return getPlaceholderMessage(player, messages.get(key));
     }
 
@@ -144,7 +144,7 @@ public class MessageManager {
      * @param key the name (key) of the message in the config
      * @return a message with the given key/path
      */
-    public String getFormattedMessage(MCOfflinePlayer player, String key) {
+    public String getFormattedMessage(OfflinePlayer player, String key) {
         return MessageController.colorChat(messages.get("prefix") + getPlaceholderMessage(player, messages.get(key)));
     }
 
@@ -155,7 +155,7 @@ public class MessageManager {
      * @param message the message to send
      * @return the message with variables replaced
      */
-    public String getPlaceholderMessage(MCOfflinePlayer player, String message) {
+    public String getPlaceholderMessage(OfflinePlayer player, String message) {
         message = message.replace("%player_name%", player.getName());
         for (Map.Entry<String, String> entry : messages.entrySet()) {
             message = message.replace("%" + entry + "%", entry.getValue());
@@ -170,7 +170,7 @@ public class MessageManager {
      * @param player the player to send the message to
      * @param message the message to send
      */
-    public void sendMessage(MCPlayer player, String message) {
+    public void sendMessage(Player player, String message) {
         player.sendMessage(getPlaceholderMessage(player, message));
     }
 }

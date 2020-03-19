@@ -1,6 +1,6 @@
 package org.battleplugins.tracker.tracking;
 
-import mc.alk.mc.MCOfflinePlayer;
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
 import org.battleplugins.tracker.tracking.message.DeathMessageManager;
 import org.battleplugins.tracker.tracking.recap.RecapManager;
 import org.battleplugins.tracker.tracking.stat.StatType;
@@ -40,7 +40,7 @@ public interface TrackerInterface {
      * @param player the player to check
      * @return if a player has a record in the tracker
      */
-    boolean hasRecord(MCOfflinePlayer player);
+    boolean hasRecord(OfflinePlayer player);
 
     /**
      * Returns the record for the given OfflinePlayer
@@ -48,7 +48,7 @@ public interface TrackerInterface {
      * @param player the OfflinePlayer to get the record from
      * @return the record for the given OfflinePlayer
      */
-    Optional<Record> getRecord(MCOfflinePlayer player);
+    Optional<Record> getRecord(OfflinePlayer player);
 
     /**
      * Returns a map of all the records
@@ -66,7 +66,7 @@ public interface TrackerInterface {
      * @param player the player to check
      * @return if a player has a versus tally in the tracker
      */
-    boolean hasVersusTally(MCOfflinePlayer player);
+    boolean hasVersusTally(OfflinePlayer player);
 
     /**
      * Returns the versus tally for the given OfflinePlayers
@@ -75,7 +75,7 @@ public interface TrackerInterface {
      * @param player2 the second OfflinePlayer to get the versus tally from
      * @return the versus tally for the given OfflinePlayers
      */
-    Optional<VersusTally> getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2);
+    Optional<VersusTally> getVersusTally(OfflinePlayer player1, OfflinePlayer player2);
 
     /**
      * Creates a new versus tally for the given OfflinePlayers
@@ -84,7 +84,7 @@ public interface TrackerInterface {
      * @param player2 the second OfflinePlayer in the versus tally
      * @return the new versus tally for the given OfflinePlayers
      */
-    VersusTally createNewVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2);
+    VersusTally createNewVersusTally(OfflinePlayer player1, OfflinePlayer player2);
 
     /**
      * Returns or creates a versus tally for the given OfflinePlayers
@@ -93,7 +93,7 @@ public interface TrackerInterface {
      * @param player2 the second OfflinePlayer to get the versus tally from
      * @return the versus tally for the given OfflinePlayers or create a new one
      */
-    default VersusTally getOrCreateVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
+    default VersusTally getOrCreateVersusTally(OfflinePlayer player1, OfflinePlayer player2) {
         return getVersusTally(player1, player2).orElse(createNewVersusTally(player1, player2));
     }
     /**
@@ -109,7 +109,7 @@ public interface TrackerInterface {
      * @param statType the stat type to increment the value for
      * @param player the player to increment the value for
      */
-    default void incrementValue(StatType statType, MCOfflinePlayer player) {
+    default void incrementValue(StatType statType, OfflinePlayer player) {
         incrementValue(statType.getInternalName(), player);
     }
 
@@ -119,7 +119,7 @@ public interface TrackerInterface {
      * @param statType the stat type (String) to increment the value for
      * @param player the player to increment the value for
      */
-    default void incrementValue(String statType, MCOfflinePlayer player) {
+    default void incrementValue(String statType, OfflinePlayer player) {
         Optional<Record> opRecord = getRecord(player);
         if (!opRecord.isPresent())
             return;
@@ -133,7 +133,7 @@ public interface TrackerInterface {
      * @param statType the stat type to decrement the value for
      * @param player the player to decrement the value for
      */
-    default void decrementValue(StatType statType, MCOfflinePlayer player) {
+    default void decrementValue(StatType statType, OfflinePlayer player) {
         decrementValue(statType.getInternalName(), player);
     }
 
@@ -143,7 +143,7 @@ public interface TrackerInterface {
      * @param statType the stat type (String) to decrement the value for
      * @param player the player to decrement the value for
      */
-    default void decrementValue(String statType, MCOfflinePlayer player) {
+    default void decrementValue(String statType, OfflinePlayer player) {
         Optional<Record> opRecord = getRecord(player);
         if (!opRecord.isPresent())
             return;
@@ -158,7 +158,7 @@ public interface TrackerInterface {
      * @param value the value to set
      * @param player the player to set the value for
      */
-    default void setValue(StatType statType, float value, MCOfflinePlayer player) {
+    default void setValue(StatType statType, float value, OfflinePlayer player) {
         setValue(statType.getInternalName(), value, player);
     }
 
@@ -169,7 +169,7 @@ public interface TrackerInterface {
      * @param value the value to set
      * @param player the player to set the value for
      */
-    void setValue(String statType, float value, MCOfflinePlayer player);
+    void setValue(String statType, float value, OfflinePlayer player);
 
     /**
      * Sets the ranking for the specified players
@@ -178,14 +178,14 @@ public interface TrackerInterface {
      * @param loser the player to decrement the rating for
      * @param tie if the end result was a tie
      */
-    void updateRating(MCOfflinePlayer killer, MCOfflinePlayer loser, boolean tie);
+    void updateRating(OfflinePlayer killer, OfflinePlayer loser, boolean tie);
 
     /**
      * Enables tracking for the specified player
      *
      * @param player the player to enable tracking for
      */
-    default void enableTracking(MCOfflinePlayer player) {
+    default void enableTracking(OfflinePlayer player) {
         Optional<Record> opRecord = getRecord(player);
         if (!opRecord.isPresent())
             return;
@@ -198,7 +198,7 @@ public interface TrackerInterface {
      *
      * @param player the player to disable tracking for
      */
-    default void disableTracking(MCOfflinePlayer player) {
+    default void disableTracking(OfflinePlayer player) {
         Optional<Record> opRecord = getRecord(player);
         if (!opRecord.isPresent())
             return;
@@ -211,7 +211,7 @@ public interface TrackerInterface {
      *
      * @param player the player to enable messages for
      */
-    default void enableMessages(MCOfflinePlayer player) {
+    default void enableMessages(OfflinePlayer player) {
         Optional<Record> opRecord = getRecord(player);
         if (!opRecord.isPresent())
             return;
@@ -224,7 +224,7 @@ public interface TrackerInterface {
      *
      * @param player the player to disable messages for
      */
-    default void disableMessages(MCOfflinePlayer player) {
+    default void disableMessages(OfflinePlayer player) {
         Optional<Record> opRecord = getRecord(player);
         if (!opRecord.isPresent())
             return;
@@ -239,7 +239,7 @@ public interface TrackerInterface {
      * @param player the player to create the record for
      * @return the new record created
      */
-    Record createNewRecord(MCOfflinePlayer player);
+    Record createNewRecord(OfflinePlayer player);
 
     /**
      * Adds a record for the specified player to the tracker
@@ -248,7 +248,7 @@ public interface TrackerInterface {
      * @param record the record to add
      * @return the new record created
      */
-    Record createNewRecord(MCOfflinePlayer player, Record record);
+    Record createNewRecord(OfflinePlayer player, Record record);
 
     /**
      * Returns the record for the given player or creates
@@ -257,7 +257,7 @@ public interface TrackerInterface {
      * @param player the player to get/create the record for
      * @return the record for the given player or create a new one
      */
-    default Record getOrCreateRecord(MCOfflinePlayer player) {
+    default Record getOrCreateRecord(OfflinePlayer player) {
         return getRecord(player).orElse(createNewRecord(player));
     }
 
@@ -266,7 +266,7 @@ public interface TrackerInterface {
      *
      * @param player the player to remove the record for
      */
-    void removeRecord(MCOfflinePlayer player);
+    void removeRecord(OfflinePlayer player);
 
     /**
      * Returns the death message manager for this tracker interface
@@ -294,7 +294,7 @@ public interface TrackerInterface {
      *
      * @param player the player to save records for
      */
-    void save(MCOfflinePlayer player);
+    void save(OfflinePlayer player);
 
     /**
      * Saves the records for all the players in the cache

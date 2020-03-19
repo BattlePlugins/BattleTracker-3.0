@@ -1,7 +1,7 @@
 package org.battleplugins.tracker.util;
 
-import mc.alk.mc.APIType;
-import mc.alk.mc.MCPlatform;
+import org.battleplugins.api.Platform;
+import org.battleplugins.api.PlatformTypes;
 import org.battleplugins.tracker.BattleTracker;
 
 import java.io.BufferedInputStream;
@@ -54,7 +54,7 @@ public class DependencyUtil {
         CompletableFuture<DownloadResult> sqliteFuture = new CompletableFuture<>();
 
         // Sponge has its own libraries for this, no need to install anything
-        if (MCPlatform.getAPI() == APIType.SPONGE) {
+        if (Platform.getPlatformType() == PlatformTypes.SPONGE) {
             future.complete(DownloadResult.SUCCESS);
             return future;
         }

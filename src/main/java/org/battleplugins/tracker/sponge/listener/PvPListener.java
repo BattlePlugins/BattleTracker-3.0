@@ -2,8 +2,8 @@ package org.battleplugins.tracker.sponge.listener;
 
 import lombok.AllArgsConstructor;
 
-import mc.alk.mc.MCPlayer;
-import mc.alk.sponge.SpongePlayer;
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
+import org.battleplugins.api.sponge.entity.living.player.SpongePlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.recap.DamageInfo;
@@ -71,8 +71,8 @@ public class PvPListener {
             Optional<UUID> opOwnerUUID = damager.get(TameableData.class).get().owner().get();
             if (opOwnerUUID.isPresent()) {
                 UUID uuid = opOwnerUUID.get();
-                if (plugin.getPlatform().getOfflinePlayer(uuid).isOnline()) {
-                    killer = ((SpongePlayer) plugin.getPlatform().getPlayer(uuid)).getHandle();
+                if (plugin.getServer().getOfflinePlayer(uuid).map(OfflinePlayer::isOnline).orElse(false)) {
+                    killer = ((SpongePlayer) plugin.getServer().getPlayer(uuid).get()).getHandle();
                     // Use a bone to show the case was a wolf
                     weapon = ItemStack.builder().itemType(ItemTypes.BONE).quantity(1).build();
                 }
@@ -84,11 +84,11 @@ public class PvPListener {
 
         // Check the killers world just incase for some reason the
         // killed player was teleported to another world
-        if (plugin.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
+        if (plugin.getConfigManager().getPvPConfig().getNode("ignoredWorlds").getCollectionValue(String.class).contains(killer.getWorld().getName()))
             return;
 
-        TrackerUtil.updatePvPStats(plugin.getPlatform().getOfflinePlayer(killed.getUniqueId().toString()),
-                plugin.getPlatform().getOfflinePlayer(killer.getUniqueId().toString()));
+        TrackerUtil.updatePvPStats(plugin.getServer().getOfflinePlayer(killed.getUniqueId().toString()).get(),
+                plugin.getServer().getOfflinePlayer(killer.getUniqueId().toString()).get());
 
         TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
         if (pvpTracker.getDeathMessageManager().isDefaultMessagesOverriden())
@@ -114,7 +114,7 @@ public class PvPListener {
         }
 
         Player spongePlayer = (Player) event.getTargetEntity();
-        MCPlayer player = plugin.getPlatform().getPlayer(spongePlayer.getName());
+        org.battleplugins.api.entity.living.player.Player player = plugin.getServer().getPlayer(spongePlayer.getName()).get();
         TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
 
         RecapManager recapManager = pvpTracker.getRecapManager();
@@ -139,8 +139,8 @@ public class PvPListener {
             Optional<UUID> opOwnerUUID = damager.get(TameableData.class).get().owner().get();
             if (opOwnerUUID.isPresent()) {
                 UUID uuid = opOwnerUUID.get();
-                if (plugin.getPlatform().getOfflinePlayer(uuid).isOnline()) {
-                    return ((SpongePlayer) plugin.getPlatform().getPlayer(uuid)).getHandle();
+                if (plugin.getServer().getOfflinePlayer(uuid).map(OfflinePlayer::isOnline).orElse(false)) {
+                    return ((SpongePlayer) plugin.getServer().getPlayer(uuid).get()).getHandle();
                 }
             }
         }

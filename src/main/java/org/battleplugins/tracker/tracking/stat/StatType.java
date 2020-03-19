@@ -30,7 +30,7 @@ public class StatType {
     @Builder.Default
     private boolean tracked = true;
 
-    public StatType(String internalName, String name, boolean tracked) {
+    StatType(String internalName, String name, boolean tracked) {
         this.internalName = internalName;
         this.name = name;
         this.tracked = tracked;

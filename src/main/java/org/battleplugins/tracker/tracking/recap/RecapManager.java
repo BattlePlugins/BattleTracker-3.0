@@ -1,10 +1,14 @@
 package org.battleplugins.tracker.tracking.recap;
 
 import mc.alk.battlecore.util.TimeUtil;
-import mc.alk.mc.ChatColor;
-import mc.alk.mc.MCPlayer;
-import mc.alk.mc.inventory.MCInventory;
-import mc.alk.mc.inventory.MCItemStack;
+
+import org.battleplugins.api.entity.living.player.Player;
+import org.battleplugins.api.inventory.Inventory;
+import org.battleplugins.api.inventory.item.ItemStack;
+import org.battleplugins.api.inventory.item.ItemTypes;
+import org.battleplugins.api.inventory.item.component.DisplayNameComponent;
+import org.battleplugins.api.inventory.item.component.LoreComponent;
+import org.battleplugins.api.message.MessageStyle;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.util.TrackerUtil;
 
@@ -18,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -50,17 +53,17 @@ public class RecapManager {
      * @param player the player to send the click even to
      * @param recap the recap of the player who died
      */
-    public void sendArmorRecap(MCPlayer player, Recap recap) {
-        MCItemStack empty = MCItemStack.builder().type("bone").build();
-        MCInventory recapInventory = recap.getInventory();
-        MCInventory inventory = plugin.getPlatform().createInventory(plugin, 54, recap.getPlayerName() + "'s Recap");
-        inventory.setItem(13, Optional.of(recapInventory.getItem(45).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
-        inventory.setItem(22, Optional.of(recapInventory.getItem(46).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
-        inventory.setItem(31, Optional.of(recapInventory.getItem(47).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
-        inventory.setItem(40, Optional.of(recapInventory.getItem(48).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
+    public void sendArmorRecap(Player player, Recap recap) {
+        ItemStack empty = ItemStack.builder().type(ItemTypes.BONE).component(DisplayNameComponent.class, "").build();
+        Inventory recapInventory = recap.getInventory();
+        Inventory inventory = Inventory.builder().size(54).name(recap.getPlayerName() + "'s Recap").build(plugin);
+        inventory.setItem(13, recapInventory.getItem(45).orElse(empty).clone());
+        inventory.setItem(22, recapInventory.getItem(46).orElse(empty).clone());
+        inventory.setItem(31, recapInventory.getItem(47).orElse(empty).clone());
+        inventory.setItem(40, recapInventory.getItem(48).orElse(empty).clone());
 
-        inventory.setItem(21, Optional.of(recapInventory.getItem(49).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
-        inventory.setItem(23, Optional.of(recapInventory.getItem(50).clone()).filter(stack -> !stack.getType().equalsIgnoreCase("air")).orElse(empty));
+        inventory.setItem(21, recapInventory.getItem(49).orElse(empty).clone());
+        inventory.setItem(23, recapInventory.getItem(50).orElse(empty).clone());
 
         inventory.setItem(25, getRecapBook(recap));
         player.openInventory(inventory);
@@ -72,20 +75,20 @@ public class RecapManager {
      * @param player the player to send the click even to
      * @param recap the recap of the player who died
      */
-    public void sendInventoryRecap(MCPlayer player, Recap recap) {
-        MCInventory inventory = recap.getInventory();
+    public void sendInventoryRecap(Player player, Recap recap) {
+        Inventory inventory = recap.getInventory();
         inventory.setItem(52, getRecapBook(recap));
 
         player.openInventory(inventory);
     }
 
     // TODO: Add message translations for this
-    private MCItemStack getRecapBook(Recap recap) {
+    private ItemStack getRecapBook(Recap recap) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        List<String> lore = new ArrayList<>(Arrays.asList(ChatColor.GRAY + "Death Time: " + ChatColor.YELLOW + TimeUtil.convertToShortString(System.currentTimeMillis() - recap.getDeathTime()) + "ago",
-                ChatColor.GRAY + "Starting Health: " + ChatColor.GREEN + "♥ +" + decimalFormat.format(recap.getStartingHealth() / 2),
+        List<String> lore = new ArrayList<>(Arrays.asList(MessageStyle.GRAY + "Death Time: " + MessageStyle.YELLOW + TimeUtil.convertToShortString(System.currentTimeMillis() - recap.getDeathTime()) + "ago",
+                MessageStyle.GRAY + "Starting Health: " + MessageStyle.GREEN + "♥ +" + decimalFormat.format(recap.getStartingHealth() / 2),
                 "",
-                ChatColor.GOLD + "Damage Log:"));
+                MessageStyle.GOLD + "Damage Log:"));
 
         // Obtains last 10 damages dealt
         List<DamageInfo> damageInfos = recap.getLastDamages().stream().sorted((recap1, recap2) -> (int) (recap2.getLogTime() - recap1.getLogTime())).collect(Collectors.toList());
@@ -97,14 +100,14 @@ public class RecapManager {
             DamageInfo damageInfo = damageInfos.get(i);
             String timeAgo = "(" + TimeUtil.convertToShortString(System.currentTimeMillis() - damageInfo.getLogTime()).trim() + ")";
 
-            lore.add(ChatColor.RED + "♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + timeAgo + " " + ChatColor.AQUA + TrackerUtil.capitalizeFirst(damageInfo.getCause().replace("_", " ")));
+            lore.add(MessageStyle.RED + "♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + MessageStyle.YELLOW + timeAgo + " " + MessageStyle.AQUA + TrackerUtil.capitalizeFirst(damageInfo.getCause().replace("_", " ")));
         }
 
-        return MCItemStack.builder()
-                .type("book")
+        return ItemStack.builder()
+                .type(ItemTypes.BOOK)
                 .quantity(1)
-                .displayName(ChatColor.GOLD + "Recap Information:")
-                .lore(lore)
+                .component(DisplayNameComponent.class, MessageStyle.GOLD + "Recap Information:")
+                .component(LoreComponent.class, lore)
                 .build();
     }
 }

@@ -3,14 +3,16 @@ package org.battleplugins.tracker.sign;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import mc.alk.battlecore.configuration.Configuration;
-import mc.alk.battlecore.configuration.ConfigurationSection;
-import mc.alk.battlecore.controllers.MessageController;
+import mc.alk.battlecore.message.MessageController;
 import mc.alk.battlecore.util.LocationUtil;
 import mc.alk.battlecore.util.Log;
-import mc.alk.mc.MCLocation;
-import mc.alk.mc.block.MCBlock;
-import mc.alk.mc.block.MCSign;
+
+import org.battleplugins.api.configuration.Configuration;
+import org.battleplugins.api.configuration.ConfigurationNode;
+import org.battleplugins.api.world.Location;
+import org.battleplugins.api.world.block.Block;
+import org.battleplugins.api.world.block.entity.BlockEntity;
+import org.battleplugins.api.world.block.entity.Sign;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.record.Record;
@@ -77,7 +79,7 @@ public class SignManager {
      *
      * @return a map of all the signs
      */
-    private Map<MCLocation, LeaderboardSign> signs;
+    private Map<Location, LeaderboardSign> signs;
 
     public SignManager(BattleTracker plugin) {
         this.plugin = plugin;
@@ -92,7 +94,7 @@ public class SignManager {
      *
      * @param sign the sign to refresh the content on
      */
-    public void refreshSignContent(MCSign sign) {
+    public void refreshSignContent(Sign sign) {
         if (!signs.containsKey(sign.getLocation())) {
             Log.debug("Sign at location " + sign.getLocation() + " is not a tracker sign!");
             return;
@@ -115,7 +117,7 @@ public class SignManager {
                 normalSignLines += 1;
         }
 
-        List<MCSign> signsBelow = SignUtil.getSignsBelow(signs.get(sign.getLocation()));
+        List<Sign> signsBelow = SignUtil.getSignsBelow(signs.get(sign.getLocation()));
         extraLines = signsBelow.size() * 4;
 
         Optional<TrackerInterface> opTracker = plugin.getTrackerManager().getInterface(trackerName);
@@ -158,7 +160,7 @@ public class SignManager {
         if (!updateSignsBelow || signsBelow.isEmpty() || records.size() <= recordIndex)
             return;
 
-        for (MCSign signBelow : signsBelow) {
+        for (Sign signBelow : signsBelow) {
             for (int i = 0; i < signBelow.getLines().length; i++) {
                 String line = lines[i];
                 String formattedLine = line.replace("%ranking%", String.valueOf(recordIndex + 1));
@@ -187,72 +189,74 @@ public class SignManager {
      * @param config the config (saves) file to save them in
      */
     public void saveSigns(String path, Configuration config) {
+        // TODO: Sign saving
         int index = 1;
-        for (Map.Entry<MCLocation, LeaderboardSign> signEntry : this.signs.entrySet()) {
+        for (Map.Entry<Location, LeaderboardSign> signEntry : this.signs.entrySet()) {
             String signPath = path + "." + index;
-            config.set(signPath + ".location", LocationUtil.toString(signEntry.getKey()));
-            config.set(signPath + ".tracker", signEntry.getValue().getTrackerName());
-            config.set(signPath + ".statType", signEntry.getValue().getStatType());
+            // config.set(signPath + ".location", LocationUtil.toString(signEntry.getKey()));
+            // config.set(signPath + ".tracker", signEntry.getValue().getTrackerName());
+            // config.set(signPath + ".statType", signEntry.getValue().getStatType());
         }
 
-        config.save();
+        // config.save();
     }
 
     private void loadDataFromConfig(String path, Configuration config) {
-        ConfigurationSection leaderboardSection = config.getSection(path + ".leaderboard");
-        ConfigurationSection personalSection = config.getSection(path + ".personal");
+        ConfigurationNode leaderboardSection = config.getNode(path + ".leaderboard");
+        ConfigurationNode personalSection = config.getNode(path + ".personal");
 
         this.leaderboardFormat = new String[4];
-        this.leaderboardFormat[0] = MessageController.colorChat(leaderboardSection.getString("lines.1", ""));
-        this.leaderboardFormat[1] = MessageController.colorChat(leaderboardSection.getString("lines.2", ""));
-        this.leaderboardFormat[2] = MessageController.colorChat(leaderboardSection.getString("lines.3", ""));
-        this.leaderboardFormat[3] = MessageController.colorChat(leaderboardSection.getString("lines.4", ""));
+        this.leaderboardFormat[0] = MessageController.colorChat(leaderboardSection.getNode("lines.1").getValue(""));
+        this.leaderboardFormat[1] = MessageController.colorChat(leaderboardSection.getNode("lines.2").getValue(""));
+        this.leaderboardFormat[2] = MessageController.colorChat(leaderboardSection.getNode("lines.3").getValue(""));
+        this.leaderboardFormat[3] = MessageController.colorChat(leaderboardSection.getNode("lines.4").getValue(""));
 
-        this.updateSignsBelow = leaderboardSection.getBoolean("updateSignsBelow", true);
-        this.listingFormat = leaderboardSection.getString("listingFormat", "");
+        this.updateSignsBelow = leaderboardSection.getNode("updateSignsBelow").getValue(true);
+        this.listingFormat = leaderboardSection.getNode("listingFormat").getValue("");
 
         this.personalFormat = new String[4];
-        this.personalFormat[0] = MessageController.colorChat(personalSection.getString("lines.1"));
-        this.personalFormat[1] = MessageController.colorChat(personalSection.getString("lines.2"));
-        this.personalFormat[2] = MessageController.colorChat(personalSection.getString("lines.3"));
-        this.personalFormat[3] = MessageController.colorChat(personalSection.getString("lines.4"));
+        this.personalFormat[0] = MessageController.colorChat(personalSection.getNode("lines.1").getValue(String.class));
+        this.personalFormat[1] = MessageController.colorChat(personalSection.getNode("lines.2").getValue(String.class));
+        this.personalFormat[2] = MessageController.colorChat(personalSection.getNode("lines.3").getValue(String.class));
+        this.personalFormat[3] = MessageController.colorChat(personalSection.getNode("lines.4").getValue(String.class));
 
-        this.personalSignsEnabled = personalSection.getBoolean("enabled", true);
+        this.personalSignsEnabled = personalSection.getNode("enabled").getValue(true);
     }
 
     private void loadDataFromSaves(String path, Configuration config) {
-        for (String str : config.getSection(path).getKeys(false)) {
-            ConfigurationSection section = config.getSection(path + "." + str);
-            MCLocation location = LocationUtil.fromString(section.getString("location"));
+        for (String str : config.getNode(path).getCollectionValue(String.class)) {
+            ConfigurationNode section = config.getNode(path + "." + str);
+            Location location = LocationUtil.fromString(section.getNode("location").getValue(String.class));
             if (location == null) {
-                Log.warn("Location " + section.getString("location") + " was invalid for sign " + str + ".");
+                Log.warn("Location " + section.getNode("location").getValue() + " was invalid for sign " + str + ".");
                 continue;
             }
 
-            MCSign sign = getSign(location, true);
-            if (sign == null)
+            if (!getSign(location, true).isPresent()) {
                 continue;
+            }
 
-            String trackerName = section.getString("tracker");
+            Sign sign = getSign(location, true).get();
+            String trackerName = section.getNode("tracker").getValue(String.class);
             if (trackerName == null || trackerName.isEmpty()) {
                 Log.warn("Sign " + str + " does not specify a tracker!");
                 continue;
             }
 
-            LeaderboardSign leaderboardSign = new LeaderboardSign(location, section.getString("statType", "rating"), trackerName);
+            LeaderboardSign leaderboardSign = new LeaderboardSign(location, section.getNode("statType").getValue("rating"), trackerName);
             signs.put(location, leaderboardSign);
         }
     }
 
-    private MCSign getSign(MCLocation location, boolean showWarning) {
-        MCBlock block = location.getWorld().getBlockAt(location);
-        if (!block.getWorld().isType(block, MCSign.class)) {
+    private Optional<Sign> getSign(Location location, boolean showWarning) {
+        Optional<BlockEntity> blockEntity = location.getWorld().getBlockEntityAt(location);
+        if (!blockEntity.isPresent() || !blockEntity.get().getLocation().getWorld().isType(blockEntity.get(), Sign.class)) {
             if (showWarning)
                 Log.warn("Block at location " + location.toString() + " is not a sign!");
 
-            return null;
+            return Optional.empty();
         }
 
-        return block.getWorld().toType(block, MCSign.class);
+        return blockEntity.map(be -> be.getLocation().getWorld().toType(be, Sign.class));
     }
 }

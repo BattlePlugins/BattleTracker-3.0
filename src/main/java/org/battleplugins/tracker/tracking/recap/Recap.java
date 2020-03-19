@@ -1,9 +1,10 @@
 package org.battleplugins.tracker.tracking.recap;
 
-import mc.alk.mc.MCPlatform;
-import mc.alk.mc.MCPlayer;
-import mc.alk.mc.inventory.MCInventory;
-import mc.alk.mc.inventory.MCPlayerInventory;
+import org.battleplugins.api.entity.living.player.Player;
+import org.battleplugins.api.inventory.Inventory;
+import org.battleplugins.api.inventory.entity.PlayerInventory;
+import org.battleplugins.api.inventory.item.ItemStack;
+import org.battleplugins.api.inventory.item.ItemTypes;
 import org.battleplugins.tracker.BattleTracker;
 
 import lombok.Getter;
@@ -35,7 +36,7 @@ public class Recap {
      *
      * @return the inventory associated with this recap
      */
-    private MCInventory inventory;
+    private Inventory inventory;
 
     /**
      * The player name associated with this recap
@@ -67,11 +68,11 @@ public class Recap {
     @Setter
     private boolean visible;
 
-    public Recap(MCPlayer player) {
+    public Recap(Player player) {
         this(player.getInventory(), player.getName(), player.getHealth());
     }
 
-    public Recap(MCPlayerInventory inventory, String playerName, double health) {
+    public Recap(PlayerInventory inventory, String playerName, double health) {
         this.playerName = playerName;
         this.startingHealth = health;
         this.lastDamages = Collections.synchronizedList(new ArrayList<>());
@@ -80,17 +81,17 @@ public class Recap {
         this.inventory = constructInventoryView(inventory);
     }
 
-    private MCInventory constructInventoryView(MCPlayerInventory playerInventory) {
-        MCInventory inventory = MCPlatform.getPlatform().createInventory(BattleTracker.getInstance(), 54, playerName + "'s Recap");
+    private Inventory constructInventoryView(PlayerInventory playerInventory) {
+        Inventory inventory = Inventory.builder().size(54).name(playerName + "'s Recap").build(BattleTracker.getInstance());
         inventory.setContents(playerInventory.getContents().clone());
 
-        inventory.setItem(45, playerInventory.getHelmet().clone());
-        inventory.setItem(46, playerInventory.getChestplate().clone());
-        inventory.setItem(47, playerInventory.getLeggings().clone());
-        inventory.setItem(48, playerInventory.getBoots().clone());
+        inventory.setItem(45, playerInventory.getHelmet().orElse(ItemStack.builder().type(ItemTypes.AIR).build()).clone());
+        inventory.setItem(46, playerInventory.getChestplate().orElse(ItemStack.builder().type(ItemTypes.AIR).build()).clone());
+        inventory.setItem(47, playerInventory.getLeggings().orElse(ItemStack.builder().type(ItemTypes.AIR).build()).clone());
+        inventory.setItem(48, playerInventory.getBoots().orElse(ItemStack.builder().type(ItemTypes.AIR).build()).clone());
 
-        inventory.setItem(49, playerInventory.getItemInOffHand().clone());
-        inventory.setItem(50, playerInventory.getItemInMainHand().clone());
+        inventory.setItem(49, playerInventory.getItemInOffHand().orElse(ItemStack.builder().type(ItemTypes.AIR).build()).clone());
+        inventory.setItem(50, playerInventory.getItemInMainHand().orElse(ItemStack.builder().type(ItemTypes.AIR).build()).clone());
 
         return inventory;
     }

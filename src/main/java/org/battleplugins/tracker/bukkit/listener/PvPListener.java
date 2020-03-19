@@ -2,7 +2,6 @@ package org.battleplugins.tracker.bukkit.listener;
 
 import lombok.AllArgsConstructor;
 
-import mc.alk.mc.MCPlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.bukkit.util.CompatUtil;
@@ -81,11 +80,11 @@ public class PvPListener implements Listener {
 
         // Check the killers world just incase for some reason the
         // killed player was teleported to another world
-        if (plugin.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getWorld().getName()))
+        if (plugin.getConfigManager().getPvPConfig().getNode("ignoredWorlds").getCollectionValue(String.class).contains(killer.getWorld().getName()))
             return;
 
-        TrackerUtil.updatePvPStats(plugin.getPlatform().getOfflinePlayer(killed.getUniqueId()),
-                plugin.getPlatform().getOfflinePlayer(killer.getUniqueId()));
+        TrackerUtil.updatePvPStats(plugin.getServer().getOfflinePlayer(killed.getUniqueId()).get(),
+                plugin.getServer().getOfflinePlayer(killer.getUniqueId()).get());
 
         TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
         if (pvpTracker.getDeathMessageManager().isDefaultMessagesOverriden())
@@ -105,7 +104,7 @@ public class PvPListener implements Listener {
         if (!(event.getEntity() instanceof Player) || !(getTrueDamager(event) instanceof Player))
             return;
 
-        MCPlayer player = plugin.getPlatform().getPlayer(event.getEntity().getName());
+        org.battleplugins.api.entity.living.player.Player player = plugin.getServer().getPlayer(event.getEntity().getName()).get();
         TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
 
         RecapManager recapManager = pvpTracker.getRecapManager();

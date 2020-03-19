@@ -2,11 +2,12 @@ package org.battleplugins.tracker.executor;
 
 import lombok.AllArgsConstructor;
 
-import mc.alk.battlecore.controllers.MessageController;
 import mc.alk.battlecore.executor.CustomCommandExecutor;
-import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCPlayer;
-import mc.alk.mc.command.MCCommandSender;
+import mc.alk.battlecore.message.MessageController;
+
+import org.battleplugins.api.command.CommandSender;
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
+import org.battleplugins.api.entity.living.player.Player;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.message.MessageManager;
@@ -34,12 +35,12 @@ public class TrackerExecutor extends CustomCommandExecutor {
     private TrackerInterface tracker;
 
     @MCCommand(cmds = "top")
-    public void topCommand(MCCommandSender sender) {
+    public void topCommand(CommandSender sender) {
         topCommand(sender, 5);
     }
 
     @MCCommand(cmds = "top")
-    public void topCommand(MCCommandSender sender, int amount) {
+    public void topCommand(CommandSender sender, int amount) {
         MessageManager messageManager = plugin.getMessageManager();
         sender.sendMessage(MessageController.colorChat(messageManager.getMessage("leaderboardHeader").replace("%tracker%", tracker.getName())));
         Map<Record, Float> sortedRecords = TrackerUtil.getSortedRecords(tracker, amount);
@@ -64,7 +65,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
     }
 
     @MCCommand(cmds = "rank")
-    public void rankCommand(MCCommandSender sender, MCOfflinePlayer player) {
+    public void rankCommand(CommandSender sender, OfflinePlayer player) {
         MessageManager messageManager = plugin.getMessageManager();
         Optional<Record> opRecord = tracker.getRecord(player);
         if (!opRecord.isPresent()) {
@@ -85,7 +86,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
     }
 
     @MCCommand(cmds = "reset", perm = "battletracker.reset")
-    public void resetCommand(MCCommandSender sender, MCOfflinePlayer player) {
+    public void resetCommand(CommandSender sender, OfflinePlayer player) {
         MessageManager messageManager = plugin.getMessageManager();
         if (!tracker.hasRecord(player)) {
             sender.sendMessage(messageManager.getFormattedMessage(player, "recordNotFound"));
@@ -97,7 +98,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
     }
 
     @MCCommand(cmds = "set", perm = "battletracker.set")
-    public void setCommand(MCCommandSender sender, MCOfflinePlayer player, String statType, float value) {
+    public void setCommand(CommandSender sender, OfflinePlayer player, String statType, float value) {
         MessageManager messageManager = plugin.getMessageManager();
         Optional<Record> opRecord = tracker.getRecord(player);
         if (!opRecord.isPresent()) {
@@ -116,7 +117,7 @@ public class TrackerExecutor extends CustomCommandExecutor {
     }
 
     @MCCommand(cmds = "recap", perm = "battletracker.recap")
-    public void recapCommand(MCPlayer player, String name) {
+    public void recapCommand(Player player, String name) {
         MessageManager messageManager = plugin.getMessageManager();
         RecapManager recapManager = tracker.getRecapManager();
 
@@ -141,12 +142,12 @@ public class TrackerExecutor extends CustomCommandExecutor {
     }
 
     @MCCommand(cmds = {"vs", "versus"}, perm = "battletracker.versus")
-    public void versusCommandSelf(MCPlayer sender, MCOfflinePlayer player2) {
+    public void versusCommandSelf(Player sender, OfflinePlayer player2) {
         versusCommand(sender, sender, player2);
     }
 
     @MCCommand(cmds = {"vs", "versus"}, perm = "battletracker.versus")
-    public void versusCommand(MCCommandSender sender, MCOfflinePlayer player1, MCOfflinePlayer player2) {
+    public void versusCommand(CommandSender sender, OfflinePlayer player1, OfflinePlayer player2) {
         MessageManager messageManager = plugin.getMessageManager();
         Optional<VersusTally> opTally = tracker.getVersusTally(player1, player2);
         if (!opTally.isPresent()) {

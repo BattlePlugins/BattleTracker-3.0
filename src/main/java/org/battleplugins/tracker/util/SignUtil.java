@@ -1,9 +1,11 @@
 package org.battleplugins.tracker.util;
 
 import mc.alk.battlecore.util.Log;
-import mc.alk.mc.ChatColor;
-import mc.alk.mc.MCWorld;
-import mc.alk.mc.block.MCSign;
+
+import org.battleplugins.api.message.MessageStyle;
+import org.battleplugins.api.world.Location;
+import org.battleplugins.api.world.World;
+import org.battleplugins.api.world.block.entity.Sign;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.sign.LeaderboardSign;
@@ -36,7 +38,7 @@ public class SignUtil {
         String statType = null;
         for (TrackerInterface loopedTracker : trackers) {
             for (String line : lines) {
-                if (!ChatColor.stripColor(line).toLowerCase().contains(loopedTracker.getName().toLowerCase()))
+                if (!MessageStyle.stripColor(line).toLowerCase().contains(loopedTracker.getName().toLowerCase()))
                     continue;
 
                 tracker = loopedTracker;
@@ -50,7 +52,7 @@ public class SignUtil {
         for (String line : lines) {
             for (String loopedStatType : tracker.getRecords().entrySet()
                     .iterator().next().getValue().getStats().keySet()) {
-                if (!ChatColor.stripColor(line).toLowerCase().contains(loopedStatType.toLowerCase()))
+                if (!MessageStyle.stripColor(line).toLowerCase().contains(loopedStatType.toLowerCase()))
                     continue;
 
                 statType = loopedStatType;
@@ -70,7 +72,7 @@ public class SignUtil {
             String formattedLine = TrackerUtil.replacePlaceholders(line, replacements);
 
             // One line is enough
-            if (ChatColor.stripColor(formattedLine).equalsIgnoreCase(ChatColor.stripColor(lines[i])))
+            if (MessageStyle.stripColor(formattedLine).equalsIgnoreCase(MessageStyle.stripColor(lines[i])))
                 return true;
         }
 
@@ -88,7 +90,7 @@ public class SignUtil {
         Collection<TrackerInterface> trackers = BattleTracker.getInstance().getTrackerManager().getInterfaces().values();
         for (TrackerInterface loopedTracker : trackers) {
             for (String line : lines) {
-                if (!ChatColor.stripColor(line).toLowerCase().contains(loopedTracker.getName().toLowerCase()))
+                if (!MessageStyle.stripColor(line).toLowerCase().contains(loopedTracker.getName().toLowerCase()))
                     continue;
 
                 return loopedTracker.getName();
@@ -120,7 +122,7 @@ public class SignUtil {
         for (String line : lines) {
             for (String loopedStatType : tracker.getRecords().entrySet()
                     .iterator().next().getValue().getStats().keySet()) {
-                if (!ChatColor.stripColor(line).toLowerCase().contains(loopedStatType.toLowerCase()))
+                if (!MessageStyle.stripColor(line).toLowerCase().contains(loopedStatType.toLowerCase()))
                     continue;
 
                 return loopedStatType;
@@ -136,14 +138,15 @@ public class SignUtil {
      * @param sign the leaderboard sign to get the signs below
      * @return all the signs below the given leaderboard sign
      */
-    public static List<MCSign> getSignsBelow(LeaderboardSign sign) {
-        List<MCSign> signs = new ArrayList<>();
-        MCWorld world = sign.getLocation().getWorld();
+    public static List<Sign> getSignsBelow(LeaderboardSign sign) {
+        List<Sign> signs = new ArrayList<>();
+        World world = sign.getLocation().getWorld();
         int x = sign.getLocation().getBlockX();
         int y = sign.getLocation().getBlockY();
         int z = sign.getLocation().getBlockZ();
-        while (world.isType(world.getBlockAt(x, y--, z), MCSign.class)) {
-            signs.add(world.toType(world.getBlockAt(x, y, z), MCSign.class));
+        while (world.getBlockEntityAt(new Location(world, x, y, z)).isPresent() && world.isType(world.getBlockEntityAt(new Location(world, x, y, z)).get(), Sign.class)) {
+            signs.add(world.toType(world.getBlockEntityAt(new Location(world, x, y, z)).get(), Sign.class));
+            y--;
         }
         return signs;
     }

@@ -2,7 +2,8 @@ package org.battleplugins.tracker.sql;
 
 import mc.alk.battlecore.serializers.SQLSerializer;
 import mc.alk.battlecore.util.Log;
-import mc.alk.mc.scheduler.Scheduler;
+
+import org.battleplugins.api.scheduler.Scheduler;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.StatType;
 import org.battleplugins.tracker.tracking.stat.StatTypes;

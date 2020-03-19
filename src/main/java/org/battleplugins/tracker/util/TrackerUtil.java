@@ -1,14 +1,12 @@
 package org.battleplugins.tracker.util;
 
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
+import org.battleplugins.api.message.Message;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.stat.StatTypes;
 import org.battleplugins.tracker.tracking.stat.record.Record;
 import org.battleplugins.tracker.tracking.stat.tally.VersusTally;
-
-import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCPlatform;
-import mc.alk.mc.chat.Message;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -138,7 +136,7 @@ public class TrackerUtil {
      * @param killed the player killed
      * @param killer the killer
      */
-    public static void updatePvPStats(MCOfflinePlayer killed, MCOfflinePlayer killer) {
+    public static void updatePvPStats(OfflinePlayer killed, OfflinePlayer killer) {
         BattleTracker tracker = BattleTracker.getInstance();
         TrackerInterface pvpTracker = tracker.getTrackerManager().getPvPInterface();
 
@@ -151,11 +149,11 @@ public class TrackerUtil {
         if (killedRecord.isTracking())
             pvpTracker.incrementValue(StatTypes.DEATHS, killed);
 
-        pvpTracker.updateRating(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), tracker.getPlatform().getOfflinePlayer(killed.getUniqueId()), false);
+        pvpTracker.updateRating(killer, killed, false);
 
-        if (killerRecord.getStat(StatTypes.STREAK) % tracker.getConfig().getInt("streakMessageEvery", 15) == 0) {
-            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(tracker.getPlatform().getOfflinePlayer(killer.getUniqueId()), String.valueOf((int) killerRecord.getStat(StatTypes.STREAK)));
-            MCPlatform.broadcastMessage(Message.builder().message(streakMessage).build());
+        if (killerRecord.getStat(StatTypes.STREAK) % tracker.getConfig().getNode("streakMessageEvery").getValue(15) == 0) {
+            String streakMessage = tracker.getMessageManager().getFormattedStreakMessage(killer, String.valueOf((int) killerRecord.getStat(StatTypes.STREAK)));
+            tracker.getServer().getOnlinePlayers().forEach(player -> player.sendMessage(Message.builder().message(streakMessage).build()));
         }
 
         VersusTally versusTally = pvpTracker.getOrCreateVersusTally(killer, killed);

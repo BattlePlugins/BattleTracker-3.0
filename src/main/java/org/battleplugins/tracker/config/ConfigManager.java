@@ -3,9 +3,11 @@ package org.battleplugins.tracker.config;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import mc.alk.battlecore.configuration.Configuration;
 import mc.alk.battlecore.util.FileUtil;
 import mc.alk.battlecore.util.Log;
+
+import org.battleplugins.api.configuration.Configuration;
+import org.battleplugins.api.configuration.ConfigurationProvider;
 import org.battleplugins.tracker.BattleTracker;
 
 import java.io.File;
@@ -125,7 +127,10 @@ public class ConfigManager {
             }
         }
 
-        return new Configuration(configFile);
+        return Configuration.builder()
+                .file(configFile)
+                .provider(ConfigurationProvider.class)
+                .build();
     }
 
     /**
@@ -144,12 +149,17 @@ public class ConfigManager {
      * Savesall the config files for BattleTracker
      */
     public void saveConfigs() {
-        config.save();
-        messagesConfig.save();
-        signsConfig.save();
-        pvPConfig.save();
-        pvEConfig.save();
-        signSaves.save();
+        try {
+            config.save();
+            messagesConfig.save();
+            signsConfig.save();
+            pvPConfig.save();
+            pvEConfig.save();
+            signSaves.save();
+        } catch (IOException ex) {
+            Log.warn("Failed to save configs!");
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -158,7 +168,12 @@ public class ConfigManager {
      * @param config the config to reload
      */
     public void reloadConfig(Configuration config) {
+        try {
         config.save();
         config.reload();
+        } catch (IOException ex) {
+            Log.warn("Failed to config file!");
+            ex.printStackTrace();
+        }
     }
 }

@@ -31,7 +31,7 @@ public class BTPlaceholderExtension extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return plugin.getDescription().getVersion();
+        return plugin.getDescription().getVersion().toString();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class BTPlaceholderExtension extends PlaceholderExpansion {
             return "";
 
         TrackerInterface trackerInterface = plugin.getTrackerManager().getInterface(interfaceName).get();
-        Record record = trackerInterface.getOrCreateRecord(plugin.getPlatform().getPlayer(player.getUniqueId()));
+        Record record = trackerInterface.getOrCreateRecord(plugin.getServer().getPlayer(player.getUniqueId()).get());
 
         // Gets leaderboard stats (ex: %bt_pvp_top_kills_1%)
         if (split[1].equalsIgnoreCase("top")) {

@@ -2,10 +2,9 @@ package org.battleplugins.tracker.sponge.listener;
 
 import lombok.AllArgsConstructor;
 
-import mc.alk.mc.MCOfflinePlayer;
-import mc.alk.mc.MCPlayer;
-import mc.alk.mc.block.MCSign;
-import mc.alk.sponge.block.SpongeSign;
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
+import org.battleplugins.api.sponge.world.block.entity.SpongeSign;
+import org.battleplugins.api.world.block.entity.Sign;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.sign.LeaderboardSign;
@@ -46,7 +45,7 @@ public class TrackerListener {
         TrackerInterface pvpInterface = plugin.getTrackerManager().getPvPInterface();
         TrackerInterface pveInterface = plugin.getTrackerManager().getPvEInterface();
 
-        MCOfflinePlayer offlinePlayer = plugin.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId());
+        OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(event.getTargetEntity().getUniqueId()).get();
         if (!pvpInterface.hasRecord(offlinePlayer) && plugin.getTrackerManager().isTrackingPvP()) {
             pvpInterface.createNewRecord(offlinePlayer);
         }
@@ -64,7 +63,7 @@ public class TrackerListener {
     @Listener
     public void onQuit(ClientConnectionEvent.Disconnect event) {
         for (Map.Entry<String, TrackerInterface> interfaces : plugin.getTrackerManager().getInterfaces().entrySet()) {
-            interfaces.getValue().save(plugin.getPlatform().getOfflinePlayer(event.getTargetEntity().getUniqueId()));
+            interfaces.getValue().save(plugin.getServer().getOfflinePlayer(event.getTargetEntity().getUniqueId()).get());
         }
 
         for (TrackerInterface trackerInterface : plugin.getTrackerManager().getInterfaces().values()) {
@@ -95,8 +94,8 @@ public class TrackerListener {
             lines[i] = Text.of(event.getText().get(i)).toPlain();
         }
 
-        MCPlayer player = plugin.getPlatform().getPlayer(source.get().getName());
-        MCSign sign = new SpongeSign(event.getTargetTile());
+        org.battleplugins.api.entity.living.player.Player player = plugin.getServer().getPlayer(source.get().getUniqueId()).get();
+        Sign sign = new SpongeSign(event.getTargetTile());
         if (!SignUtil.isLeaderboardSign(lines))
             return;
 
@@ -122,7 +121,7 @@ public class TrackerListener {
         plugin.getSignManager().addSign(leaderboardSign);
 
         plugin.getPlatform().scheduleSyncTask(plugin, () -> {
-            MCSign reobtainedSign = sign.getWorld().toType(sign.getWorld().getBlockAt(sign.getLocation()), MCSign.class);
+            Sign reobtainedSign = sign.getWorld().toType(sign.getWorld().getBlockEntityAt(sign.getLocation()).get(), org.battleplugins.api.world.block.entity.Sign.class);
             plugin.getSignManager().refreshSignContent(reobtainedSign);
         }, 2000);
         player.sendMessage(plugin.getMessageManager().getFormattedMessage("createdNewSign"));

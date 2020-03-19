@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import mc.alk.mc.MCOfflinePlayer;
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 
 import java.util.Map;
@@ -60,7 +60,7 @@ public class VersusTally {
      */
     private Map<String, Float> stats;
 
-    public VersusTally(TrackerInterface tracker, MCOfflinePlayer player1, MCOfflinePlayer player2, Map<String, Float> stats) {
+    public VersusTally(TrackerInterface tracker, OfflinePlayer player1, OfflinePlayer player2, Map<String, Float> stats) {
         this(tracker, player1.getUniqueId().toString(), player2.getUniqueId().toString(), player1.getName(), player2.getName(), stats);
     }
 }

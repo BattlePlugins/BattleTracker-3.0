@@ -14,7 +14,6 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerDeathEvent;
 import cn.nukkit.item.Item;
 
-import mc.alk.mc.MCPlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.recap.DamageInfo;
@@ -73,11 +72,11 @@ public class PvPListener implements Listener {
 
         // Check the killers world just incase for some reason the
         // killed player was teleported to another world
-        if (plugin.getConfigManager().getPvPConfig().getStringList("ignoredWorlds").contains(killer.getLevel().getName()))
+        if (plugin.getConfigManager().getPvPConfig().getNode("ignoredWorlds").getCollectionValue(String.class).contains(killer.getLevel().getName()))
             return;
 
-        TrackerUtil.updatePvPStats(plugin.getPlatform().getOfflinePlayer(killed.getUniqueId().toString()),
-                plugin.getPlatform().getOfflinePlayer(killer.getUniqueId().toString()));
+        TrackerUtil.updatePvPStats(plugin.getServer().getOfflinePlayer(killed.getUniqueId().toString()).get(),
+                plugin.getServer().getOfflinePlayer(killer.getUniqueId().toString()).get());
 
         TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
         if (pvpTracker.getDeathMessageManager().isDefaultMessagesOverriden())
@@ -97,7 +96,7 @@ public class PvPListener implements Listener {
         if (!(event.getEntity() instanceof Player) || !(getTrueDamager(event) instanceof Player))
             return;
 
-        MCPlayer player = plugin.getPlatform().getPlayer(event.getEntity().getName());
+        org.battleplugins.api.entity.living.player.Player player = plugin.getServer().getPlayer(event.getEntity().getName()).get();
         TrackerInterface pvpTracker = plugin.getTrackerManager().getPvPInterface();
 
         RecapManager recapManager = pvpTracker.getRecapManager();
@@ -106,7 +105,7 @@ public class PvPListener implements Listener {
             recap = recapManager.getDeathRecaps().compute(player.getName(), (key, value) -> new Recap(player));
         }
 
-        recap.getLastDamages().add(new DamageInfo(event.getEntity().getName(), (double) event.getDamage()));
+        recap.getLastDamages().add(new DamageInfo(event.getEntity().getName(), event.getDamage()));
     }
 
     private Entity getTrueDamager(EntityDamageByEntityEvent event) {

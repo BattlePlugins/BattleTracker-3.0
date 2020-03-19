@@ -4,15 +4,18 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import mc.alk.battlecore.configuration.Configuration;
-import mc.alk.battlecore.controllers.MessageController;
-import mc.alk.mc.ChatColor;
-import mc.alk.mc.MCPlatform;
-import mc.alk.mc.MCPlayer;
-import mc.alk.mc.chat.ClickAction;
-import mc.alk.mc.chat.HoverAction;
-import mc.alk.mc.chat.Message;
-import mc.alk.mc.entity.MCEntity;
+import mc.alk.battlecore.message.MessageController;
+
+import org.apache.commons.lang.WordUtils;
+import org.battleplugins.api.configuration.Configuration;
+import org.battleplugins.api.entity.Entity;
+import org.battleplugins.api.entity.living.player.Player;
+import org.battleplugins.api.inventory.item.ItemStack;
+import org.battleplugins.api.inventory.item.component.DisplayNameComponent;
+import org.battleplugins.api.message.ClickAction;
+import org.battleplugins.api.message.HoverAction;
+import org.battleplugins.api.message.Message;
+import org.battleplugins.api.message.MessageStyle;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.tracking.TrackerInterface;
 import org.battleplugins.tracker.tracking.recap.DamageInfo;
@@ -20,10 +23,12 @@ import org.battleplugins.tracker.tracking.recap.Recap;
 import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -99,9 +104,9 @@ public class DeathMessageManager {
      */
     private int msgRadius;
 
-    private Map<String, List<String>> itemMessages;
-    private Map<String, List<String>> entityMessages;
-    private Map<String, List<String>> causeMessages;
+    private Map<String, Collection<String>> itemMessages;
+    private Map<String, Collection<String>> entityMessages;
+    private Map<String, Collection<String>> causeMessages;
 
     public DeathMessageManager(BattleTracker plugin, TrackerInterface tracker, Configuration config) {
         this.plugin = plugin;
@@ -116,29 +121,29 @@ public class DeathMessageManager {
      * @param config the config file
      */
     public void loadDataFromConfig(Configuration config) {
-        this.enabled = config.getBoolean("messages.enabled", true);
-        this.prefix = MessageController.colorChat(config.getString("prefix", "[Tracker]"));
-        this.defaultMessagesOverriden = config.getBoolean("options.overrideDefaultMessages", true);
-        this.hoverMessagesEnabled = config.getBoolean("options.useHoverMessages", true);
-        this.clickMessagesEnabled = config.getBoolean("options.useClickMessages", true);
+        this.enabled = config.getNode("messages.enabled").getValue(true);
+        this.prefix = MessageController.colorChat(config.getNode("prefix").getValue("[Tracker]"));
+        this.defaultMessagesOverriden = config.getNode("options.overrideDefaultMessages").getValue(true);
+        this.hoverMessagesEnabled = config.getNode("options.useHoverMessages").getValue(true);
+        this.clickMessagesEnabled = config.getNode("options.useClickMessages").getValue(true);
 
-        this.hoverContent = config.getString("options.hoverContent", "all");
-        this.clickContent = config.getString("options.clickContent", "all");
+        this.hoverContent = config.getNode("options.hoverContent").getValue("all");
+        this.clickContent = config.getNode("options.clickContent").getValue("all");
 
-        this.msgRadius = config.getInt("options.msgRadius", 0);
+        this.msgRadius = config.getNode("options.msgRadius").getValue(0);
 
         this.entityMessages = new HashMap<>();
-        for (String str : config.getSection("messages.entityDeaths").getKeys(false)) {
-            entityMessages.put(str, config.getStringList("messages.entityDeaths." + str));
+        for (String str : config.getNode("messages.entityDeaths").getCollectionValue(String.class)) {
+            entityMessages.put(str, config.getNode("messages.entityDeaths." + str).getCollectionValue(String.class));
         }
 
         this.causeMessages = new HashMap<>();
-        for (String str : config.getSection("messages.causeDeaths").getKeys(false)) {
-            causeMessages.put(str, config.getStringList("messages.causeDeaths." + str));
+        for (String str : config.getNode("messages.causeDeaths").getCollectionValue(String.class)) {
+            causeMessages.put(str, config.getNode("messages.causeDeaths." + str).getCollectionValue(String.class));
         }
 
         this.itemMessages = new HashMap<>();
-        for (String str : config.getSection("messages").getKeys(false)) {
+        for (String str : config.getNode("messages").getCollectionValue(String.class)) {
             // Item messages are just defined right in the messages section, so check for other sections first
             if (str.equalsIgnoreCase("entityDeaths"))
                 continue;
@@ -149,7 +154,7 @@ public class DeathMessageManager {
             if (str.equalsIgnoreCase("enabled"))
                 continue;
 
-            itemMessages.put(str, config.getStringList("messages." + str));
+            itemMessages.put(str, config.getNode("messages." + str).getCollectionValue(String.class));
         }
     }
 
@@ -165,20 +170,19 @@ public class DeathMessageManager {
         if (!enabled)
             return;
 
-        List<String> items = itemMessages.get(itemName);
-        if (items == null || items.isEmpty())
-            items = itemMessages.get("unknown"); // item isn't in list
-
         // At this point they want these specific messages disabled
-        if (items == null)
+        if (itemMessages == null)
             return;
 
-        MCPlayer killed = plugin.getPlatform().getPlayer(killedName);
-        if (killed == null)
+        List<String> items = new ArrayList<>(itemMessages.get(itemName));
+        if (items.isEmpty())
+            items =  new ArrayList<>(itemMessages.get("unknown")); // item isn't in list
+
+        if (!plugin.getServer().getPlayer(killedName).isPresent())
             return;
 
-        Random random = new Random();
-        String message = items.get(random.nextInt(items.size()));
+        Player killed = plugin.getServer().getPlayer(killedName).get();
+        String message = items.get(ThreadLocalRandom.current().nextInt(items.size()));
         message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
@@ -201,20 +205,20 @@ public class DeathMessageManager {
         if (!enabled)
             return;
 
-        List<String> entities = entityMessages.get(killerName);
-        if (entities == null || entities.isEmpty())
-            entities = entityMessages.get("unknown"); // entity isn't in list
-
         // At this point they want these specific messages disabled
-        if (entities == null)
+        if (entityMessages == null)
             return;
 
-        MCPlayer killed = plugin.getPlatform().getPlayer(killedName);
-        if (killed == null)
+        List<String> entities = new ArrayList<>(entityMessages.get(killerName));
+        if (entities.isEmpty())
+            entities = new ArrayList<>(entityMessages.get("unknown")); // entity isn't in list
+
+
+        if (!plugin.getServer().getPlayer(killedName).isPresent())
             return;
 
-        Random random = new Random();
-        String message = entities.get(random.nextInt(entities.size()));
+        Player killed = plugin.getServer().getPlayer(killedName).get();
+        String message = entities.get(ThreadLocalRandom.current().nextInt(entities.size()));
         message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
@@ -237,20 +241,19 @@ public class DeathMessageManager {
         if (!enabled)
             return;
 
-        List<String> causes = causeMessages.get(killedName);
-        if (causes == null || causes.isEmpty())
-            causes = causeMessages.get("unknown"); // cause isn't in list
-
         // At this point they want these specific messages disabled
-        if (causes == null)
+        if (causeMessages == null)
             return;
 
-        MCPlayer killed = plugin.getPlatform().getPlayer(killedName);
-        if (killed == null)
+        List<String> causes = new ArrayList<>(causeMessages.get(killedName));
+        if (causes.isEmpty())
+            causes = new ArrayList<>(causeMessages.get("unknown")); // cause isn't in list
+
+        if (!plugin.getServer().getPlayer(killedName).isPresent())
             return;
 
-        Random random = new Random();
-        String message = causes.get(random.nextInt(causes.size()));
+        Player killed = plugin.getServer().getPlayer(killedName).get();
+        String message = causes.get(ThreadLocalRandom.current().nextInt(causes.size()));
         message = replacePlaceholders(message, killerName, killedName, itemName, 0);
         message = MessageController.colorChat(message);
 
@@ -285,7 +288,7 @@ public class DeathMessageManager {
         return message;
     }
 
-    private void attachHoverEvent(Message.Builder messageBuilder, MCPlayer player) {
+    private void attachHoverEvent(Message.Builder messageBuilder, Player player) {
         if (!hoverMessagesEnabled)
             return;
 
@@ -313,7 +316,7 @@ public class DeathMessageManager {
         messageBuilder.hoverMessage(hoverMessage);
     }
 
-    private void attachClickEvent(Message.Builder messageBuilder, MCPlayer player) {
+    private void attachClickEvent(Message.Builder messageBuilder, Player player) {
         if (!clickMessagesEnabled || clickContent.equalsIgnoreCase("none"))
             return;
 
@@ -321,15 +324,15 @@ public class DeathMessageManager {
         messageBuilder.clickValue("/" + tracker.getName() + " recap " + player.getName());
     }
 
-    private void sendDeathMessage(MCPlayer source, Message message) {
+    private void sendDeathMessage(Player source, Message message) {
         if (msgRadius == 0) {
-            MCPlatform.broadcastMessage(message);
+            plugin.getServer().getOnlinePlayers().forEach(player -> player.sendMessage(message));
         } else {
-            for (MCEntity entity : source.getNearbyEntities(msgRadius, msgRadius, msgRadius)) {
-                if (!(entity instanceof MCPlayer))
+            for (Entity entity : source.getNearbyEntities(msgRadius, msgRadius, msgRadius)) {
+                if (!(entity instanceof Player))
                     continue;
 
-                MCPlayer radiusPlayer = (MCPlayer) entity;
+                Player radiusPlayer = (Player) entity;
                 radiusPlayer.sendMessage(message);
             }
         }
@@ -337,7 +340,7 @@ public class DeathMessageManager {
 
     private String getRecapHoverMessage(Recap recap) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        String hoverMessage = ChatColor.GOLD + "Damage Recap:";
+        StringBuilder hoverMessage = new StringBuilder(MessageStyle.GOLD + "Damage Recap:");
 
         // Obtains last 10 damages dealt
         List<DamageInfo> damageInfos = recap.getLastDamages().stream().sorted((recap1, recap2) -> (int) (recap2.getLogTime() - recap1.getLogTime())).collect(Collectors.toList());
@@ -347,17 +350,30 @@ public class DeathMessageManager {
 
         for (int i = damageInfos.size() - max; i < damageInfos.size(); i++) {
             DamageInfo damageInfo = damageInfos.get(i);
-            hoverMessage += "\n" + ChatColor.RED + " ♥ -" + decimalFormat.format(damageInfo.getDamage() / 2) + " " + ChatColor.YELLOW + ChatColor.AQUA + TrackerUtil.capitalizeFirst(damageInfo.getCause().replace("_", " "));
+            hoverMessage.append("\n" + MessageStyle.RED + " ♥ -")
+                    .append(decimalFormat.format(damageInfo.getDamage() / 2))
+                    .append(" ")
+                    .append(MessageStyle.YELLOW)
+                    .append(MessageStyle.AQUA)
+                    .append(TrackerUtil.capitalizeFirst(damageInfo.getCause().replace("_", " "))
+            );
         }
 
-        return hoverMessage;
+        return hoverMessage.toString();
     }
 
-    private String getArmorHoverMessage(MCPlayer player) {
-        return ChatColor.GOLD + "Armor:"
-                + "\n" + ChatColor.GRAY + " Helmet: " + ChatColor.YELLOW + player.getInventory().getHelmet().getFormattedCommonName()
-                + "\n" + ChatColor.GRAY + " Chestplate: " + ChatColor.YELLOW + player.getInventory().getChestplate().getFormattedCommonName()
-                + "\n" + ChatColor.GRAY + " Leggings: " + ChatColor.YELLOW + player.getInventory().getLeggings().getFormattedCommonName()
-                + "\n" + ChatColor.GRAY + " Boots: " + ChatColor.YELLOW + player.getInventory().getBoots().getFormattedCommonName();
+    private String getArmorHoverMessage(Player player) {
+        return MessageStyle.GOLD + "Armor:"
+                + "\n" + MessageStyle.GRAY + " Helmet: " + MessageStyle.YELLOW + player.getInventory().getHelmet().map(this::formatItemName).orElse("None")
+                + "\n" + MessageStyle.GRAY + " Chestplate: " + MessageStyle.YELLOW + player.getInventory().getChestplate().map(this::formatItemName).orElse("None")
+                + "\n" + MessageStyle.GRAY + " Leggings: " + MessageStyle.YELLOW + player.getInventory().getLeggings().map(this::formatItemName).orElse("None")
+                + "\n" + MessageStyle.GRAY + " Boots: " + MessageStyle.YELLOW + player.getInventory().getBoots().map(this::formatItemName).orElse("None");
+    }
+
+    private String formatItemName(ItemStack itemStack) {
+        if (itemStack.getValue(DisplayNameComponent.class).isPresent()) {
+            return itemStack.getValue(DisplayNameComponent.class).get();
+        }
+        return WordUtils.capitalize(itemStack.getType().getIdentifier().getKey().replace("_", " "));
     }
 }

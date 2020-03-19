@@ -3,8 +3,8 @@ package org.battleplugins.tracker.tracking;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import mc.alk.battlecore.configuration.Configuration;
-import mc.alk.mc.MCOfflinePlayer;
+import org.battleplugins.api.configuration.Configuration;
+import org.battleplugins.api.entity.living.player.OfflinePlayer;
 import org.battleplugins.tracker.BattleTracker;
 import org.battleplugins.tracker.sql.SQLInstance;
 import org.battleplugins.tracker.tracking.message.DeathMessageManager;
@@ -67,17 +67,17 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public boolean hasRecord(MCOfflinePlayer player) {
+    public boolean hasRecord(OfflinePlayer player) {
         return records.containsKey(player.getUniqueId());
     }
 
     @Override
-    public Optional<Record> getRecord(MCOfflinePlayer player) {
+    public Optional<Record> getRecord(OfflinePlayer player) {
         return Optional.ofNullable(records.get(player.getUniqueId()));
     }
 
     @Override
-    public boolean hasVersusTally(MCOfflinePlayer player) {
+    public boolean hasVersusTally(OfflinePlayer player) {
         for (VersusTally tally : versusTallies) {
             if (tally.getId1().equals(player.getUniqueId().toString()))
                 return true;
@@ -90,7 +90,7 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public Optional<VersusTally> getVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
+    public Optional<VersusTally> getVersusTally(OfflinePlayer player1, OfflinePlayer player2) {
         for (VersusTally tally : versusTallies) {
             if (tally.getId1().equals(player1.getUniqueId().toString()) &&
                     tally.getId2().equals(player2.getUniqueId().toString())) {
@@ -109,20 +109,20 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public VersusTally createNewVersusTally(MCOfflinePlayer player1, MCOfflinePlayer player2) {
+    public VersusTally createNewVersusTally(OfflinePlayer player1, OfflinePlayer player2) {
         VersusTally versusTally = new VersusTally(this, player1, player2, new HashMap<>());
         versusTallies.add(versusTally);
         return versusTally;
     }
 
     @Override
-    public void setValue(String statType, float value, MCOfflinePlayer player) {
+    public void setValue(String statType, float value, OfflinePlayer player) {
         Record record = records.get(player.getUniqueId());
         record.setValue(statType, value);
     }
 
     @Override
-    public void updateRating(MCOfflinePlayer killer, MCOfflinePlayer killed, boolean tie) {
+    public void updateRating(OfflinePlayer killer, OfflinePlayer killed, boolean tie) {
         Record killerRecord = getOrCreateRecord(killer);
         Record killedRecord = getOrCreateRecord(killed);
         ratingCalculator.updateRating(killerRecord, killedRecord, tie);
@@ -161,7 +161,7 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public Record createNewRecord(MCOfflinePlayer player) {
+    public Record createNewRecord(OfflinePlayer player) {
         Map<String, Float> columns = new HashMap<>();
         for (String column : sql.getOverallColumns()) {
             columns.put(column, 0f);
@@ -172,21 +172,21 @@ public class Tracker implements TrackerInterface {
     }
 
     @Override
-    public Record createNewRecord(MCOfflinePlayer player, Record record) {
+    public Record createNewRecord(OfflinePlayer player, Record record) {
         record.setRating(ratingCalculator.getDefaultRating());
         records.put(player.getUniqueId(), record);
         return record;
     }
 
     @Override
-    public void removeRecord(MCOfflinePlayer player) {
+    public void removeRecord(OfflinePlayer player) {
         records.remove(player.getUniqueId());
 
         save(player);
     }
 
     @Override
-    public void save(MCOfflinePlayer player) {
+    public void save(OfflinePlayer player) {
         sql.save(player.getUniqueId());
     }
 
