@@ -3,16 +3,18 @@ package org.battleplugins.tracker.config;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import mc.alk.battlecore.util.FileUtil;
 import mc.alk.battlecore.util.Log;
 
 import org.battleplugins.api.configuration.Configuration;
 import org.battleplugins.api.configuration.ConfigurationProvider;
 import org.battleplugins.tracker.BattleTracker;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Manages configuration files used across BattleTracker.
@@ -70,25 +72,30 @@ public class ConfigManager {
     public ConfigManager(BattleTracker plugin) {
         this.plugin = plugin;
 
-        loadConfigs();
+        try {
+            loadConfigs();
+        } catch (IOException ex) {
+            plugin.getLogger().warning("Failed to load configs!");
+            ex.printStackTrace();
+        }
     }
 
     /**
      * Loads all the configs necessary for BattleTracker
      */
-    public void loadConfigs() {
-        if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdir();
+    public void loadConfigs() throws IOException {
+        if (Files.notExists(plugin.getDataFolder())) {
+            Files.createDirectories(plugin.getDataFolder());
         }
 
-        File trackerFolder = new File(plugin.getDataFolder(), "tracking");
-        if (!trackerFolder.exists()) {
-            trackerFolder.mkdir();
+        Path trackerFolder = Paths.get(plugin.getDataFolder().toString(), "tracking");
+        if (Files.notExists(trackerFolder)) {
+            Files.createDirectories(trackerFolder);
         }
 
-        File savesFolder = new File(plugin.getDataFolder(), "saves");
-        if (!savesFolder.exists()) {
-            savesFolder.mkdir();
+        Path savesFolder = Paths.get(plugin.getDataFolder().toString(), "saves");
+        if (Files.notExists(savesFolder)) {
+            Files.createDirectories(savesFolder);
         }
 
         config = loadConfig(plugin.getDataFolder(), "", "config.yml");
@@ -110,25 +117,24 @@ public class ConfigManager {
      * @param resource the resource to load from
      * @return the configuration object of the file
      */
-    public Configuration loadConfig(File directory, String resourceDir, String resource) {
-        File configFile = new File(directory, resource);
-        if (!configFile.exists()) {
+    public Configuration loadConfig(Path directory, String resourceDir, String resource) {
+        Path configPath = Paths.get(directory.toString(), resource);
+        if (Files.notExists(configPath)) {
             try {
-                InputStream stream = plugin.getClass().getResourceAsStream("/" + resourceDir + resource);
-                if (stream == null) {
-                    configFile.createNewFile();
+                URI uri = this.getClass().getResource(resourceDir + resource).toURI();
+                Path path = Paths.get(uri);
+                if (Files.notExists(path)) {
+                    Files.copy(path, configPath);
                     Log.debug("Did not find " + resource + " in the jar, so creating an empty file instead.");
-                } else {
-                    FileUtil.writeFile(configFile, plugin.getClass().getResourceAsStream("/" + resourceDir + resource));
                 }
-            } catch (IOException ex) {
+            } catch (IOException | URISyntaxException ex) {
                 Log.err("Could not create " + resource + " config file!");
                 ex.printStackTrace();
             }
         }
 
         return Configuration.builder()
-                .file(configFile)
+                .path(configPath)
                 .provider(ConfigurationProvider.class)
                 .build();
     }

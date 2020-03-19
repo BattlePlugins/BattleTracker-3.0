@@ -6,7 +6,6 @@ import org.battleplugins.tracker.BattleTracker;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,8 +13,14 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -27,7 +32,7 @@ import java.util.zip.ZipFile;
  */
 public class DependencyUtil {
 
-    private static File libFolder;
+    private static Path libFolder;
 
     private static URLClassLoader classLoader = ((URLClassLoader) ClassLoader.getSystemClassLoader());
     private static Method method;
@@ -59,10 +64,10 @@ public class DependencyUtil {
             return future;
         }
 
-        File sqlFile = new File(libFolder, MYSQL_NAME + ".jar");
-        File sqliteFile = new File(libFolder, SQLITE_NAME + ".jar");
+        Path sqlFile = Paths.get(libFolder.toString(), MYSQL_NAME + ".jar");
+        Path sqliteFile = Paths.get(libFolder.toString(), SQLITE_NAME + ".jar");
 
-        if (sqlFile.exists() || isClassInPath("com.mysql.jdbc.Driver")) {
+        if (Files.exists(sqlFile) || isClassInPath("com.mysql.jdbc.Driver")) {
             BattleTracker.getInstance().getLogger().info("MySQL was found!");
             if (!isClassInPath("com.mysql.jdbc.Driver"))
                 loadDependency(sqlFile);
@@ -73,7 +78,7 @@ public class DependencyUtil {
             downloadFile(MYSQL_NAME + ".jar", MYSQL_DOWNLOAD, true, sqlFuture);
         }
 
-        if (sqliteFile.exists() || isClassInPath("org.sqlite.JDBC")) {
+        if (Files.exists(sqliteFile) || isClassInPath("org.sqlite.JDBC")) {
             BattleTracker.getInstance().getLogger().info("SQLite was found!");
             if (!isClassInPath("org.sqlite.JDBC"))
                 loadDependency(sqliteFile);
@@ -137,9 +142,9 @@ public class DependencyUtil {
      *
      * @param jarFile the file to load in
      */
-    public static void loadDependency(File jarFile) {
+    public static void loadDependency(Path jarFile) {
         try {
-            method.invoke(classLoader, jarFile.toURI().toURL());
+            method.invoke(classLoader, jarFile.toUri().toURL());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -153,16 +158,16 @@ public class DependencyUtil {
      * @param future the future to complete to upon download
      */
     private static void downloadFile(String file, String link, boolean loadToClasspath, CompletableFuture<DownloadResult> future) {
-        if (!libFolder.exists())
-            libFolder.mkdir();
-
         BufferedInputStream in = null;
         FileOutputStream fout = null;
         try {
+            if (Files.notExists(libFolder)) {
+                Files.createDirectories(libFolder);
+            }
             // Download the file
             URL url = new URL(link);
             in = new BufferedInputStream(url.openStream());
-            fout = new FileOutputStream(libFolder.getAbsolutePath() + File.separator + file);
+            fout = new FileOutputStream(libFolder.toAbsolutePath().toString() + FileSystems.getDefault().getSeparator() + file);
 
             byte[] data = new byte[1024];
             int count;
@@ -171,20 +176,22 @@ public class DependencyUtil {
                 fout.write(data, 0, count);
             }
             //Just a quick check to make sure we didn't leave any files from last time...
-            for (final File xFile : libFolder.listFiles()) {
-                if (xFile.getName().endsWith(".zip")) {
-                    xFile.delete();
+            Files.walk(libFolder).filter(path -> path.endsWith(".zip")).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
-            }
+            });
             // Check to see if it's a zip file, if it is, unzip it.
-            File dFile = new File(libFolder.getAbsolutePath() + File.separator + file);
-            if (dFile.getName().endsWith(".zip")) {
+            Path dFile = Paths.get(libFolder.toAbsolutePath().toString(), file);
+            if (dFile.getFileName().toString().endsWith(".zip")) {
                 // Unzip
-                unzip(dFile.getCanonicalPath());
+                unzip(dFile.toRealPath().toString());
             }
 
             if (loadToClasspath)
-                loadDependency(new File(libFolder, file));
+                loadDependency(Paths.get(libFolder.toString(), file));
 
             BattleTracker.getInstance().getLogger().info("Finished downloading jar.");
         } catch (FileNotFoundException ex) {
@@ -220,21 +227,19 @@ public class DependencyUtil {
      */
     private static void unzip(String file) {
         try {
-            File fSourceZip = new File(file);
+            Path fSourceZip = Paths.get(file);
             String zipPath = file.substring(0, file.length() - 4);
-            ZipFile zipFile = new ZipFile(fSourceZip);
+            ZipFile zipFile = new ZipFile(fSourceZip.toFile());
             Enumeration<? extends ZipEntry> e = zipFile.entries();
             while (e.hasMoreElements()) {
                 ZipEntry entry = e.nextElement();
-                File destinationFilePath = new File(zipPath, entry.getName());
-                destinationFilePath.getParentFile().mkdirs();
-                if (entry.isDirectory()) {
-                    continue;
-                } else {
+                Path destinationFilePath = Paths.get(zipPath, entry.getName());
+                Files.createDirectories(destinationFilePath.getParent());
+                if (!entry.isDirectory()) {
                     BufferedInputStream bis = new BufferedInputStream(zipFile.getInputStream(entry));
                     int b;
                     byte buffer[] = new byte[1024];
-                    FileOutputStream fos = new FileOutputStream(destinationFilePath);
+                    FileOutputStream fos = new FileOutputStream(destinationFilePath.toFile());
                     BufferedOutputStream bos = new BufferedOutputStream(fos, 1024);
                     while ((b = bis.read(buffer, 0, 1024)) != -1) {
                         bos.write(buffer, 0, b);
@@ -242,47 +247,51 @@ public class DependencyUtil {
                     bos.flush();
                     bos.close();
                     bis.close();
-                    String name = destinationFilePath.getName();
+                    String name = destinationFilePath.getFileName().toString();
                     if (name.endsWith(".jar") && doesFileExist(name)) {
-                        destinationFilePath.renameTo(new File(BattleTracker.getInstance().getDataFolder().getParent(), libFolder + File.separator + name));
+                        Files.move(destinationFilePath, Paths.get(BattleTracker.getInstance().getDataFolder().getParent().toString(), libFolder.getFileName().toString(), name));
                     }
                 }
             }
             zipFile.close();
 
             // Move any plugin data folders that were included to the right place, Bukkit won't do this for us.
-            for (File dFile : new File(zipPath).listFiles()) {
-                if (dFile.isDirectory()) {
-                    if (doesFileExist(dFile.getName())) {
-                        File oFile = new File(BattleTracker.getInstance().getDataFolder().getParent(), dFile.getName()); // Get current dir
-                        File[] contents = oFile.listFiles(); // List of existing files in the current dir
-                        for (final File cFile : dFile.listFiles()) { // Loop through all the files in the new dir
+            for (Path dFile : Files.walk(Paths.get(zipPath)).collect(Collectors.toList())) {
+                if (Files.isDirectory(dFile)) {
+                    if (doesFileExist(dFile.getFileName().toString())) {
+                        Path oFile = Paths.get(BattleTracker.getInstance().getDataFolder().getParent().toString(), dFile.getFileName().toString()); // Get current dir
+                        Stream<Path> contents = Files.walk(Paths.get(zipPath)); // List of existing files in the current dir
+                        for (Path cFile : Files.walk(dFile).collect(Collectors.toList())) { // Loop through all the files in the new dir
                             boolean found = false;
-                            for (final File xFile : contents) { // Loop through contents to see if it exists
-                                if (xFile.getName().equals(cFile.getName())) {
+                            for (Path xFile : contents.collect(Collectors.toList())) { // Loop through contents to see if it exists
+                                if (xFile.getFileName().toString().equals(cFile.getFileName().toString())) {
                                     found = true;
                                     break;
                                 }
                             }
                             if (!found) {
                                 // Move the new file into the current dir
-                                cFile.renameTo(new File(oFile.getCanonicalFile() + File.separator + cFile.getName()));
+                                Files.move(cFile, Paths.get(oFile.toRealPath().toString(), cFile.getFileName().toString()));
                             } else {
                                 // This file already exists, so we don't need it anymore.
-                                cFile.delete();
+                                Files.delete(cFile);
                             }
                         }
                     }
                 }
-                dFile.delete();
+                Files.delete(dFile);
             }
-            new File(zipPath).delete();
-            fSourceZip.delete();
+            Files.delete(Paths.get(zipPath));
+            Files.delete(fSourceZip);
         } catch (IOException ex) {
             BattleTracker.getInstance().getLogger().severe("The dependency downloader tried to unzip a dependency file, but was unsuccessful.");
             ex.printStackTrace();
         }
-        new File(file).delete();
+        try {
+            Files.delete(Paths.get(file));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -292,13 +301,8 @@ public class DependencyUtil {
      * @param name a name to check for inside the dependencies folder.
      * @return true if a file inside the dependencies folder is named this.
      */
-    private static boolean doesFileExist(String name) {
-        for (File file : libFolder.listFiles()) {
-            if (file.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean doesFileExist(String name) throws IOException {
+        return Files.walk(libFolder).map(path -> path.getFileName().toString().equals(name)).findFirst().orElse(false);
     }
 
     private static boolean isClassInPath(String className) {
@@ -316,7 +320,7 @@ public class DependencyUtil {
      *
      * @param libFolder the lib/dependency folder
      */
-    public static void setLibFolder(File libFolder) {
+    public static void setLibFolder(Path libFolder) {
         DependencyUtil.libFolder = libFolder;
     }
 

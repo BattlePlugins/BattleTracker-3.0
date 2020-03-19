@@ -33,6 +33,7 @@ import org.battleplugins.tracker.util.DependencyUtil.DownloadResult;
 import org.battleplugins.tracker.util.TrackerUtil;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -91,7 +92,7 @@ public final class BattleTracker extends BattlePlugin {
         super.onEnable();
 
         getLogger().info("You are running " + TrackerInfo.NAME + " on " + TrackerUtil.capitalizeFirst(this.getPlatform().getType().getName()) + "!");
-        DependencyUtil.setLibFolder(new File(getDataFolder(), "libraries"));
+        DependencyUtil.setLibFolder(Paths.get(getDataFolder().toString(), "libraries"));
         DependencyUtil.downloadDepedencies().whenComplete((result, action) -> {
             if (result != DownloadResult.SUCCESS) {
                 getLogger().severe("Unable to download SQL libraries for BattleTracker!");
